@@ -1,7 +1,8 @@
 import Logo from "../common/Logo";
 import ThemeToggler from "./ThemeToggler";
+import UserMenu from "./UserMenu";
 
-const Navbar = () => {
+const Navbar = async () => {
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -57,17 +58,7 @@ const Navbar = () => {
             </button>
 
             {/* <!-- User Menu --> */}
-            <div className="relative">
-              <button className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
-                <img
-                  src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
-                  alt="User"
-                  className="w-8 h-8 rounded-full"
-                />
-                <span className="hidden sm:block">John Doe</span>
-                <i className="fas fa-chevron-down text-sm"></i>
-              </button>
-            </div>
+            <UserMenu />
 
             <ThemeToggler />
 

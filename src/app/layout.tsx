@@ -1,8 +1,10 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar/Navbar";
+import { connectDB } from "@/libs/connectDB";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
+import React from "react";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -13,11 +15,14 @@ export const metadata: Metadata = {
     "Connect directly with local farmers and get the freshest produce delivered to your doorstep",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
+  authInterceptedModal,
 }: Readonly<{
   children: React.ReactNode;
+  authInterceptedModal: React.ReactNode;
 }>) {
+  await connectDB();
   return (
     <html lang="en">
       <body
@@ -26,6 +31,7 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
+          {authInterceptedModal}
           {children}
           <Footer />
         </ThemeProvider>

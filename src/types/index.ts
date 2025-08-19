@@ -10,5 +10,4 @@ export interface IUserModel extends Document {
   address: string;
   bio?: string;
   password: string;
-  confirmPassword: string;
 }

@@ -1,7 +1,12 @@
+"use client";
+
+import { FaEye, FaSeedling } from "react-icons/fa6";
+import UploadAvatar from "../common/UploadAvatar";
+
 const RegisterForm = () => {
+  const role = "Farmer";
   return (
-    <form className="space-y-6" action="#" method="POST">
-      {/* <!-- Account Type - Full Width --> */}
+    <form className="space-y-6" action="#">
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           I want to register as:
@@ -10,14 +15,13 @@ const RegisterForm = () => {
           <label className="relative group">
             <input
               type="radio"
-              name="userType"
-              value="customer"
+              value="Customer"
+              name="role"
               className="sr-only peer"
-              checked
             />
             <div className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900 hover:border-primary-300 dark:hover:border-primary-400 transition-all duration-200">
               <div className="text-center">
-                <i className="fas fa-user text-2xl mb-3 text-gray-600 dark:text-gray-400 peer-checked:text-primary-600 group-hover:text-primary-500 transition-colors"></i>
+                <FaSeedling className="text-2xl mb-3 text-gray-600 dark:text-gray-400 peer-checked:text-primary-600 group-hover:text-primary-500 transition-colors" />
                 <div className="font-semibold text-gray-900 dark:text-white peer-checked:text-primary-700 dark:peer-checked:text-primary-300">
                   Customer
                 </div>
@@ -28,15 +32,10 @@ const RegisterForm = () => {
             </div>
           </label>
           <label className="relative group">
-            <input
-              type="radio"
-              name="userType"
-              value="farmer"
-              className="sr-only peer"
-            />
+            <input type="radio" value="Farmer" className="sr-only peer" />
             <div className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900 hover:border-primary-300 dark:hover:border-primary-400 transition-all duration-200">
               <div className="text-center">
-                <i className="fas fa-tractor text-2xl mb-3 text-gray-600 dark:text-gray-400 peer-checked:text-primary-600 group-hover:text-primary-500 transition-colors"></i>
+                <FaSeedling className="text-2xl mb-3 text-gray-600 dark:text-gray-400 peer-checked:text-primary-600 group-hover:text-primary-500 transition-colors" />
                 <div className="font-semibold text-gray-900 dark:text-white peer-checked:text-primary-700 dark:peer-checked:text-primary-300">
                   Farmer
                 </div>
@@ -48,46 +47,8 @@ const RegisterForm = () => {
           </label>
         </div>
       </div>
-
       {/* <!-- Profile Picture Upload - Full Width --> */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-          Profile Picture
-        </label>
-        <div className="flex items-center justify-center space-x-6">
-          {/* <!-- Image Preview --> */}
-          <div className="shrink-0">
-            <img
-              id="profilePreview"
-              className="h-20 w-20 object-cover rounded-full border-2 border-gray-300 dark:border-gray-600"
-              src="data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100' height='100' fill='%23e5e7eb'/%3e%3ctext x='50%25' y='50%25' font-size='18' text-anchor='middle' alignment-baseline='middle' fill='%236b7280'%3ePhoto%3c/text%3e%3c/svg%3e"
-              alt="Profile preview"
-            />
-          </div>
-          {/* <!-- Upload Button --> */}
-          <div className="flex-1 max-w-xs">
-            <label
-              htmlFor="profilePicture"
-              className="relative cursor-pointer bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 py-2 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500 transition block text-center"
-            >
-              <span className="flex items-center justify-center">
-                <i className="fas fa-camera mr-2"></i>
-                Choose photo
-              </span>
-              <input
-                id="profilePicture"
-                name="profilePicture"
-                type="file"
-                className="sr-only"
-                accept="image/*"
-              />
-            </label>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-center">
-              PNG, JPG, GIF up to 2MB
-            </p>
-          </div>
-        </div>
-      </div>
+      <UploadAvatar />
 
       {/* <!-- Two Column Layout for Form Fields --> */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -110,7 +71,6 @@ const RegisterForm = () => {
               placeholder="John"
             />
           </div>
-
           {/* <!-- Email --> */}
           <div>
             <label
@@ -146,7 +106,7 @@ const RegisterForm = () => {
               placeholder="Enter your full address"
             ></textarea>
           </div>
-
+          <div className="w-full h-2" />
           {/* <!-- Password --> */}
           <div>
             <label
@@ -168,7 +128,7 @@ const RegisterForm = () => {
                 type="button"
                 className="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
-                <i className="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+                <FaEye className="text-gray-400 hover:text-gray-600" />
               </button>
             </div>
           </div>
@@ -269,77 +229,79 @@ const RegisterForm = () => {
       </div>
 
       {/* <!-- Farmer-specific fields (hidden by default) --> */}
-      <div id="farmerFields" className="hidden space-y-4">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="farmName"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-            >
-              Farm Name
-            </label>
-            <input
-              id="farmName"
-              name="farmName"
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              placeholder="Green Valley Farm"
-            />
+      {role === "Farmer" && (
+        <div id="farmerFields" className="space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="farmName"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Farm Name
+              </label>
+              <input
+                id="farmName"
+                name="farmName"
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                placeholder="Green Valley Farm"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="specialization"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Specialization
+              </label>
+              <select
+                id="specialization"
+                name="specialization"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Select specialization</option>
+                <option value="vegetables">Vegetables</option>
+                <option value="fruits">Fruits</option>
+                <option value="grains">Grains</option>
+                <option value="dairy">Dairy</option>
+                <option value="mixed">Mixed Farming</option>
+              </select>
+            </div>
           </div>
           <div>
             <label
-              htmlFor="specialization"
+              htmlFor="farmSize"
               className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              Specialization
+              Farm Size
             </label>
-            <select
-              id="specialization"
-              name="specialization"
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-            >
-              <option value="">Select specialization</option>
-              <option value="vegetables">Vegetables</option>
-              <option value="fruits">Fruits</option>
-              <option value="grains">Grains</option>
-              <option value="dairy">Dairy</option>
-              <option value="mixed">Mixed Farming</option>
-            </select>
+            <div className="flex space-x-2">
+              <input
+                id="farmSize"
+                name="farmSize"
+                type="number"
+                min="0"
+                step="0.1"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                placeholder="5.5"
+              />
+              <select
+                id="farmSizeUnit"
+                name="farmSizeUnit"
+                className="w-24 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+              >
+                <option value="acres">Acres</option>
+                <option value="hectares">Hectares</option>
+                <option value="sq_ft">Sq Ft</option>
+                <option value="sq_m">Sq M</option>
+              </select>
+            </div>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Enter the total area of your farm
+            </p>
           </div>
         </div>
-        <div>
-          <label
-            htmlFor="farmSize"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            Farm Size
-          </label>
-          <div className="flex space-x-2">
-            <input
-              id="farmSize"
-              name="farmSize"
-              type="number"
-              min="0"
-              step="0.1"
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              placeholder="5.5"
-            />
-            <select
-              id="farmSizeUnit"
-              name="farmSizeUnit"
-              className="w-24 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
-            >
-              <option value="acres">Acres</option>
-              <option value="hectares">Hectares</option>
-              <option value="sq_ft">Sq Ft</option>
-              <option value="sq_m">Sq M</option>
-            </select>
-          </div>
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            Enter the total area of your farm
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* <!-- Terms and Conditions --> */}
       <div className="flex items-start">

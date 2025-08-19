@@ -1,11 +1,19 @@
 import { IUserModel } from "@/types";
 import mongoose, { Model, Schema } from "mongoose";
 
+// User role enum
+enum UserRole {
+  farmer = "Farmer",
+  customer = "Customer",
+}
+
 const userSchema = new Schema<IUserModel>(
   {
     role: {
       type: String,
       required: [true, "User role is required."],
+      enum: Object.values(UserRole),
+      default: UserRole.farmer,
     },
     avatar: {
       type: String,
@@ -39,10 +47,6 @@ const userSchema = new Schema<IUserModel>(
       type: String,
       required: [true, "Password is required."],
       minlength: [6, "Password must be 6 characters or longer"],
-    },
-    confirmPassword: {
-      type: String,
-      required: [true, "Confirm password is required"],
     },
   },
   { timestamps: true }

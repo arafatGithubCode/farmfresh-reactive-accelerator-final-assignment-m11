@@ -1,11 +1,9 @@
-// import { auth } from "@/auth";
+import { auth } from "@/auth";
 import Image from "next/image";
 import Link from "next/link";
 
 const UserMenu = async () => {
-  const session = {
-    user: false,
-  };
+  const session = await auth();
   return (
     <div className="relative">
       {session?.user ? (

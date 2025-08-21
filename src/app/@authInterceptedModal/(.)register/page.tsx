@@ -1,12 +1,12 @@
+import AuthInterceptedModal from "@/components/auth/AuthInterceptedModal";
 import RegisterForm from "@/components/auth/RegisterForm";
-import AuthInterceptedModal from "@/components/common/AuthInterceptedModal";
 import Link from "next/link";
 import { FaSeedling } from "react-icons/fa6";
 
 const RegisterIntercepted = () => {
   return (
     <AuthInterceptedModal>
-      <div className="max-w-4xl w-full space-y-8 bg-gray-900 p-2 rounded shadow-lg drop-shadow-lg shadow-white/40 mt-[25rem] mb-5">
+      <div className="max-w-4xl w-full mx-auto space-y-8 bg-gray-900 p-2 rounded shadow-lg drop-shadow-lg shadow-white/40 absolute left-0 right-0 top-20">
         {/* <!-- Header --> */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">

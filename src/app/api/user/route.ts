@@ -1,6 +1,7 @@
 import { connectDB } from "@/libs/connectDB";
 import { getErrorMessage } from "@/libs/errorHandler";
 import { User } from "@/models/userModel";
+import { RegisterFormDataType } from "@/types";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -8,8 +9,19 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   await connectDB();
   try {
-    const { role, avatar, name, email, phone, address, bio, password } =
-      await req.json();
+    const {
+      firstName,
+      lastName,
+      email,
+      address,
+      bio,
+      phone,
+      password,
+      role,
+      farmName,
+      farmSize,
+      farmSizeUnit,
+    }: RegisterFormDataType = await req.json();
 
     // encrypt password
     const salt = await bcrypt.genSalt(10);
@@ -17,13 +29,16 @@ export const POST = async (req: NextRequest) => {
 
     const payload = {
       role,
-      avatar,
-      name,
+      firstName,
+      lastName,
       email,
       phone,
       address,
       bio,
       password: hashedPassword,
+      farmSize,
+      farmName,
+      farmSizeUnit,
     };
 
     await User.create(payload);

@@ -43,7 +43,7 @@ const AuthInterceptedModal = ({ children }: { children: ReactNode }) => {
     >
       <div
         ref={wrapper}
-        className="h-screen flex justify-center items-center overflow-hidden overflow-y-scroll"
+        className="h-screen flex justify-center items-center overflow-hidden overflow-y-scroll relative"
       >
         {children}
       </div>

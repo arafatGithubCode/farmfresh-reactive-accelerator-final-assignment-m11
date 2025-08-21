@@ -1,5 +1,5 @@
+import AuthInterceptedModal from "@/components/auth/AuthInterceptedModal";
 import LoginForm from "@/components/auth/LoginForm";
-import AuthInterceptedModal from "@/components/common/AuthInterceptedModal";
 import Link from "next/link";
 import { FaSeedling } from "react-icons/fa6";
 

@@ -67,7 +67,7 @@ export const validateRegistrationForm = (
       errors.specialization = "Specialization is required";
   }
 
-  if (!input.terms) {
+  if (input.terms !== true) {
     errors.terms =
       "To continue with us, please accept our terms and conditions.";
   }

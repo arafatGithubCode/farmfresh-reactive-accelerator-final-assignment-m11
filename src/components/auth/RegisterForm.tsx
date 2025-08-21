@@ -1,15 +1,16 @@
 "use client";
 
+import { doRegistration } from "@/actions";
 import { RegisterFormDataType, RegistrationFormValidationError } from "@/types";
 import { validateRegistrationForm } from "@/validations";
-import { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
-import { FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
+import Image from "next/image";
+import { ChangeEvent, FocusEvent, FormEvent, useRef, useState } from "react";
+import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
-import UploadAvatar from "../common/UploadAvatar";
 import GoogleAuth from "./GoogleAuth";
 
 const initialValues: RegisterFormDataType = {
-  role: "Farmer",
+  role: "customer",
   type: "",
   file: null,
   firstName: "",
@@ -53,7 +54,9 @@ const RegisterForm = () => {
   const [showPass, setShowPass] = useState<boolean>(false);
   const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
 
-  //   on blur (when leaving field)
+  const fileUploadRef = useRef<HTMLInputElement | null>(null);
+
+  //   onBlur: (when leaving field)
   const handleBlur = (
     e: FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -78,6 +81,7 @@ const RegisterForm = () => {
     }
   };
 
+  //   onChange: update form value + live validation
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -98,7 +102,7 @@ const RegisterForm = () => {
       [name]:
         type === "checked"
           ? checked
-          : type === "files"
+          : type === "file"
           ? files?.[0] || null
           : value,
     });
@@ -119,9 +123,9 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+    console.log(errors);
     const validationErrors = validateRegistrationForm(formValues);
-
+    // check and return error
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       setTouched(
@@ -132,6 +136,10 @@ const RegisterForm = () => {
       );
       return;
     }
+
+    // perform registration
+    const result = await doRegistration(formValues);
+    console.log(result, "click-res");
   };
 
   return (
@@ -187,7 +195,56 @@ const RegisterForm = () => {
         </div>
       </Field>
       {/* <!-- Profile Picture Upload - Full Width --> */}
-      <UploadAvatar error={errors.file} />
+      <Field error={errors.file}>
+        <input type="hidden" value="avatar" name="type" />
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          Profile Picture
+        </label>
+        <div className="flex items-center justify-center space-x-6">
+          {/* <!-- Image Preview --> */}
+          <div
+            className="shrink-0"
+            onClick={() => {
+              if (fileUploadRef.current) {
+                fileUploadRef.current?.click();
+              }
+            }}
+          >
+            <Image
+              id="profilePreview"
+              className="h-20 w-20 object-cover rounded-full border-2 border-gray-300 dark:border-gray-600"
+              src="data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100' height='100' fill='%23e5e7eb'/%3e%3ctext x='50%25' y='50%25' font-size='18' text-anchor='middle' alignment-baseline='middle' fill='%236b7280'%3ePhoto%3c/text%3e%3c/svg%3e"
+              alt="Profile preview"
+              width={50}
+              height={50}
+            />
+          </div>
+          {/* <!-- Upload Button --> */}
+          <div className="flex-1 max-w-xs">
+            <label
+              htmlFor="profilePicture"
+              className="relative cursor-pointer bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 py-2 px-4 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500 transition block text-center"
+            >
+              <span className="flex items-center justify-center">
+                <FaCamera className="mr-2" />
+                Choose photo
+              </span>
+              <input
+                id="profilePicture"
+                name="file"
+                type="file"
+                className="sr-only"
+                accept="image/*"
+                ref={fileUploadRef}
+                onChange={handleChange}
+              />
+            </label>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 text-center">
+              PNG, JPG, GIF up to 2MB
+            </p>
+          </div>
+        </div>
+      </Field>
 
       {/* <!-- Two Column Layout for Form Fields --> */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -264,7 +321,7 @@ const RegisterForm = () => {
               <input
                 id="password"
                 name="password"
-                type={showConfirmPass ? "text" : "password"}
+                type={showPass ? "text" : "password"}
                 value={formValues.password}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -371,7 +428,7 @@ const RegisterForm = () => {
               <input
                 id="confirmPassword"
                 name="confirmPassword"
-                type={showPass ? "text" : "password"}
+                type={showConfirmPass ? "text" : "password"}
                 value={formValues.confirmPassword}
                 onChange={handleChange}
                 onBlur={handleBlur}
@@ -475,6 +532,11 @@ const RegisterForm = () => {
                 <option value="sq_m">Sq M</option>
               </select>
             </div>
+            {errors.farmSizeUnit && (
+              <p className="text-red-400 text-xs my-1 text-right w-full">
+                {errors.farmSizeUnit}
+              </p>
+            )}
             <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Enter the total area of your farm
             </p>

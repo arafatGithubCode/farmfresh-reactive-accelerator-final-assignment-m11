@@ -1,18 +1,21 @@
 "use client";
 
-import { doRegistration } from "@/actions";
-import { RegisterFormDataType, RegistrationFormValidationError } from "@/types";
+import {
+  IUserRegistrationForm,
+  RegistrationFormValidationError,
+} from "@/types";
 import { validateRegistrationForm } from "@/validations";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FocusEvent, FormEvent, useRef, useState } from "react";
 import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
 import GoogleAuth from "./GoogleAuth";
 
-const initialValues: RegisterFormDataType = {
-  role: "customer",
-  type: "",
+const initialValues: IUserRegistrationForm = {
+  role: "Customer",
   file: null,
+  avatar_url: "",
   firstName: "",
   lastName: "",
   email: "",
@@ -30,7 +33,7 @@ const initialValues: RegisterFormDataType = {
 
 const RegisterForm = () => {
   const [formValues, setFormValues] =
-    useState<RegisterFormDataType>(initialValues);
+    useState<IUserRegistrationForm>(initialValues);
   const [errors, setErrors] = useState<RegistrationFormValidationError>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({
     role: false,
@@ -51,10 +54,14 @@ const RegisterForm = () => {
     terms: false,
   });
 
+  const [submitErr, setSubmitErr] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
   const [showPass, setShowPass] = useState<boolean>(false);
   const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
-
   const fileUploadRef = useRef<HTMLInputElement | null>(null);
+
+  const router = useRouter();
 
   //   onBlur: (when leaving field)
   const handleBlur = (
@@ -92,7 +99,7 @@ const RegisterForm = () => {
       [name]:
         type === "checked"
           ? checked
-          : type === "files"
+          : type === "file"
           ? files?.[0] || null
           : value,
     }));
@@ -123,27 +130,74 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    console.log(errors);
-    const validationErrors = validateRegistrationForm(formValues);
-    // check and return error
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      setTouched(
-        Object.keys(formValues).reduce(
-          (acc, key) => ({ ...acc, [key]: true }),
-          {}
-        )
-      );
-      return;
-    }
+    setLoading(true);
 
-    // perform registration
-    const result = await doRegistration(formValues);
-    console.log(result, "click-res");
+    try {
+      const validationErrors = validateRegistrationForm(formValues);
+      // check and return error
+      if (Object.keys(validationErrors).length > 0) {
+        setLoading(false);
+        setErrors(validationErrors);
+        setTouched(
+          Object.keys(formValues).reduce(
+            (acc, key) => ({ ...acc, [key]: true }),
+            {}
+          )
+        );
+        return;
+      }
+
+      // upload avatar to cloudinary
+      let avatarUrl = formValues.avatar_url;
+
+      if (formValues.file) {
+        const avatarFormData = new FormData();
+        avatarFormData.append("file", formValues.file);
+        avatarFormData.append("type", "avatar");
+
+        const response = await fetch(`http://localhost:3000/api/upload`, {
+          method: "POST",
+          body: avatarFormData,
+        });
+        if (!response.ok) {
+          setSubmitErr("Failed to upload avatar.");
+          setLoading(false);
+          return;
+        }
+        const data = await response.json();
+        avatarUrl = data?.secure_url;
+      }
+
+      // register user
+      const userData = { ...formValues, avatar_url: avatarUrl };
+
+      const response = await fetch(`http://localhost:3000/api/user`, {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        setSubmitErr("Registration Failed.");
+        setLoading(false);
+        return;
+      }
+      console.log(response);
+      setLoading(false);
+      router.push("/");
+      router.push("/login");
+    } catch (error) {
+      setLoading(false);
+      setSubmitErr("Internal server error.");
+      console.log(error);
+    }
   };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
+      <p className="my-1 text-red-500 text-center">{submitErr}</p>
       <Field error={touched.role && errors.role}>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           I want to register as:
@@ -153,9 +207,9 @@ const RegisterForm = () => {
             <input
               type="radio"
               name="role"
-              value="customer"
+              value="Customer"
               onChange={handleChange}
-              checked={formValues.role.toLowerCase() === "customer"}
+              checked={formValues.role === "Customer"}
               className="sr-only peer"
             />
             <div className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900 hover:border-primary-300 dark:hover:border-primary-400 transition-all duration-200">
@@ -174,10 +228,10 @@ const RegisterForm = () => {
             <input
               type="radio"
               name="role"
-              value="farmer"
+              value="Farmer"
               onChange={handleChange}
               onBlur={handleBlur}
-              checked={formValues.role.toLowerCase() === "farmer"}
+              checked={formValues.role === "Farmer"}
               className="sr-only peer"
             />
             <div className="p-4 border-2 border-gray-200 dark:border-gray-600 rounded-lg cursor-pointer peer-checked:border-primary-500 peer-checked:bg-primary-50 dark:peer-checked:bg-primary-900 hover:border-primary-300 dark:hover:border-primary-400 transition-all duration-200">
@@ -196,7 +250,6 @@ const RegisterForm = () => {
       </Field>
       {/* <!-- Profile Picture Upload - Full Width --> */}
       <Field error={errors.file}>
-        <input type="hidden" value="avatar" name="type" />
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           Profile Picture
         </label>
@@ -213,7 +266,12 @@ const RegisterForm = () => {
             <Image
               id="profilePreview"
               className="h-20 w-20 object-cover rounded-full border-2 border-gray-300 dark:border-gray-600"
-              src="data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100' height='100' fill='%23e5e7eb'/%3e%3ctext x='50%25' y='50%25' font-size='18' text-anchor='middle' alignment-baseline='middle' fill='%236b7280'%3ePhoto%3c/text%3e%3c/svg%3e"
+              src={
+                formValues.file && formValues.file instanceof File
+                  ? URL.createObjectURL(formValues.file)
+                  : formValues.avatar_url ||
+                    "data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100' height='100' fill='%23e5e7eb'/%3e%3ctext x='50%25' y='50%25' font-size='18' text-anchor='middle' alignment-baseline='middle' fill='%236b7280'%3ePhoto%3c/text%3e%3c/svg%3e"
+              }
               alt="Profile preview"
               width={50}
               height={50}
@@ -308,7 +366,7 @@ const RegisterForm = () => {
               placeholder="Enter your full address"
             ></textarea>
           </Field>
-          <div className="w-full h-2" />
+          <div className="w-full h-[3px]" />
           {/* <!-- Password --> */}
           <Field error={touched.password && errors.password}>
             <label
@@ -575,6 +633,7 @@ const RegisterForm = () => {
 
       {/* <!-- Submit Button --> */}
       <button
+        disabled={loading}
         type="submit"
         className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-105"
       >

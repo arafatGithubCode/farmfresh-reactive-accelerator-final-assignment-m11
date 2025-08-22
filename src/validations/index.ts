@@ -1,10 +1,13 @@
 // validations.ts
-import { RegisterFormDataType, RegistrationFormValidationError } from "@/types";
+import {
+  IUserRegistrationForm,
+  RegistrationFormValidationError,
+} from "@/types";
 import { isValidatePhoneNumber } from "@/utils/isValidatePhoneNumber";
 import { isValidEmail } from "@/utils/isValidEmail";
 
 export const validateRegistrationForm = (
-  input: RegisterFormDataType
+  input: IUserRegistrationForm
 ): RegistrationFormValidationError => {
   const errors: RegistrationFormValidationError = {};
 

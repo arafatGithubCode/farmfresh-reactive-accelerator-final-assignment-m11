@@ -1,7 +1,6 @@
 import { connectDB } from "@/libs/connectDB";
 import { getErrorMessage } from "@/libs/errorHandler";
 import { User } from "@/models/userModel";
-import { RegisterFormDataType } from "@/types";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -9,36 +8,31 @@ import { NextRequest, NextResponse } from "next/server";
 export const POST = async (req: NextRequest) => {
   await connectDB();
   try {
-    const {
-      firstName,
-      lastName,
-      email,
-      address,
-      bio,
-      phone,
-      password,
-      role,
-      farmName,
-      farmSize,
-      farmSizeUnit,
-    }: RegisterFormDataType = await req.json();
+    const userData = await req.json();
+    console.log("user-data", userData);
+    // Delete farm related data if the role is Customer
+    if (userData.role === "Customer") {
+      delete userData.farmName;
+      delete userData.specialization;
+      delete userData.farmSize;
+      delete userData.farmSizeUnit;
+    }
+
+    // delete file instead just save its url
+    if (userData.file) {
+      delete userData.file;
+    }
+
+    // delete confirm password
+    delete userData.confirmPassword;
 
     // encrypt password
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(userData?.password, salt);
 
     const payload = {
-      role,
-      firstName,
-      lastName,
-      email,
-      phone,
-      address,
-      bio,
+      ...userData,
       password: hashedPassword,
-      farmSize,
-      farmName,
-      farmSizeUnit,
     };
 
     await User.create(payload);

@@ -1,22 +1,9 @@
 import { Document } from "mongoose";
 
 // User model interface
-export interface IUserModel extends Document {
-  role: string;
-  avatar: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-  bio?: string;
-  password: string;
-}
-
-// Registration form type
-export interface RegisterFormDataType {
+export interface IUser extends Document {
   role: "Farmer" | "Customer" | string;
-  type: string;
-  file: File | null;
+  avatar_url: string;
   firstName: string;
   email: string;
   address: string;
@@ -24,16 +11,33 @@ export interface RegisterFormDataType {
   lastName: string;
   phone: string;
   bio: string;
-  confirmPassword: string;
   farmName?: string;
   specialization?: string;
   farmSize?: string;
   farmSizeUnit?: string;
   terms: boolean;
-  general?: string;
+}
+
+export interface IUserRegistrationForm {
+  role: "Farmer" | "Customer";
+  file: File | null;
+  avatar_url: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  password: string;
+  confirmPassword: string;
+  phone: string;
+  bio: string;
+  farmName?: string;
+  specialization?: string;
+  farmSize?: string;
+  farmSizeUnit?: string;
+  terms: boolean;
 }
 
 // Error type for registration form
 export type RegistrationFormValidationError = Partial<
-  Record<keyof RegisterFormDataType, string>
+  Record<keyof IUserRegistrationForm, string>
 >;

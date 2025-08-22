@@ -1,4 +1,4 @@
-import { IUserModel } from "@/types";
+import { IUser } from "@/types";
 import mongoose, { Model, Schema } from "mongoose";
 
 // User role enum
@@ -7,21 +7,25 @@ enum UserRole {
   customer = "Customer",
 }
 
-const userSchema = new Schema<IUserModel>(
+const userSchema = new Schema<IUser>(
   {
     role: {
       type: String,
       required: [true, "User role is required."],
       enum: Object.values(UserRole),
-      default: UserRole.farmer,
+      default: UserRole.customer,
     },
-    avatar: {
+    avatar_url: {
       type: String,
       required: [true, "Avatar is required."],
     },
-    name: {
+    firstName: {
       type: String,
-      required: [true, "User name is required."],
+      required: [true, "first name is required."],
+    },
+    lastName: {
+      type: String,
+      required: [true, "last name is required."],
     },
     email: {
       type: String,
@@ -48,9 +52,28 @@ const userSchema = new Schema<IUserModel>(
       required: [true, "Password is required."],
       minlength: [6, "Password must be 6 characters or longer"],
     },
+    terms: {
+      type: Boolean,
+      required: [
+        true,
+        "To continue with us, please accept our terms and conditions.",
+      ],
+    },
+    farmName: {
+      type: String,
+    },
+    farmSize: {
+      type: String,
+    },
+    farmSizeUnit: {
+      type: String,
+    },
+    specialization: {
+      type: String,
+    },
   },
   { timestamps: true }
 );
 
-export const User: Model<IUserModel> =
-  mongoose.models?.User ?? mongoose.model<IUserModel>("User", userSchema);
+export const User: Model<IUser> =
+  mongoose.models?.User ?? mongoose.model<IUser>("User", userSchema);

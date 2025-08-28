@@ -1,16 +1,17 @@
-import { Document } from "mongoose";
+// User Role
+export type UserRole = "Farmer" | "Customer";
 
 // User model interface
-export interface IUser extends Document {
-  role: "Farmer" | "Customer" | string;
-  avatar_url: string;
+export interface IUserDB {
+  role: UserRole;
+  avatar_url?: string;
   firstName: string;
   email: string;
   address: string;
   password: string;
   lastName: string;
   phone: string;
-  bio: string;
+  bio?: string;
   farmName?: string;
   specialization?: string;
   farmSize?: string;
@@ -19,9 +20,8 @@ export interface IUser extends Document {
 }
 
 export interface IUserRegistrationForm {
-  role: "Farmer" | "Customer";
+  role: UserRole;
   file: File | null;
-  avatar_url: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -41,3 +41,25 @@ export interface IUserRegistrationForm {
 export type RegistrationFormValidationError = Partial<
   Record<keyof IUserRegistrationForm, string>
 >;
+
+// Upload Kind
+export type UploadKind = "avatar" | "product";
+
+// Upload result type
+export interface UploadResult {
+  success: true;
+  success_url: string;
+  public_id: string;
+  width: number;
+  height: number;
+  format: string;
+}
+
+// Upload error type
+export interface UploadError {
+  success: false;
+  error: string;
+}
+
+// Upload response
+export type UploadResponse = UploadResult | UploadError;

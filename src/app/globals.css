@@ -4,6 +4,23 @@
 
 @layer utilities {
   button:disabled {
-    @apply cursor-not-allowed bg-gray-400 hover:scale-100 hover:bg-gray-400;
+    @apply cursor-not-allowed hover:scale-100;
   }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.miniSpinner {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 4px solid #ffffff;
+  animation: spin 1s linear infinite;
 }

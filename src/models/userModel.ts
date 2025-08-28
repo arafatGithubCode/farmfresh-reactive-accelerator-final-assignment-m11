@@ -1,4 +1,4 @@
-import { IUser } from "@/types";
+import { IUserDB } from "@/types";
 import mongoose, { Model, Schema } from "mongoose";
 
 // User role enum
@@ -7,7 +7,7 @@ enum UserRole {
   customer = "Customer",
 }
 
-const userSchema = new Schema<IUser>(
+const userSchema = new Schema<IUserDB>(
   {
     role: {
       type: String,
@@ -17,7 +17,6 @@ const userSchema = new Schema<IUser>(
     },
     avatar_url: {
       type: String,
-      required: [true, "Avatar is required."],
     },
     firstName: {
       type: String,
@@ -45,7 +44,6 @@ const userSchema = new Schema<IUser>(
     },
     bio: {
       type: String,
-      required: false,
     },
     password: {
       type: String,
@@ -75,5 +73,5 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-export const User: Model<IUser> =
-  mongoose.models?.User ?? mongoose.model<IUser>("User", userSchema);
+export const User: Model<IUserDB> =
+  mongoose.models?.User ?? mongoose.model<IUserDB>("User", userSchema);

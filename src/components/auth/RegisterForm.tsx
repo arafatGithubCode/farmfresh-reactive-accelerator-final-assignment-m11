@@ -1,5 +1,6 @@
 "use client";
 
+import { doRegistration } from "@/actions";
 import {
   IUserRegistrationForm,
   RegistrationFormValidationError,
@@ -7,15 +8,22 @@ import {
 import { validateRegistrationForm } from "@/validations";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FocusEvent, FormEvent, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FocusEvent,
+  FormEvent,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
+import MiniSpinner from "../ui/MiniSpinner";
 import GoogleAuth from "./GoogleAuth";
 
 const initialValues: IUserRegistrationForm = {
   role: "Customer",
   file: null,
-  avatar_url: "",
   firstName: "",
   lastName: "",
   email: "",
@@ -54,14 +62,14 @@ const RegisterForm = () => {
     terms: false,
   });
 
-  const [submitErr, setSubmitErr] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [submitErr, setSubmitErr] = useState<{ general?: string } | null>(null);
+
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const [showPass, setShowPass] = useState<boolean>(false);
   const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
   const fileUploadRef = useRef<HTMLInputElement | null>(null);
-
-  const router = useRouter();
 
   //   onBlur: (when leaving field)
   const handleBlur = (
@@ -128,15 +136,14 @@ const RegisterForm = () => {
     }
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitErr(null);
 
     try {
+      // check field validation and return error
       const validationErrors = validateRegistrationForm(formValues);
-      // check and return error
       if (Object.keys(validationErrors).length > 0) {
-        setLoading(false);
         setErrors(validationErrors);
         setTouched(
           Object.keys(formValues).reduce(
@@ -147,57 +154,48 @@ const RegisterForm = () => {
         return;
       }
 
-      // upload avatar to cloudinary
-      let avatarUrl = formValues.avatar_url;
+      const formData = new FormData();
+      for (const [key, value] of Object.entries(formValues)) {
+        formData.append(key, value);
+      }
 
-      if (formValues.file) {
-        const avatarFormData = new FormData();
-        avatarFormData.append("file", formValues.file);
-        avatarFormData.append("type", "avatar");
-
-        const response = await fetch(`http://localhost:3000/api/upload`, {
-          method: "POST",
-          body: avatarFormData,
-        });
-        if (!response.ok) {
-          setSubmitErr("Failed to upload avatar.");
-          setLoading(false);
+      startTransition(async () => {
+        const result = await doRegistration(formData);
+        if (!result.success) {
+          setSubmitErr({ general: result.error });
           return;
         }
-        const data = await response.json();
-        avatarUrl = data?.secure_url;
-      }
-
-      // register user
-      const userData = { ...formValues, avatar_url: avatarUrl };
-
-      const response = await fetch(`http://localhost:3000/api/user`, {
-        method: "POST",
-        headers: {
-          "Content-type": "application/json",
-        },
-        body: JSON.stringify(userData),
+        const resetForm = (): IUserRegistrationForm => ({
+          farmName: "",
+          lastName: "",
+          address: "",
+          bio: "",
+          confirmPassword: "",
+          email: "",
+          file: null,
+          firstName: "",
+          password: "",
+          phone: "",
+          role: "Customer",
+          terms: false,
+          farmSize: "",
+          farmSizeUnit: "",
+          specialization: "",
+        });
+        setFormValues(resetForm());
+        router.push("/login");
       });
-
-      if (!response.ok) {
-        setSubmitErr("Registration Failed.");
-        setLoading(false);
-        return;
-      }
-      console.log(response);
-      setLoading(false);
-      router.push("/");
-      router.push("/login");
     } catch (error) {
-      setLoading(false);
-      setSubmitErr("Internal server error.");
       console.log(error);
     }
   };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
-      <p className="my-1 text-red-500 text-center">{submitErr}</p>
+      {submitErr?.general && (
+        <p className="text-red-500 text-sm text-center">{submitErr.general}</p>
+      )}
+
       <Field error={touched.role && errors.role}>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
           I want to register as:
@@ -269,8 +267,7 @@ const RegisterForm = () => {
               src={
                 formValues.file && formValues.file instanceof File
                   ? URL.createObjectURL(formValues.file)
-                  : formValues.avatar_url ||
-                    "data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100' height='100' fill='%23e5e7eb'/%3e%3ctext x='50%25' y='50%25' font-size='18' text-anchor='middle' alignment-baseline='middle' fill='%236b7280'%3ePhoto%3c/text%3e%3c/svg%3e"
+                  : "data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100' height='100' fill='%23e5e7eb'/%3e%3ctext x='50%25' y='50%25' font-size='18' text-anchor='middle' alignment-baseline='middle' fill='%236b7280'%3ePhoto%3c/text%3e%3c/svg%3e"
               }
               alt="Profile preview"
               width={50}
@@ -633,11 +630,11 @@ const RegisterForm = () => {
 
       {/* <!-- Submit Button --> */}
       <button
-        disabled={loading}
+        disabled={isPending}
         type="submit"
-        className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-105"
+        className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-105 flex items-center justify-center"
       >
-        Create Account
+        {isPending ? <MiniSpinner /> : "Create Account"}
       </button>
 
       {/* <!-- Divider --> */}

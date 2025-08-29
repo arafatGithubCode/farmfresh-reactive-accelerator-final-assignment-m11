@@ -49,7 +49,7 @@ export const uploadImage = async (
     // final return result
     const finalResult: UploadResponse = {
       success: true,
-      success_url: result.success_url,
+      secure_url: result.secure_url,
       public_id: result.public_id,
       format: result.format,
       width: result.width,

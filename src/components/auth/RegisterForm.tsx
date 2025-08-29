@@ -1,6 +1,6 @@
 "use client";
 
-import { doRegistration } from "@/actions/doRegister";
+import { doRegistration } from "@/actions/auth";
 import {
   IUserRegistrationForm,
   RegistrationFormValidationError,
@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { ChangeEvent, FocusEvent, FormEvent, useRef, useState } from "react";
 import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
-import MiniSpinner from "../ui/MiniSpinner";
+import SubmitBtn from "../ui/SubmitBtn";
 import Toast from "../ui/Toast";
 import GoogleAuth from "./GoogleAuth";
 
@@ -620,13 +620,7 @@ const RegisterForm = () => {
         </Field>
 
         {/* <!-- Submit Button --> */}
-        <button
-          disabled={loading}
-          type="submit"
-          className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-105 flex items-center justify-center"
-        >
-          {loading ? <MiniSpinner /> : "Create Account"}
-        </button>
+        <SubmitBtn label="Create Account" loading={loading} />
 
         {/* <!-- Divider --> */}
         <div className="relative">

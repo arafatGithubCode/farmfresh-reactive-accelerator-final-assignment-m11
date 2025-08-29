@@ -48,7 +48,7 @@ export type UploadKind = "avatar" | "product";
 // Upload result type
 export interface UploadResult {
   success: true;
-  success_url: string;
+  secure_url: string;
   public_id: string;
   width: number;
   height: number;
@@ -66,3 +66,9 @@ export type UploadResponse = UploadResult | UploadError;
 
 // Toast mode type
 export type ToastMode = "SUCCESS" | "ERROR" | "WARNING";
+
+// Credential Input type
+export interface CredentialInput {
+  email: string;
+  password: string;
+}

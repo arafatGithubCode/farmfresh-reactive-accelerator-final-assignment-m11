@@ -1,5 +1,6 @@
 "use server";
 
+import { signIn } from "@/auth";
 import { createUser, getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
 import { IUserDB, UserRole } from "@/types";
@@ -8,6 +9,7 @@ import { getFile } from "@/validations/getFile";
 import { getStr } from "@/validations/getStr";
 import bcrypt from "bcryptjs";
 
+// Perform registration
 export const doRegistration = async (formData: FormData) => {
   try {
     // Extract and validate base field
@@ -65,7 +67,7 @@ export const doRegistration = async (formData: FormData) => {
       const upload = await uploadImage(avatarFile, "avatar");
 
       if (!upload.success) throw new Error(upload.error);
-      payload.avatar_url = upload.success_url;
+      payload.avatar_url = upload.secure_url;
     } else {
       payload.avatar_url = undefined;
     }
@@ -82,4 +84,15 @@ export const doRegistration = async (formData: FormData) => {
     }
     return { success: false, error: "Unknown registration error" };
   }
+};
+
+// Perform credential login
+export const doCredentialLogIn = async (formData: FormData) => {
+  const result = await signIn("credentials", {
+    email: formData.get("email"),
+    password: formData.get("password"),
+    redirect: false,
+  });
+  console.log("res___", result);
+  return result;
 };

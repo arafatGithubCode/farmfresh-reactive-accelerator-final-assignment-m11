@@ -6,7 +6,7 @@ import { FaSeedling } from "react-icons/fa6";
 const LoginInterceptPage = () => {
   return (
     <AuthInterceptedModal>
-      <div className="max-w-md w-full space-y-8 bg-gray-900 px-5 py-2 rounded shadow-lg drop-shadow-lg shadow-white/40 mt-5">
+      <div className="max-w-md w-full mx-auto space-y-8 bg-gray-900 px-5 py-2 rounded shadow-lg drop-shadow-lg shadow-white/40 mt-5 absolute left-0 right-0 top-16">
         {/* <!-- Header --> */}
         <div className="text-center">
           <div className="flex justify-center mb-6">

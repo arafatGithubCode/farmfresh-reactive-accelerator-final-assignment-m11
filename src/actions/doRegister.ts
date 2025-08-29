@@ -1,41 +1,12 @@
 "use server";
 
-import { User } from "@/models/userModel";
+import { createUser, getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
 import { IUserDB, UserRole } from "@/types";
+import { getBool } from "@/validations/getBool";
+import { getFile } from "@/validations/getFile";
+import { getStr } from "@/validations/getStr";
 import bcrypt from "bcryptjs";
-
-const getStr = (
-  fd: FormData,
-  key: string,
-  required: boolean
-): string | undefined => {
-  const v = fd.get(key);
-  const s = typeof v === "string" ? v.trim() : undefined;
-  if (required && !s) throw new Error(`${key} is required.`);
-  return s;
-};
-
-const getBool = (
-  fd: FormData,
-  key: string,
-  required: boolean
-): boolean | undefined => {
-  const v = fd.get(key);
-  if (v === null) {
-    if (required) throw new Error(`${key} is required.`);
-    return undefined;
-  }
-
-  // supports "true/on/1"
-  const s = String(v).toLowerCase();
-  return s === "true" || s === "on" || s === "1";
-};
-
-const getFile = (fd: FormData, key: string): File | null => {
-  const v = fd.get(key);
-  return v instanceof File ? v : null;
-};
 
 export const doRegistration = async (formData: FormData) => {
   try {
@@ -56,8 +27,8 @@ export const doRegistration = async (formData: FormData) => {
     if (terms !== true) throw new Error("You must accept terms & conditions.");
 
     // Reject duplicate
-    const exist = await User.findOne({ email }).lean();
-    if (exist) throw new Error("This email is already exist.");
+    const exist = await getUserByEmail(email);
+    if (exist) throw new Error("This email already exists.");
 
     // hash password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -100,7 +71,7 @@ export const doRegistration = async (formData: FormData) => {
     }
 
     // create user
-    const created = await User.create(payload);
+    const created = await createUser(payload);
     return { success: true, userId: created._id.toString() };
   } catch (err: unknown) {
     if (err instanceof Error) {

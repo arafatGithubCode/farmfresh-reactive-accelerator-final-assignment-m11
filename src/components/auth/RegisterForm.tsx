@@ -1,21 +1,15 @@
 "use client";
 
-import { doRegistration } from "@/actions";
+import { doRegistration } from "@/actions/doRegister";
 import {
   IUserRegistrationForm,
   RegistrationFormValidationError,
 } from "@/types";
-import { validateRegistrationForm } from "@/validations";
+import { resetForm } from "@/utils/resetForm";
+import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  ChangeEvent,
-  FocusEvent,
-  FormEvent,
-  useRef,
-  useState,
-  useTransition,
-} from "react";
+import { ChangeEvent, FocusEvent, FormEvent, useRef, useState } from "react";
 import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
 import MiniSpinner from "../ui/MiniSpinner";
@@ -64,7 +58,7 @@ const RegisterForm = () => {
 
   const [submitErr, setSubmitErr] = useState<{ general?: string } | null>(null);
 
-  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const [showPass, setShowPass] = useState<boolean>(false);
@@ -136,9 +130,10 @@ const RegisterForm = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitErr(null);
+    setLoading(true);
 
     try {
       // check field validation and return error
@@ -151,6 +146,7 @@ const RegisterForm = () => {
             {}
           )
         );
+        setLoading(false);
         return;
       }
 
@@ -159,33 +155,19 @@ const RegisterForm = () => {
         formData.append(key, value);
       }
 
-      startTransition(async () => {
-        const result = await doRegistration(formData);
-        if (!result.success) {
-          setSubmitErr({ general: result.error });
-          return;
-        }
-        const resetForm = (): IUserRegistrationForm => ({
-          farmName: "",
-          lastName: "",
-          address: "",
-          bio: "",
-          confirmPassword: "",
-          email: "",
-          file: null,
-          firstName: "",
-          password: "",
-          phone: "",
-          role: "Customer",
-          terms: false,
-          farmSize: "",
-          farmSizeUnit: "",
-          specialization: "",
-        });
-        setFormValues(resetForm());
-        router.push("/login");
-      });
+      const result = await doRegistration(formData);
+      if (!result.success) {
+        setSubmitErr({ general: result.error });
+        setLoading(false);
+        return;
+      }
+
+      setFormValues(resetForm());
+      router.refresh();
+      router.push("/login");
+      setLoading(false);
     } catch (error) {
+      setLoading(false);
       console.log(error);
     }
   };
@@ -630,11 +612,11 @@ const RegisterForm = () => {
 
       {/* <!-- Submit Button --> */}
       <button
-        disabled={isPending}
+        disabled={loading}
         type="submit"
         className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-105 flex items-center justify-center"
       >
-        {isPending ? <MiniSpinner /> : "Create Account"}
+        {loading ? <MiniSpinner /> : "Create Account"}
       </button>
 
       {/* <!-- Divider --> */}

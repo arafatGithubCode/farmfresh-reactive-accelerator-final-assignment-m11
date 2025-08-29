@@ -63,3 +63,6 @@ export interface UploadError {
 
 // Upload response
 export type UploadResponse = UploadResult | UploadError;
+
+// Toast mode type
+export type ToastMode = "SUCCESS" | "ERROR" | "WARNING";

@@ -36,6 +36,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@auth/mongodb-adapter@npm:^3.10.0":
+  version: 3.10.0
+  resolution: "@auth/mongodb-adapter@npm:3.10.0"
+  dependencies:
+    "@auth/core": "npm:0.40.0"
+  peerDependencies:
+    mongodb: ^6
+  checksum: 10c0/f088145cc047e3017dac6afa710ecfb80e407957f40e1814274a4928d804fd7b6b2ecde289ae2891b65ec9e0ed901d4544a22f8cd906fb43cd90f664bea11346
+  languageName: node
+  linkType: hard
+
 "@emnapi/core@npm:^1.4.3":
   version: 1.4.5
   resolution: "@emnapi/core@npm:1.4.5"
@@ -1853,6 +1864,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "farmfresh-reactive-accelerator-final-assignment-m11@workspace:."
   dependencies:
+    "@auth/mongodb-adapter": "npm:^3.10.0"
     "@types/node": "npm:^20"
     "@types/react": "npm:^18"
     "@types/react-dom": "npm:^18"
@@ -1860,7 +1872,7 @@ __metadata:
     cloudinary: "npm:^2.7.0"
     eslint: "npm:^8"
     eslint-config-next: "npm:14.2.30"
-    mongodb: "npm:^6.18.0"
+    mongodb: "npm:^6.19.0"
     mongoose: "npm:^8.17.1"
     next: "npm:14.2.30"
     next-auth: "npm:^5.0.0-beta.29"
@@ -3037,7 +3049,41 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mongodb@npm:^6.18.0, mongodb@npm:~6.18.0":
+"mongodb@npm:^6.19.0":
+  version: 6.19.0
+  resolution: "mongodb@npm:6.19.0"
+  dependencies:
+    "@mongodb-js/saslprep": "npm:^1.1.9"
+    bson: "npm:^6.10.4"
+    mongodb-connection-string-url: "npm:^3.0.0"
+  peerDependencies:
+    "@aws-sdk/credential-providers": ^3.188.0
+    "@mongodb-js/zstd": ^1.1.0 || ^2.0.0
+    gcp-metadata: ^5.2.0
+    kerberos: ^2.0.1
+    mongodb-client-encryption: ">=6.0.0 <7"
+    snappy: ^7.3.2
+    socks: ^2.7.1
+  peerDependenciesMeta:
+    "@aws-sdk/credential-providers":
+      optional: true
+    "@mongodb-js/zstd":
+      optional: true
+    gcp-metadata:
+      optional: true
+    kerberos:
+      optional: true
+    mongodb-client-encryption:
+      optional: true
+    snappy:
+      optional: true
+    socks:
+      optional: true
+  checksum: 10c0/b25d6bedbb3d85b059fc6aa1e48d585722945b5fdf96cf6767a48069c13636e5e1d004908b1f095f580d0d03c8973c37f55325ce659a8c7f35c7414be23627fc
+  languageName: node
+  linkType: hard
+
+"mongodb@npm:~6.18.0":
   version: 6.18.0
   resolution: "mongodb@npm:6.18.0"
   dependencies:

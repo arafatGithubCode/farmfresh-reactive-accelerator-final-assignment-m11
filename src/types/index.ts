@@ -72,3 +72,10 @@ export interface CredentialInput {
   email: string;
   password: string;
 }
+
+// Session User type
+export interface SessionUser {
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+}

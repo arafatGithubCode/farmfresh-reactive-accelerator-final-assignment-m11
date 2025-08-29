@@ -1,6 +1,7 @@
 "use server";
 
-import { signIn } from "@/auth";
+import { signIn, signOut } from "@/auth";
+import { connectDB } from "@/libs/connectDB";
 import { createUser, getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
 import { IUserDB, UserRole } from "@/types";
@@ -11,6 +12,7 @@ import bcrypt from "bcryptjs";
 
 // Perform registration
 export const doRegistration = async (formData: FormData) => {
+  await connectDB();
   try {
     // Extract and validate base field
     const role = getStr(formData, "role", true) as UserRole;
@@ -96,3 +98,6 @@ export const doCredentialLogIn = async (formData: FormData) => {
   console.log("res___", result);
   return result;
 };
+
+// Perform sing out
+export const doSignOut = async () => [await signOut()];

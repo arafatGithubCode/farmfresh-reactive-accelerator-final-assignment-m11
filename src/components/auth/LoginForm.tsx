@@ -26,6 +26,7 @@ const LoginForm = () => {
       }
       setLoading(false);
       router.push("/product");
+      router.back();
     } catch (err) {
       console.log(err);
       setLoading(false);

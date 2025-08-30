@@ -1,7 +1,6 @@
 import { User } from "@/models/userModel";
 import { IUserDB } from "@/types";
 import { replaceUserIdInObj } from "@/utils/replaceUserIdInObj";
-import { Types } from "mongoose";
 
 // Create a user
 export const createUser = async (payload: IUserDB) => {
@@ -10,7 +9,7 @@ export const createUser = async (payload: IUserDB) => {
 
 // Get user by email
 export const getUserByEmail = async (email: string) => {
-  const user: (IUserDB & { _id: Types.ObjectId }) | null = await User.findOne({
+  const user = await User.findOne({
     email,
   }).lean();
   return user ? replaceUserIdInObj(user) : null;

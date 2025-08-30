@@ -104,5 +104,5 @@ export const doSignOut = async () => [await signOut()];
 
 // Perform google auth
 export const doSignIn = async () => {
-  await signIn("google", { redirectTo: "/product" });
+  await signIn("google", { redirectTo: "/products" });
 };

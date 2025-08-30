@@ -1,20 +1,11 @@
 "use client";
 
 import { doSignOut } from "@/actions/auth";
-import { SessionUser } from "@/types";
 import Image from "next/image";
 import { useState } from "react";
 import { FaAngleDown } from "react-icons/fa6";
 
-const UserNestedNav = ({
-  user,
-  avatar,
-  name,
-}: {
-  user: SessionUser;
-  avatar?: string;
-  name?: string;
-}) => {
+const UserNestedNav = ({ image, name }: { image: string; name: string }) => {
   const [showSubNav, setShowSubNav] = useState<boolean>(false);
   return (
     <>
@@ -24,16 +15,16 @@ const UserNestedNav = ({
       >
         <Image
           src={
-            user.image ||
-            avatar ||
-            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
+            image
+              ? image
+              : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
           }
           alt="User"
           className="w-8 h-8 rounded-full"
           width={50}
           height={50}
         />
-        <span className="hidden sm:block">{user.name || name}</span>
+        <span className="hidden sm:block">{name}</span>
         <FaAngleDown />
       </button>
       {showSubNav && (

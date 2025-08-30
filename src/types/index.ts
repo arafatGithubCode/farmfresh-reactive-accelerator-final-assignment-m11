@@ -79,3 +79,12 @@ export interface SessionUser {
   email?: string | null;
   image?: string | null;
 }
+
+// User session type
+export interface IUserSession {
+  id?: string;
+  name?: string;
+  email?: string;
+  image?: string;
+  role?: string;
+}

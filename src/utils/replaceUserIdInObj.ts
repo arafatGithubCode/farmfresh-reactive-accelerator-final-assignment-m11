@@ -2,8 +2,7 @@ import { Types } from "mongoose";
 
 export const replaceUserIdInObj = <T extends { _id: Types.ObjectId }>(
   obj: T
-): Omit<T, "_id"> & { id: string } => {
+) => {
   const { _id, ...rest } = obj;
-
   return { ...rest, id: _id.toString() };
 };

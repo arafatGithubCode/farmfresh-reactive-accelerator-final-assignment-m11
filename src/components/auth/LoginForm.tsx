@@ -25,7 +25,7 @@ const LoginForm = () => {
         setError("Wrong Credentials!");
       }
       setLoading(false);
-      router.replace("/product");
+      router.replace("/products");
     } catch (err) {
       console.log(err);
       setLoading(false);

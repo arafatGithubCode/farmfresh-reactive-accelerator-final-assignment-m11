@@ -19,14 +19,13 @@ const LoginForm = () => {
     try {
       const formData = new FormData(e.currentTarget);
       const result = await doCredentialLogIn(formData);
-      console.log(result);
+
       if (result?.error) {
         setLoading(false);
         setError("Wrong Credentials!");
       }
       setLoading(false);
-      router.push("/product");
-      router.back();
+      router.replace("/product");
     } catch (err) {
       console.log(err);
       setLoading(false);

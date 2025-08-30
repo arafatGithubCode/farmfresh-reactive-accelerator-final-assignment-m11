@@ -1,9 +1,15 @@
+import { auth } from "@/auth";
 import AuthInterceptedModal from "@/components/auth/AuthInterceptedModal";
 import LoginForm from "@/components/auth/LoginForm";
 import Link from "next/link";
 import { FaSeedling } from "react-icons/fa6";
 
-const LoginInterceptPage = () => {
+const LoginInterceptPage = async () => {
+  const session = await auth();
+
+  if (session) {
+    return null;
+  }
   return (
     <AuthInterceptedModal>
       <div className="max-w-md w-full mx-auto space-y-8 bg-gray-900 px-5 py-2 rounded shadow-lg drop-shadow-lg shadow-white/40 mt-5 absolute left-0 right-0 top-16">

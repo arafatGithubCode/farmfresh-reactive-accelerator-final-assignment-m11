@@ -95,9 +95,14 @@ export const doCredentialLogIn = async (formData: FormData) => {
     password: formData.get("password"),
     redirect: false,
   });
-  console.log("res___", result);
+
   return result;
 };
 
 // Perform sing out
 export const doSignOut = async () => [await signOut()];
+
+// Perform google auth
+export const doSignIn = async () => {
+  await signIn("google", { redirectTo: "/product" });
+};

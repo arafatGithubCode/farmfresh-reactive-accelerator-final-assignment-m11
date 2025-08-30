@@ -44,6 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
           return exist;
         } catch (err) {
+          console.log(err, "auth.ts");
           if (err instanceof Error) {
             throw new Error(err.message);
           }

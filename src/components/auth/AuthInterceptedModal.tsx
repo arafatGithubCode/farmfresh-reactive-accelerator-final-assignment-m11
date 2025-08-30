@@ -16,24 +16,22 @@ const AuthInterceptedModal = ({ children }: { children: ReactNode }) => {
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       if (e.target === overlay.current || e.target === wrapper.current) {
-        if (onDismiss) return onDismiss();
+        onDismiss();
       }
     },
     [onDismiss]
   );
 
-  const onKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onDismiss();
-
-      document.removeEventListener("keydown", onKeyDown);
-    },
-    [onDismiss]
-  );
-
   useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-  }, [onKeyDown]);
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onDismiss();
+    };
+
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [onDismiss]);
 
   return (
     <div

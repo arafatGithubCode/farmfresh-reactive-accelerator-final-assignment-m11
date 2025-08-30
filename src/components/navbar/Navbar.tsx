@@ -31,6 +31,7 @@ const Navbar = async () => {
                   <>
                     <NavItem link="/products" label="Products" />
                     <NavItem link="/farmers" label="Farmers" />
+                    <NavItem link="/my-orders" label="My Orders" />
                   </>
                 )}
               </>

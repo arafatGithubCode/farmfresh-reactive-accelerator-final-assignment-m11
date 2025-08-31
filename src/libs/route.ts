@@ -1,4 +1,10 @@
 export const LOGIN = "/login";
 export const ROOT = "/";
 
-export const PUBLIC_ROUTE = ["/login", "/about", "/products", "/farmers"];
+export const PUBLIC_ROUTE = [
+  "/login",
+  "/api/auth/callback/google",
+  "/about",
+  "/products",
+  "/farmers",
+];

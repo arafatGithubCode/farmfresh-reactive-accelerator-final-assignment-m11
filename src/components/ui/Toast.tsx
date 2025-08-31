@@ -1,21 +1,56 @@
 "use client";
 
 import { ToastMode } from "@/types";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { MdClose } from "react-icons/md";
 
 const Toast = ({
   mode,
   message,
+  duration = 5000,
 }: {
   mode: ToastMode;
-  message: string | undefined;
+  message?: string;
+  duration?: number;
 }) => {
-  const [showToast, setShowToast] = useState(true);
+  const [showToast, setShowToast] = useState<boolean>(true);
+  const [remaining, setRemaining] = useState<number>(duration);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number | null>(null);
+
+  //   start time
+  const startTimer = (time: number) => {
+    startTimeRef.current = Date.now();
+    timerRef.current = setTimeout(() => setShowToast(false), time);
+  };
+
+  // clear time
+  const clearTimer = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  };
+
+  // handle pause on hover
+  const handleMouseEnter = () => {
+    if (timerRef.current && startTimeRef.current) {
+      clearTimer();
+      const elapsed = Date.now() - startTimeRef.current;
+      setRemaining((prev) => prev - elapsed);
+    }
+  };
+
+  // resume when mouse end
+  const handleMouseLeave = () => {
+    if (remaining > 0) {
+      startTimer(remaining);
+    }
+  };
 
   const baseStyle =
-    "px-2 py-1 w-fit rounded font-medium text-sm shadow text-white flex items-center justify-between gap-2 animate-bounce";
+    "px-3 py-2 w-fit rounded font-medium text-sm shadow text-white flex items-center justify-between gap-2 transition-opacity animate-bounce-skew duration-300";
 
   const modeStyle: Record<ToastMode, string> = {
     SUCCESS: "bg-green-500",
@@ -23,17 +58,26 @@ const Toast = ({
     WARNING: "bg-yellow-500 text-black",
   };
 
+  useEffect(() => {
+    startTimer(duration);
+    return clearTimer;
+  }, [duration]);
+
+  if (!showToast) return null;
+
   return createPortal(
-    <div
-      className={`${
-        showToast ? "fixed" : "flex-none"
-      } bottom-6 left-1/2 transform -translate-x-1/2 z-50`}
-    >
-      <div className={`${baseStyle} ${modeStyle[mode]}`}>
+    <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+      <div
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        role="alert"
+        aria-live="polite"
+        className={`${baseStyle} ${modeStyle[mode]}`}
+      >
         <span>{message}</span>
         <MdClose
           className="text-xl cursor-pointer"
-          onClick={() => setShowToast((prev) => !prev)}
+          onClick={() => setShowToast(false)}
         />
       </div>
     </div>,

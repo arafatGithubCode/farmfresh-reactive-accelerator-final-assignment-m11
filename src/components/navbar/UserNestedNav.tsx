@@ -28,7 +28,7 @@ const UserNestedNav = ({ image, name }: { image: string; name: string }) => {
         <FaAngleDown />
       </button>
       {showSubNav && (
-        <div className="bg-gray-100 dark:bg-gray-900 rounded py-2 absolute left-0 right-0 top-12 animate-fadeUp shadow divide-x-2">
+        <div className="bg-gray-100 dark:bg-gray-900 rounded py-2 absolute left-0 right-0 top-12 animate-fade-up shadow divide-x-2">
           <button
             onClick={async () => {
               await doSignOut();

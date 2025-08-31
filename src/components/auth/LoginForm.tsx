@@ -121,7 +121,7 @@ const LoginForm = () => {
         {/* <!-- Social Login --> */}
         <GoogleAuth />
       </form>
-      {error && <Toast mode="ERROR" message={error} />}
+      {!!error && <Toast mode="ERROR" message={error} />}
     </>
   );
 };

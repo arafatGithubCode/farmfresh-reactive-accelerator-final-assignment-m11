@@ -3,7 +3,8 @@
 import { ToastMode } from "@/types";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { MdClose } from "react-icons/md";
+import { FaCheckCircle } from "react-icons/fa";
+import { MdClose, MdError, MdWarning } from "react-icons/md";
 
 const Toast = ({
   mode,
@@ -74,6 +75,13 @@ const Toast = ({
         aria-live="polite"
         className={`${baseStyle} ${modeStyle[mode]}`}
       >
+        {mode === "SUCCESS" ? (
+          <FaCheckCircle className="text-xl" />
+        ) : mode === "WARNING" ? (
+          <MdWarning className="text-xl" />
+        ) : (
+          <MdError className="text-xl" />
+        )}
         <span>{message}</span>
         <MdClose
           className="text-xl cursor-pointer"

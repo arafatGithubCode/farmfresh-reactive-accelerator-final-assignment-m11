@@ -1,8 +1,13 @@
 import AddProductForm from "@/components/add-product/AddProductForm";
+import AccessDenied from "@/components/ui/AccessDenied";
 import BreadCrumb from "@/components/ui/BreadCrumb";
+import Toast from "@/components/ui/Toast";
+import { getUserSession } from "@/utils/getUserSession";
 
-const AddProductPage = () => {
-  return (
+const AddProductPage = async () => {
+  const userSession = await getUserSession();
+
+  return userSession?.role === "Farmer" ? (
     <>
       <BreadCrumb />
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -16,6 +21,14 @@ const AddProductPage = () => {
           <AddProductForm />
         </div>
       </div>
+    </>
+  ) : (
+    <>
+      <AccessDenied allowedRole="Farmer" path="Add-Product page" />
+      <Toast
+        mode="WARNING"
+        message="Only farmer can access add product page."
+      />
     </>
   );
 };

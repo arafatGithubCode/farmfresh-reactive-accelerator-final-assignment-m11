@@ -100,7 +100,7 @@ const RegisterForm = () => {
     setFormValues((prev) => ({
       ...prev,
       [name]:
-        type === "checked"
+        type === "checkbox"
           ? checked
           : type === "file"
           ? files?.[0] || null
@@ -110,7 +110,7 @@ const RegisterForm = () => {
     const fieldErrors = validateRegistrationForm({
       ...formValues,
       [name]:
-        type === "checked"
+        type === "checkbox"
           ? checked
           : type === "file"
           ? files?.[0] || null

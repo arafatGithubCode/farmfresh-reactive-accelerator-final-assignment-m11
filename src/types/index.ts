@@ -88,3 +88,28 @@ export interface IUserSession {
   image?: string;
   role?: string;
 }
+
+// Add product form
+export interface IProduct {
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  unit: string;
+  stock: number;
+  files: File[];
+  farmLocation: string;
+  harvestDate: string;
+  features: string[];
+}
+
+// error type for add product form
+export type TAddProductValidationError = Partial<
+  Record<keyof IProduct, string>
+>;
+
+// file validation result
+export interface IFileValidationResult {
+  validFiles: File[];
+  error: string | null;
+}

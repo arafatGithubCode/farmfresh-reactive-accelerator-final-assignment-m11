@@ -90,6 +90,7 @@ export const doRegistration = async (formData: FormData) => {
 
 // Perform credential login
 export const doCredentialLogIn = async (formData: FormData) => {
+  await connectDB();
   const result = await signIn("credentials", {
     email: formData.get("email"),
     password: formData.get("password"),
@@ -100,9 +101,13 @@ export const doCredentialLogIn = async (formData: FormData) => {
 };
 
 // Perform sing out
-export const doSignOut = async () => [await signOut()];
+export const doSignOut = async () => {
+  await connectDB();
+  await signOut();
+};
 
 // Perform google auth
 export const doSignIn = async () => {
+  await connectDB();
   await signIn("google", { redirectTo: "/products" });
 };

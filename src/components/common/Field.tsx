@@ -1,12 +1,11 @@
 import { ReactNode } from "react";
 
-const Field = ({
-  children,
-  error,
-}: {
+type Props = {
   children: ReactNode;
   error: string | undefined | boolean;
-}) => {
+};
+
+const Field = ({ children, error }: Props) => {
   return (
     <div>
       {children}

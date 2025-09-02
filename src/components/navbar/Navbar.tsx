@@ -23,7 +23,7 @@ const Navbar = async () => {
                 {user.role === "Farmer" && (
                   <>
                     <NavItem link="/add-product" label="Add Product" />
-                    <NavItem link="/manage-product" label="Manage Products" />
+                    <NavItem link="/manage-products" label="Manage Products" />
                   </>
                 )}
 

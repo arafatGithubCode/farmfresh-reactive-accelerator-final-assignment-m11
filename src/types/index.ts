@@ -21,7 +21,7 @@ export interface IUserDB {
 
 export interface IUserRegistrationForm {
   role: UserRole;
-  file: File | null;
+  avatar: File | null;
   firstName: string;
   lastName: string;
   email: string;
@@ -113,6 +113,14 @@ export type TAddProductValidationError = Partial<
   Record<keyof IProduct, string>
 >;
 
+// file validation options
+export interface IFileValidateOptions {
+  file: File | File[] | FileList | null | undefined;
+  maxFile?: number;
+  maxSize?: number;
+  allowedTypes?: string[];
+  isRequired?: boolean;
+}
 // file validation result
 export interface IFileValidationResult {
   validFiles: File[];

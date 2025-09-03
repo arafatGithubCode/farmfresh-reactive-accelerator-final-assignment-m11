@@ -59,7 +59,10 @@ const AddProductForm = () => {
 
     // files validation
     if (type === "file" && files) {
-      const { validFiles, error: fileErr } = validateFile(files);
+      const { validFiles, error: fileErr } = validateFile({
+        file: files,
+        isRequired: true,
+      });
 
       if (fileErr) {
         setFileErr(fileErr);

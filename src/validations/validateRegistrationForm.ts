@@ -5,6 +5,7 @@ import {
 } from "@/types";
 import { isValidatePhoneNumber } from "@/utils/isValidatePhoneNumber";
 import { isValidEmail } from "@/utils/isValidEmail";
+import { validateFile } from "./validateFile";
 
 export const validateRegistrationForm = (
   input: IUserRegistrationForm
@@ -49,12 +50,6 @@ export const validateRegistrationForm = (
     errors.phone = "Invalid phone number";
   }
 
-  if (!input.file) {
-    errors.file = "Profile picture is required.";
-  } else if (input.file.size > 2 * 1024 * 1024) {
-    errors.file = "Max file size is 2MB.";
-  }
-
   if (!input.address) {
     errors.address = "Address is required.";
   } else if (input.address.length < 20) {
@@ -73,6 +68,16 @@ export const validateRegistrationForm = (
   if (input.terms !== true) {
     errors.terms =
       "To continue with us, please accept our terms and conditions.";
+  }
+
+  const { error: fileErr } = validateFile({
+    file: input.avatar,
+    maxFile: 1,
+    maxSize: 5 * 1024 * 1024,
+    isRequired: true,
+  });
+  if (fileErr) {
+    errors.avatar = fileErr;
   }
 
   return errors;

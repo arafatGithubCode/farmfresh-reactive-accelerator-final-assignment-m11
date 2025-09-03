@@ -57,51 +57,56 @@ const AddProductForm = () => {
   ) => {
     const { name, value, type, checked, files } = e.target as HTMLInputElement;
 
+    const updateErrors = (
+      fieldErrors: TAddProductValidationError,
+      name: string
+    ) => {
+      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
+        setErrors((prev) => ({
+          ...prev,
+          [name]: fieldErrors[name as keyof TAddProductValidationError],
+        }));
+      } else {
+        // clear error if user fixed it
+        setErrors((prev) => {
+          const newErrors = { ...prev };
+          delete newErrors[name as keyof TAddProductValidationError];
+          return newErrors;
+        });
+      }
+    };
+
     // files validation
     if (type === "file" && files) {
-      const { validFiles, error: fileErr } = validateFile({
-        file: files,
+      const { validFiles, error } = validateFile({
+        file: Array.from(files),
         isRequired: true,
       });
 
-      if (fileErr) {
-        setFileErr(fileErr);
+      if (error) {
+        setFileErr(error);
+      } else {
+        setFileErr("");
       }
 
-      setFormValues((prev) => ({
-        ...prev,
-        images: validFiles,
-      }));
+      const newValues = { ...formValues, images: validFiles };
+
+      setFormValues(newValues);
+
+      // validate with updated files
+      const fieldErrors = validateAddProductForm(newValues);
+
+      updateErrors(fieldErrors, "images");
     } else {
-      setFormValues((prev) => ({
-        ...prev,
+      const newValues = {
+        ...formValues,
         [name]: type === "checkbox" ? checked : value,
-      }));
-    }
+      };
+      setFormValues(newValues);
 
-    // validate each field on change
-    const fieldErrors = validateAddProductForm({
-      ...formValues,
-      [name]:
-        type === "checkbox" ? checked : type === "file" ? files?.[0] : value,
-    });
+      const fieldErrors = validateAddProductForm(newValues);
 
-    if (
-      fieldErrors &&
-      typeof fieldErrors === "object" &&
-      Object.keys(fieldErrors).length > 0
-    ) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: fieldErrors[name as keyof TAddProductValidationError],
-      }));
-    } else {
-      // clear error if user fixed it
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name as keyof TAddProductValidationError];
-        return newErrors;
-      });
+      updateErrors(fieldErrors, name);
     }
   };
 
@@ -113,26 +118,27 @@ const AddProductForm = () => {
 
     setTouched((prev) => ({ ...prev, [name]: true }));
 
-    // validate this field only
-    const fieldErrors = validateAddProductForm(formValues);
+    setFormValues((prev) => {
+      const fieldErrors = validateAddProductForm(prev);
 
-    if (
-      fieldErrors &&
-      typeof fieldErrors === "object" &&
-      fieldErrors[name as keyof TAddProductValidationError]
-    ) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: fieldErrors[name as keyof TAddProductValidationError],
-      }));
-    } else {
-      // clear error if user fixed it
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name as keyof TAddProductValidationError];
-        return newErrors;
-      });
-    }
+      if (
+        fieldErrors &&
+        fieldErrors[name as keyof TAddProductValidationError]
+      ) {
+        setErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: fieldErrors[name as keyof TAddProductValidationError],
+        }));
+      } else {
+        setErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          delete newErrors[name as keyof TAddProductValidationError];
+          return newErrors;
+        });
+      }
+
+      return prev;
+    });
   };
 
   //   handle remove file
@@ -185,7 +191,6 @@ const AddProductForm = () => {
           formData.append(key, value);
         }
       }
-
       await addProduct(formData);
     } catch (error) {
       console.log(error);
@@ -360,7 +365,7 @@ const AddProductForm = () => {
                   multiple
                   accept=".jpeg, .jpg, .png, .webp"
                   onChange={handleChange}
-                  onBlur={handleBlur}
+                  //   onBlur={handleBlur}
                   className="hidden"
                 />
                 <label htmlFor="images" className="cursor-pointer">

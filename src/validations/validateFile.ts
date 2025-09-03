@@ -53,5 +53,7 @@ export const validateFile = ({
     }
   }
 
+  console.log(filesArray, "array");
+
   return { validFiles: filesArray, error: null };
 };

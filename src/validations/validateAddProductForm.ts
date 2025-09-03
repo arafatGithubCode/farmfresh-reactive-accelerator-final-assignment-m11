@@ -53,13 +53,9 @@ export const validateAddProductForm = (input: IProduct) => {
   }
 
   //   validate file
-  if (input.images.length === 0) {
-    errors.images = "Product image is required.";
-  } else {
-    const { error: fileErr } = validateFile(input.images);
-    if (fileErr) {
-      errors.images = fileErr;
-    }
+  const { error } = validateFile({ file: input.images, isRequired: true });
+  if (error) {
+    errors.images = error;
   }
 
   return errors;

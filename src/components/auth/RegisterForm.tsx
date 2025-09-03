@@ -635,7 +635,7 @@ const RegisterForm = () => {
         </div>
         <GoogleAuth />
       </form>
-      {submitErr && <Toast mode="ERROR" message={submitErr.general} />}
+      {!!submitErr && <Toast mode="ERROR" message={submitErr.general} />}
     </>
   );
 };

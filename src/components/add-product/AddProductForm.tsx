@@ -1,11 +1,12 @@
 "use client";
 
+import { addProduct } from "@/actions/product";
 import { IProduct, TAddProductValidationError } from "@/types";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
 import { validateFile } from "@/validations/validateFile";
 import Image from "next/image";
 import { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
-import { FaTrash } from "react-icons/fa6";
+import { FaCloud, FaTrash } from "react-icons/fa6";
 import Field from "../common/Field";
 import Toast from "../ui/Toast";
 
@@ -27,7 +28,7 @@ const initialValues: IProduct = {
   price: 0,
   unit: "",
   stock: 0,
-  files: [],
+  images: [],
   farmLocation: "",
   harvestDate: "",
   features: [],
@@ -43,7 +44,7 @@ const AddProductForm = () => {
     price: false,
     unit: false,
     stock: false,
-    files: false,
+    images: false,
     farmLocation: false,
     harvestDate: false,
     features: false,
@@ -66,7 +67,7 @@ const AddProductForm = () => {
 
       setFormValues((prev) => ({
         ...prev,
-        files: validFiles,
+        images: validFiles,
       }));
     } else {
       setFormValues((prev) => ({
@@ -79,11 +80,7 @@ const AddProductForm = () => {
     const fieldErrors = validateAddProductForm({
       ...formValues,
       [name]:
-        type === "checkbox"
-          ? checked
-          : type === "file"
-          ? files?.[0] || null
-          : value,
+        type === "checkbox" ? checked : type === "file" ? files?.[0] : value,
     });
 
     if (
@@ -139,7 +136,7 @@ const AddProductForm = () => {
   const removeFile = (index: number) => {
     setFormValues((prev) => ({
       ...prev,
-      files: prev.files.filter((_, i) => i !== index),
+      images: prev.images && prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -154,12 +151,11 @@ const AddProductForm = () => {
   };
 
   //   handle submit
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
     // validate each field before submission
     const fieldErrors = validateAddProductForm(formValues);
-    console.log(fieldErrors);
+
     if (
       fieldErrors &&
       typeof fieldErrors === "object" &&
@@ -173,6 +169,23 @@ const AddProductForm = () => {
         )
       );
       return;
+    }
+
+    // invoke inaction
+    try {
+      const formData = new FormData();
+
+      for (const [key, value] of Object.entries(formValues)) {
+        if (key === "images" && Array.isArray(value)) {
+          value.filter((image) => formData.append("images", image));
+        } else {
+          formData.append(key, value);
+        }
+      }
+
+      await addProduct(formData);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -228,8 +241,8 @@ const AddProductForm = () => {
               </select>
             </Field>
 
-            <Field error={touched.description && errors.description}>
-              <div className="md:col-span-2">
+            <div className="md:col-span-2">
+              <Field error={touched.description && errors.description}>
                 <label
                   htmlFor="description"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
@@ -246,8 +259,8 @@ const AddProductForm = () => {
                   className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="Describe your product, growing methods, quality, etc."
                 ></textarea>
-              </div>
-            </Field>
+              </Field>
+            </div>
           </div>
         </div>
 
@@ -324,7 +337,7 @@ const AddProductForm = () => {
           </div>
         </div>
 
-        <Field error={touched.files && errors.files}>
+        <Field error={touched.images && errors.images}>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Product Images
           </h2>
@@ -348,7 +361,7 @@ const AddProductForm = () => {
                   className="hidden"
                 />
                 <label htmlFor="images" className="cursor-pointer">
-                  <i className="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                  <FaCloud className="text-4xl text-gray-400 mb-4" />
                   <p className="text-lg font-medium text-gray-900 dark:text-white">
                     Click to upload images
                   </p>
@@ -361,15 +374,16 @@ const AddProductForm = () => {
                 id="imagePreview"
                 className="mt-4 grid grid-cols-2 md:grid-cols-5 gap-4"
               >
-                {formValues.files.length > 0 &&
-                  formValues.files.map((file, index) => (
+                {formValues.images &&
+                  formValues.images.length > 0 &&
+                  formValues.images.map((image, index) => (
                     <div
                       key={index + 1}
                       className="relative h-60 w-full overflow-hidden scroll-auto"
                     >
                       <Image
-                        src={URL.createObjectURL(file)}
-                        alt={file.name}
+                        src={URL.createObjectURL(image)}
+                        alt={image.name}
                         width={150}
                         height={150}
                         className="rounded object-cover border border-gray-900 dark:border-gray-200"

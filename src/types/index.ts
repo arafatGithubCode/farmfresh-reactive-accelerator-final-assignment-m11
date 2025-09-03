@@ -97,10 +97,15 @@ export interface IProduct {
   price: number;
   unit: string;
   stock: number;
-  files: File[];
+  images: File[];
   farmLocation: string;
   harvestDate: string;
   features: string[];
+}
+
+export interface IProductModel extends IProduct {
+  farmerId: string;
+  imagesUrl: string[];
 }
 
 // error type for add product form

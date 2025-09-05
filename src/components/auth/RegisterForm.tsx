@@ -58,6 +58,11 @@ const RegisterForm = () => {
         const formData = new FormData();
 
         for (const [key, value] of Object.entries(values)) {
+          if (Array.isArray(value)) {
+            value.forEach((v) =>
+              formData.append(key, v instanceof File ? v : String(v))
+            );
+          }
           formData.append(key, value);
         }
         const response = await doRegistration(formData);
@@ -65,7 +70,7 @@ const RegisterForm = () => {
           setErr(response.error!);
         }
         resetForm();
-        router.push("/");
+        router.replace("/login");
         setLoading(false);
       } catch (error) {
         catchErr(error);

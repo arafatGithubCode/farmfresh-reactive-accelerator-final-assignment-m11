@@ -64,10 +64,9 @@ export const doRegistration = async (formData: FormData) => {
     }
 
     // upload avatar
-    const avatarFile = getFile(formData, "file")!;
+    const avatarFile = getFile(formData, "avatar")!;
     if (avatarFile) {
       const upload = await uploadImage(avatarFile, "avatar");
-
       if (!upload.success) throw new Error(upload.error);
       payload.avatar_url = upload.secure_url;
     } else {

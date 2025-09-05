@@ -1,11 +1,11 @@
 import cloudinary from "@/libs/cloudinary";
-import { UploadKind, UploadResponse } from "@/types";
+import { TUploadKind, UploadResponse } from "@/types";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { Readable } from "stream";
 
 export const uploadImage = async (
   file: File,
-  kind: UploadKind
+  kind: TUploadKind
 ): Promise<UploadResponse> => {
   try {
     // check file

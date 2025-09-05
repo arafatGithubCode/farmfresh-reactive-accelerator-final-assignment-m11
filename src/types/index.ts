@@ -1,10 +1,9 @@
 // User Role
-export type UserRole = "Farmer" | "Customer";
+export type TUserRole = "Farmer" | "Customer";
 
-// User model interface
-export interface IUserDB {
-  role: UserRole;
-  avatar_url?: string;
+// Base user type
+type TBaseUser = {
+  role: TUserRole;
   firstName: string;
   email: string;
   address: string;
@@ -17,36 +16,38 @@ export interface IUserDB {
   farmSize?: string;
   farmSizeUnit?: string;
   terms: boolean;
+};
+
+// User DB type
+export interface IUserDB extends TBaseUser {
+  avatar_url?: string;
 }
 
-export interface IUserRegistrationForm {
-  role: UserRole;
+// User registration form
+export interface IUserRegistrationForm
+  extends Omit<
+    TBaseUser,
+    "bil" | "farmName" | "specialization" | "farmSize" | "farmSizeUnit"
+  > {
   avatar: File | null;
-  firstName: string;
-  lastName: string;
-  email: string;
-  address: string;
-  password: string;
   confirmPassword: string;
-  phone: string;
   bio: string;
-  farmName?: string;
-  specialization?: string;
-  farmSize?: string;
-  farmSizeUnit?: string;
-  terms: boolean;
+  farmName: string;
+  specialization: string;
+  farmSize: string;
+  farmSizeUnit: string;
 }
 
 // Error type for registration form
-export type RegistrationFormValidationError = Partial<
+export type TRegistrationFormValidationError = Partial<
   Record<keyof IUserRegistrationForm, string>
 >;
 
 // Upload Kind
-export type UploadKind = "avatar" | "product";
+export type TUploadKind = "avatar" | "product";
 
 // Upload result type
-export interface UploadResult {
+export interface IUploadResult {
   success: true;
   secure_url: string;
   public_id: string;
@@ -56,28 +57,21 @@ export interface UploadResult {
 }
 
 // Upload error type
-export interface UploadError {
+export interface IUploadError {
   success: false;
   error: string;
 }
 
 // Upload response
-export type UploadResponse = UploadResult | UploadError;
+export type UploadResponse = IUploadResult | IUploadError;
 
 // Toast mode type
 export type ToastMode = "SUCCESS" | "ERROR" | "WARNING";
 
 // Credential Input type
-export interface CredentialInput {
+export interface ICredentialInput {
   email: string;
   password: string;
-}
-
-// Session User type
-export interface SessionUser {
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
 }
 
 // User session type

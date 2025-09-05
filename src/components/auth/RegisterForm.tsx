@@ -1,15 +1,13 @@
 "use client";
 
 import { doRegistration } from "@/actions/auth";
-import {
-  IUserRegistrationForm,
-  RegistrationFormValidationError,
-} from "@/types";
-import { resetForm } from "@/utils/resetForm";
+import { useCatchErr } from "@/hooks/useCatchErr";
+import { useForm } from "@/hooks/useForm";
+import { IUserRegistrationForm } from "@/types";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FocusEvent, FormEvent, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
 import SubmitBtn from "../ui/SubmitBtn";
@@ -35,158 +33,51 @@ const initialValues: IUserRegistrationForm = {
 };
 
 const RegisterForm = () => {
-  const [formValues, setFormValues] =
-    useState<IUserRegistrationForm>(initialValues);
-  const [errors, setErrors] = useState<RegistrationFormValidationError>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({
-    role: false,
-    type: false,
-    avatar: false,
-    firstName: false,
-    lastName: false,
-    email: false,
-    address: false,
-    password: false,
-    confirmPassword: false,
-    phone: false,
-    bio: false,
-    farmName: false,
-    specialization: false,
-    farmSize: false,
-    farmSizeUnit: false,
-    terms: false,
-  });
-
-  const [submitErr, setSubmitErr] = useState<{ general?: string } | null>(null);
-
-  const [loading, setLoading] = useState<boolean>(false);
-  const router = useRouter();
-
   const [showPass, setShowPass] = useState<boolean>(false);
   const [showConfirmPass, setShowConfirmPass] = useState<boolean>(false);
   const fileUploadRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  //   onBlur: (when leaving field)
-  const handleBlur = (
-    e: FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name } = e.target;
+  const { err, setErr, catchErr } = useCatchErr();
+  const router = useRouter();
 
-    setTouched((prev) => ({ ...prev, [name]: true }));
+  const {
+    values: formValues,
+    resetForm,
+    errors,
+    touched,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+  } = useForm<IUserRegistrationForm>({
+    initialValues,
+    validate: validateRegistrationForm,
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        const formData = new FormData();
 
-    // Validate this field only
-    const fieldErrors = validateRegistrationForm(formValues);
-    if (fieldErrors[name as keyof RegistrationFormValidationError]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: fieldErrors[name as keyof RegistrationFormValidationError],
-      }));
-    } else {
-      // clear errors if user fixed it
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name as keyof RegistrationFormValidationError];
-        return newErrors;
-      });
-    }
-  };
-
-  //   onChange: update form value + live validation
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type, checked, files } = e.target as HTMLInputElement;
-
-    setFormValues((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : type === "file"
-          ? files?.[0] || null
-          : value,
-    }));
-
-    const fieldErrors = validateRegistrationForm({
-      ...formValues,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : type === "file"
-          ? files?.[0] || null
-          : value,
-    });
-
-    if (fieldErrors[name as keyof RegistrationFormValidationError]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: fieldErrors[name as keyof RegistrationFormValidationError],
-      }));
-    } else {
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[name as keyof RegistrationFormValidationError];
-        return newErrors;
-      });
-    }
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setSubmitErr(null);
-    setLoading(true);
-
-    try {
-      // check field validation and return error
-      const validationErrors = validateRegistrationForm(formValues);
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        setTouched(
-          Object.keys(formValues).reduce(
-            (acc, key) => ({ ...acc, [key]: true }),
-            {}
-          )
-        );
+        for (const [key, value] of Object.entries(values)) {
+          formData.append(key, value);
+        }
+        const response = await doRegistration(formData);
+        if (!response.success) {
+          setErr(response.error!);
+        }
+        resetForm();
+        router.push("/");
         setLoading(false);
-        return;
-      }
-
-      const formData = new FormData();
-      for (const [key, value] of Object.entries(formValues)) {
-        formData.append(key, value);
-      }
-
-      const result = await doRegistration(formData);
-      if (!result.success) {
-        setSubmitErr({ general: result.error });
+      } catch (error) {
+        catchErr(error);
         setLoading(false);
-        return;
       }
-
-      setFormValues(resetForm());
-      router.refresh();
-      router.push("/login");
-      setLoading(false);
-    } catch (err: unknown) {
-      setLoading(false);
-      if (err instanceof Error) {
-        setSubmitErr({ general: err.message });
-      }
-      if (typeof err === "string") {
-        setSubmitErr({ general: err });
-      }
-      setSubmitErr({ general: "Registration Failed" });
-    }
-  };
+    },
+  });
 
   return (
     <>
       <form className="space-y-6" onSubmit={handleSubmit}>
-        {submitErr?.general && (
-          <p className="text-red-500 text-sm text-center">
-            {submitErr.general}
-          </p>
-        )}
+        {err && <p className="text-red-500 text-sm text-center">{err}</p>}
         <Field error={touched.role && errors.role}>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
             I want to register as:
@@ -256,8 +147,8 @@ const RegisterForm = () => {
                 id="profilePreview"
                 className="h-20 w-20 object-cover rounded-full border-2 border-gray-300 dark:border-gray-600"
                 src={
-                  formValues.avatar && formValues.avatar instanceof File
-                    ? URL.createObjectURL(formValues.avatar)
+                  formValues.avatar && Array.isArray(formValues.avatar)
+                    ? URL.createObjectURL(formValues.avatar[0])
                     : "data:image/svg+xml,%3csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100' height='100' fill='%23e5e7eb'/%3e%3ctext x='50%25' y='50%25' font-size='18' text-anchor='middle' alignment-baseline='middle' fill='%236b7280'%3ePhoto%3c/text%3e%3c/svg%3e"
                 }
                 alt="Profile preview"
@@ -598,9 +489,7 @@ const RegisterForm = () => {
               name="terms"
               type="checkbox"
               checked={formValues.terms}
-              onChange={(e) =>
-                setFormValues((prev) => ({ ...prev, terms: e.target.checked }))
-              }
+              onChange={handleChange}
               className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
             />
             <label
@@ -635,7 +524,7 @@ const RegisterForm = () => {
         </div>
         <GoogleAuth />
       </form>
-      {!!submitErr && <Toast mode="ERROR" message={submitErr.general} />}
+      {!!err && <Toast mode="ERROR" message={err} />}
     </>
   );
 };

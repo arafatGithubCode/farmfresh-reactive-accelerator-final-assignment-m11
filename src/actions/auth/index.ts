@@ -4,7 +4,7 @@ import { signIn, signOut } from "@/auth";
 import { connectDB } from "@/libs/connectDB";
 import { createUser, getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
-import { IUserDB, UserRole } from "@/types";
+import { IUserDB, TUserRole } from "@/types";
 import { getBool } from "@/validations/getBool";
 import { getFile } from "@/validations/getFile";
 import { getStr } from "@/validations/getStr";
@@ -15,7 +15,7 @@ export const doRegistration = async (formData: FormData) => {
   await connectDB();
   try {
     // Extract and validate base field
-    const role = getStr(formData, "role", true) as UserRole;
+    const role = getStr(formData, "role", true) as TUserRole;
     if (role !== "Customer" && role !== "Farmer")
       throw new Error("Invalid role");
 

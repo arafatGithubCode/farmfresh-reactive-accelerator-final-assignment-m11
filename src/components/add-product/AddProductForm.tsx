@@ -1,11 +1,11 @@
 "use client";
 
 import { addProduct } from "@/actions/product";
-import { IProduct, TAddProductValidationError } from "@/types";
+import { useCatchErr } from "@/hooks/useCatchErr";
+import { useForm } from "@/hooks/useForm";
+import { IProduct } from "@/types";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
-import { validateFile } from "@/validations/validateFile";
 import Image from "next/image";
-import { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
 import { FaCloud, FaTrash } from "react-icons/fa6";
 import Field from "../common/Field";
 import Toast from "../ui/Toast";
@@ -35,166 +35,58 @@ const initialValues: IProduct = {
 };
 
 const AddProductForm = () => {
-  const [formValues, setFormValues] = useState<IProduct>(initialValues);
-  const [fileErr, setFileErr] = useState<string>("");
-  const [touched, setTouched] = useState<Record<string, boolean>>({
-    name: false,
-    category: false,
-    description: false,
-    price: false,
-    unit: false,
-    stock: false,
-    images: false,
-    farmLocation: false,
-    harvestDate: false,
-    features: false,
+  const { err, catchErr } = useCatchErr();
+
+  const {
+    values: formValues,
+    errors,
+    touched,
+    setValues,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+  } = useForm<IProduct>({
+    initialValues,
+    validate: validateAddProductForm,
+    onSubmit: async (values) => {
+      try {
+        const formData = new FormData();
+
+        for (const [key, value] of Object.entries(values)) {
+          if (Array.isArray(value)) {
+            value.forEach((v) =>
+              formData.append(key, v instanceof File ? v : String(v))
+            );
+          } else {
+            formData.append(key, String(value));
+          }
+        }
+
+        const response = await addProduct(formData);
+        console.log(response);
+      } catch (error) {
+        catchErr(error);
+      }
+    },
   });
-  const [errors, setErrors] = useState<TAddProductValidationError>({});
 
-  //   handle change accept feature checkbox
-  const handleChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type, checked, files } = e.target as HTMLInputElement;
-
-    const updateErrors = (
-      fieldErrors: TAddProductValidationError,
-      name: string
-    ) => {
-      if (fieldErrors && Object.keys(fieldErrors).length > 0) {
-        setErrors((prev) => ({
-          ...prev,
-          [name]: fieldErrors[name as keyof TAddProductValidationError],
-        }));
-      } else {
-        // clear error if user fixed it
-        setErrors((prev) => {
-          const newErrors = { ...prev };
-          delete newErrors[name as keyof TAddProductValidationError];
-          return newErrors;
-        });
-      }
-    };
-
-    // files validation
-    if (type === "file" && files) {
-      const { validFiles, error } = validateFile({
-        file: Array.from(files),
-        isRequired: true,
-      });
-
-      if (error) {
-        setFileErr(error);
-      } else {
-        setFileErr("");
-      }
-
-      const newValues = { ...formValues, images: validFiles };
-
-      setFormValues(newValues);
-
-      // validate with updated files
-      const fieldErrors = validateAddProductForm(newValues);
-
-      updateErrors(fieldErrors, "images");
-    } else {
-      const newValues = {
-        ...formValues,
-        [name]: type === "checkbox" ? checked : value,
-      };
-      setFormValues(newValues);
-
-      const fieldErrors = validateAddProductForm(newValues);
-
-      updateErrors(fieldErrors, name);
-    }
-  };
-
-  //   onBlur (When leaving field)
-  const handleBlur = (
-    e: FocusEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name } = e.target;
-
-    setTouched((prev) => ({ ...prev, [name]: true }));
-
-    setFormValues((prev) => {
-      const fieldErrors = validateAddProductForm(prev);
-
-      if (
-        fieldErrors &&
-        fieldErrors[name as keyof TAddProductValidationError]
-      ) {
-        setErrors((prevErrors) => ({
-          ...prevErrors,
-          [name]: fieldErrors[name as keyof TAddProductValidationError],
-        }));
-      } else {
-        setErrors((prevErrors) => {
-          const newErrors = { ...prevErrors };
-          delete newErrors[name as keyof TAddProductValidationError];
-          return newErrors;
-        });
-      }
-
-      return prev;
-    });
-  };
-
-  //   handle remove file
+  //   remove one file by its index
   const removeFile = (index: number) => {
-    setFormValues((prev) => ({
+    setValues((prev) => ({
       ...prev,
-      images: prev.images && prev.images.filter((_, i) => i !== index),
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
-  //   handle checkbox toggler for feature
+  // toggle feature's check box
   const handleFeatureChange = (feature: string) => {
-    setFormValues((prev) => {
+    setValues((prev) => {
       const features = prev.features.includes(feature)
         ? prev.features.filter((f) => f !== feature)
         : [...prev.features, feature];
+
       return { ...prev, features };
     });
-  };
-
-  //   handle submit
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    // validate each field before submission
-    const fieldErrors = validateAddProductForm(formValues);
-
-    if (
-      fieldErrors &&
-      typeof fieldErrors === "object" &&
-      Object.keys(fieldErrors).length > 0
-    ) {
-      setErrors(fieldErrors);
-      setTouched(
-        Object.keys(formValues).reduce(
-          (acc, key) => ({ ...acc, [key]: true }),
-          {}
-        )
-      );
-      return;
-    }
-
-    // invoke inaction
-    try {
-      const formData = new FormData();
-
-      for (const [key, value] of Object.entries(formValues)) {
-        if (key === "images" && Array.isArray(value)) {
-          value.filter((image) => formData.append("images", image));
-        } else {
-          formData.append(key, value);
-        }
-      }
-      await addProduct(formData);
-    } catch (error) {
-      console.log(error);
-    }
   };
 
   return (
@@ -365,7 +257,7 @@ const AddProductForm = () => {
                   multiple
                   accept=".jpeg, .jpg, .png, .webp"
                   onChange={handleChange}
-                  //   onBlur={handleBlur}
+                  onBlur={handleBlur}
                   className="hidden"
                 />
                 <label htmlFor="images" className="cursor-pointer">
@@ -482,7 +374,7 @@ const AddProductForm = () => {
           </button>
         </div>
       </form>
-      {!!fileErr && <Toast mode="ERROR" message={fileErr} duration={8000} />}
+      {!!err && <Toast mode="ERROR" message={err} duration={8000} />}
     </>
   );
 };

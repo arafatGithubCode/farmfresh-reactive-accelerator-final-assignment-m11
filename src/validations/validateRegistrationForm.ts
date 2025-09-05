@@ -1,7 +1,7 @@
 // validations.ts
 import {
   IUserRegistrationForm,
-  RegistrationFormValidationError,
+  TRegistrationFormValidationError,
 } from "@/types";
 import { isValidatePhoneNumber } from "@/utils/isValidatePhoneNumber";
 import { isValidEmail } from "@/utils/isValidEmail";
@@ -9,8 +9,8 @@ import { validateFile } from "./validateFile";
 
 export const validateRegistrationForm = (
   input: IUserRegistrationForm
-): RegistrationFormValidationError => {
-  const errors: RegistrationFormValidationError = {};
+): TRegistrationFormValidationError => {
+  const errors: TRegistrationFormValidationError = {};
 
   if (!input.role) {
     errors.role = "Role is required.";
@@ -56,7 +56,7 @@ export const validateRegistrationForm = (
     errors.address = "Address must be 20 characters longer";
   }
 
-  if (input.role.toLowerCase() === "farmer") {
+  if (input.role === "Farmer") {
     if (!input.farmName) errors.farmName = "Farm name is required.";
     if (!input.farmSize) errors.farmSize = "Farm size is required.";
     if (!input.farmSizeUnit)
@@ -65,7 +65,7 @@ export const validateRegistrationForm = (
       errors.specialization = "Specialization is required";
   }
 
-  if (input.terms !== true) {
+  if (!input.terms) {
     errors.terms =
       "To continue with us, please accept our terms and conditions.";
   }

@@ -4,31 +4,55 @@ import { signIn, signOut } from "@/auth";
 import { connectDB } from "@/libs/connectDB";
 import { createUser, getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
-import { IUserDB, TUserRole } from "@/types";
-import { getBool } from "@/validations/getBool";
-import { getFile } from "@/validations/getFile";
-import { getStr } from "@/validations/getStr";
+import { IUserDB, IUserRegistrationForm } from "@/types";
+import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import bcrypt from "bcryptjs";
 
 // Perform registration
 export const doRegistration = async (formData: FormData) => {
   await connectDB();
+  console.log(formData);
   try {
-    // Extract and validate base field
-    const role = getStr(formData, "role", true) as TUserRole;
-    if (role !== "Customer" && role !== "Farmer")
-      throw new Error("Invalid role");
+    const formValues = {
+      firstName: formData.get("firstName"),
+      lastName: formData.get("lastName"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      address: formData.get("address"),
+      password: formData.get("password"),
+      confirmPassword: formData.get("confirmPassword"),
+      role: formData.get("role"),
+      bio: formData.get("bio"),
+      avatar: formData.get("avatar"),
+      farmName: formData.get("farmName"),
+      farmSize: formData.get("farmSize"),
+      farmSizeUnit: formData.get("farmSizeUnit"),
+      specialization: formData.get("specialization"),
+      terms: formData.get("terms") === "true" || formData.get("terms") === "on",
+    } as IUserRegistrationForm;
 
-    const firstName = getStr(formData, "firstName", true)!;
-    const lastName = getStr(formData, "lastName", true)!;
-    const email = getStr(formData, "email", true)!;
-    const phone = getStr(formData, "phone", true)!;
-    const bio = getStr(formData, "bio", false) ?? "";
-    const address = getStr(formData, "address", true)!;
-    const password = getStr(formData, "password", true)!;
-    const terms = getBool(formData, "terms", true);
+    // run validation
+    const errors = validateRegistrationForm(formValues);
+    console.log("server-side-validation-err", errors);
+    if (Object.keys(errors).length > 0) {
+      throw new Error(Object.values(errors)[0]!); // return first err
+    }
 
-    if (terms !== true) throw new Error("You must accept terms & conditions.");
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      address,
+      password,
+      role,
+      bio,
+      avatar,
+      farmName,
+      farmSize,
+      farmSizeUnit,
+      specialization,
+    } = formValues;
 
     // Reject duplicate
     const exist = await getUserByEmail(email);
@@ -51,12 +75,6 @@ export const doRegistration = async (formData: FormData) => {
     };
 
     if (role === "Farmer") {
-      const farmName = getStr(formData, "farmName", false) ?? undefined;
-      const specialization =
-        getStr(formData, "specialization", false) ?? undefined;
-      const farmSize = getStr(formData, "farmSize", false) ?? undefined;
-      const farmSizeUnit = getStr(formData, "farmSizeUnit", false) ?? undefined;
-
       if (farmName) payload.farmName = farmName;
       if (specialization) payload.specialization = specialization;
       if (farmSize) payload.farmSize = farmSize;
@@ -64,9 +82,8 @@ export const doRegistration = async (formData: FormData) => {
     }
 
     // upload avatar
-    const avatarFile = getFile(formData, "avatar")!;
-    if (avatarFile) {
-      const upload = await uploadImage(avatarFile, "avatar");
+    if (avatar) {
+      const upload = await uploadImage(avatar, "avatar");
       if (!upload.success) throw new Error(upload.error);
       payload.avatar_url = upload.secure_url;
     } else {
@@ -77,6 +94,7 @@ export const doRegistration = async (formData: FormData) => {
     const created = await createUser(payload);
     return { success: true, userId: created._id.toString() };
   } catch (err: unknown) {
+    console.log(err, "server-side-err");
     if (err instanceof Error) {
       return { success: false, error: err.message };
     }

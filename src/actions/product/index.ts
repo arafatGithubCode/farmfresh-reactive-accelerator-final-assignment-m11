@@ -1,5 +1,9 @@
 "use server";
 
-export const addProduct = async (formData: FormData) => {
-  console.log(formData);
+export const doAddingProduct = async (formData: FormData) => {
+  try {
+    console.log(formData);
+  } catch (error) {
+    console.log(error);
+  }
 };

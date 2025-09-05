@@ -67,7 +67,10 @@ const RegisterForm = () => {
         }
         const response = await doRegistration(formData);
         if (!response.success) {
+          console.log(response);
           setErr(response.error!);
+          setLoading(false);
+          return;
         }
         resetForm();
         router.replace("/login");

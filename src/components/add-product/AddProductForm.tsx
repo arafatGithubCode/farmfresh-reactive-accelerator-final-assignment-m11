@@ -1,6 +1,6 @@
 "use client";
 
-import { addProduct } from "@/actions/product";
+import { doAddingProduct } from "@/actions/product";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
 import { IProduct } from "@/types";
@@ -62,7 +62,7 @@ const AddProductForm = () => {
           }
         }
 
-        const response = await addProduct(formData);
+        const response = await doAddingProduct(formData);
         console.log(response);
       } catch (error) {
         catchErr(error);

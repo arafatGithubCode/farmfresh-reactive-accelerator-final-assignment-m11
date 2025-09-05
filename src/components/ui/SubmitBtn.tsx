@@ -11,7 +11,13 @@ const SubmitBtn = ({ label, loading }: { label: string; loading: boolean }) => {
       type="submit"
       className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-lg font-medium transition duration-200 transform hover:scale-105 flex items-center justify-center"
     >
-      {pending || loading ? <MiniSpinner /> : label}
+      {pending || loading ? (
+        <div className="flex items-center gap-3">
+          <MiniSpinner /> <span>{label}</span>
+        </div>
+      ) : (
+        label
+      )}
     </button>
   );
 };

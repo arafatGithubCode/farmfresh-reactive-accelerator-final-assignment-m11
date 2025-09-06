@@ -23,8 +23,14 @@ const config: Config = {
           "100%": { transform: "rotate(360deg)" },
         },
         "fade-up": {
-          "0%": { transform: "translateY(50px)", opacity: "0" },
-          "100%": { transform: "translateY(0px)", opacity: "1" },
+          "0%": {
+            transform: "translateY(50px) scale(0.95)",
+            opacity: "0",
+          },
+          "100%": {
+            transform: "translateY(0px)",
+            opacity: "1",
+          },
         },
       },
       animation: {

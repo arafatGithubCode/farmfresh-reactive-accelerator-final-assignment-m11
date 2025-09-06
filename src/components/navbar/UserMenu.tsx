@@ -1,6 +1,6 @@
 import { getUserSession } from "@/utils/getUserSession";
 import Link from "next/link";
-import UserNestedNav from "./UserNestedNav";
+import Dropdown from "../ui/Dropdown";
 
 const UserMenu = async () => {
   const user = await getUserSession();
@@ -8,7 +8,7 @@ const UserMenu = async () => {
   return (
     <div className="relative">
       {user ? (
-        <UserNestedNav image={user.image!} name={user.name!} />
+        <Dropdown image={user.image!} name={user.name!} />
       ) : (
         <Link href="/login">Sign In</Link>
       )}

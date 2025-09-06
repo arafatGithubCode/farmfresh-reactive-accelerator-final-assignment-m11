@@ -3,11 +3,13 @@
 import { doAddingProduct } from "@/actions/product";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
-import { IProduct } from "@/types";
+import { IProductForm } from "@/types";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
 import Image from "next/image";
+import { useState } from "react";
 import { FaCloud, FaTrash } from "react-icons/fa6";
 import Field from "../common/Field";
+import SubmitBtn from "../ui/SubmitBtn";
 import Toast from "../ui/Toast";
 
 const features = [
@@ -21,7 +23,7 @@ const features = [
   "Gluten-Free",
 ];
 
-const initialValues: IProduct = {
+const initialValues: IProductForm = {
   name: "",
   category: "",
   description: "",
@@ -35,7 +37,9 @@ const initialValues: IProduct = {
 };
 
 const AddProductForm = () => {
-  const { err, catchErr } = useCatchErr();
+  const { err, setErr, catchErr } = useCatchErr();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [successMsg, setSuccessMsg] = useState<string>("");
 
   const {
     values: formValues,
@@ -45,10 +49,11 @@ const AddProductForm = () => {
     handleChange,
     handleBlur,
     handleSubmit,
-  } = useForm<IProduct>({
+  } = useForm<IProductForm>({
     initialValues,
     validate: validateAddProductForm,
     onSubmit: async (values) => {
+      setLoading(true);
       try {
         const formData = new FormData();
 
@@ -63,9 +68,16 @@ const AddProductForm = () => {
         }
 
         const response = await doAddingProduct(formData);
-        console.log(response);
+        if (!response.success) {
+          setErr(response.error);
+          setLoading(false);
+          return;
+        }
+        setSuccessMsg(response.message);
+        setLoading(false);
       } catch (error) {
         catchErr(error);
+        setLoading(false);
       }
     },
   });
@@ -92,6 +104,7 @@ const AddProductForm = () => {
   return (
     <>
       <form className="p-8 space-y-8" onSubmit={handleSubmit}>
+        {err && <p className="text-red-500 text-sm text-center">{err}</p>}
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Basic Information
@@ -364,17 +377,12 @@ const AddProductForm = () => {
             ))}
           </div>
         </Field>
-
-        <div>
-          <button
-            type="submit"
-            className="w-full bg-primary-600 text-white py-3 rounded-lg font-semibold hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition"
-          >
-            Add Product
-          </button>
-        </div>
+        <SubmitBtn label="Add Product" loading={loading} />
       </form>
-      {!!err && <Toast mode="ERROR" message={err} duration={8000} />}
+      {err && <Toast mode="ERROR" message={err} duration={8000} />}
+      {successMsg && (
+        <Toast mode="SUCCESS" message={successMsg} duration={8000} />
+      )}
     </>
   );
 };

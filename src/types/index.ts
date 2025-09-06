@@ -83,28 +83,29 @@ export interface IUserSession {
   role?: string;
 }
 
-// Add product form
-export interface IProduct {
+// Product model Types
+export interface IProductModel {
+  farmerId?: string;
   name: string;
   category: string;
   description: string;
   price: number;
   unit: string;
   stock: number;
-  images: File[];
   farmLocation: string;
   harvestDate: string;
   features: string[];
+  imagesUrl: string[];
 }
 
-export interface IProductModel extends IProduct {
-  farmerId: string;
-  imagesUrl: string[];
+export interface IProductForm
+  extends Omit<IProductModel, "imagesUrl" | "farmerId"> {
+  images: File[];
 }
 
 // error type for add product form
 export type TAddProductValidationError = Partial<
-  Record<keyof IProduct, string>
+  Record<keyof IProductForm, string>
 >;
 
 // file validation options
@@ -120,3 +121,8 @@ export interface IFileValidationResult {
   validFiles: File[];
   error: string | null;
 }
+
+// Server action response
+export type TActionResponse =
+  | { success: true; message: string }
+  | { success: false; error: string };

@@ -1,7 +1,7 @@
-import { IProduct, TAddProductValidationError } from "@/types";
+import { IProductForm, TAddProductValidationError } from "@/types";
 import { validateFile } from "./validateFile";
 
-export const validateAddProductForm = (input: IProduct) => {
+export const validateAddProductForm = (input: IProductForm) => {
   const errors: TAddProductValidationError = {};
 
   // validate product name
@@ -19,15 +19,15 @@ export const validateAddProductForm = (input: IProduct) => {
   // validate product description
   if (!input.description) {
     errors.description = "Description is required.";
-  } else if (input.description.length < 5) {
-    errors.description = "Description length must be 50 characters longer.";
+  } else if (input.description.length < 20) {
+    errors.description = "Description length must be 20 characters longer.";
   }
 
   // validate farmLocation
   if (!input.farmLocation) {
     errors.farmLocation = "Farm location is required.";
-  } else if (input.farmLocation.length < 10) {
-    errors.farmLocation = "Location length must be 10 characters longer.";
+  } else if (input.farmLocation.length < 20) {
+    errors.farmLocation = "Location length must be 20 characters longer.";
   }
 
   // validate price
@@ -35,11 +35,18 @@ export const validateAddProductForm = (input: IProduct) => {
     errors.price = "Product price is required.";
   } else if (input.price < 0) {
     errors.price = "Price cannot be negative.";
+  } else if (input.price < 50) {
+    errors.price = "Minimum amount of price is 50 tk upper";
   }
 
   // validate product unit
   if (!input.unit) {
     errors.unit = "Unit is required.";
+  }
+
+  //   stock validation
+  if (!input.stock) {
+    errors.stock = "Stock is required.";
   }
 
   // validate harvest date

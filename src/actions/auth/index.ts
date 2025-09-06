@@ -11,7 +11,6 @@ import bcrypt from "bcryptjs";
 // Perform registration
 export const doRegistration = async (formData: FormData) => {
   await connectDB();
-  console.log(formData);
   try {
     const formValues = {
       firstName: formData.get("firstName"),
@@ -33,7 +32,6 @@ export const doRegistration = async (formData: FormData) => {
 
     // run validation
     const errors = validateRegistrationForm(formValues);
-    console.log("server-side-validation-err", errors);
     if (Object.keys(errors).length > 0) {
       throw new Error(Object.values(errors)[0]!); // return first err
     }
@@ -94,7 +92,6 @@ export const doRegistration = async (formData: FormData) => {
     const created = await createUser(payload);
     return { success: true, userId: created._id.toString() };
   } catch (err: unknown) {
-    console.log(err, "server-side-err");
     if (err instanceof Error) {
       return { success: false, error: err.message };
     }

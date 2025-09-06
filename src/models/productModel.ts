@@ -32,7 +32,7 @@ const productSchema = new mongoose.Schema<IProductModel>({
     type: ["String"],
     required: [true, "Please select at least one feature"],
   },
-  images: {
+  imagesUrl: {
     type: ["String"],
     required: [true, "Please select at least one image"],
   },
@@ -43,7 +43,7 @@ const productSchema = new mongoose.Schema<IProductModel>({
   price: {
     type: Number,
     required: [true, "Price is required."],
-    min: [50, "Minimum amount of price is 50 upper"],
+    min: [50, "Minimum amount of price is 50 tk upper"],
     max: [50000, "Maximum amount of price is 50000 tk less"],
   },
   stock: {
@@ -58,4 +58,4 @@ const productSchema = new mongoose.Schema<IProductModel>({
 });
 
 export const Product =
-  mongoose.models?.products ?? mongoose.model("Product", productSchema);
+  mongoose.models?.Product ?? mongoose.model("Product", productSchema);

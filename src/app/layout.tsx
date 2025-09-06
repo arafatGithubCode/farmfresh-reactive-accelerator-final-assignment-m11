@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar/Navbar";
+import BreadCrumb from "@/components/ui/BreadCrumb";
 import { connectDB } from "@/libs/connectDB";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
@@ -32,6 +33,7 @@ export default async function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
           {authInterceptedModal}
+          <BreadCrumb />
           {children}
           <Footer />
         </ThemeProvider>

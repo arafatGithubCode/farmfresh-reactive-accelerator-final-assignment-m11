@@ -1,9 +1,9 @@
 import { FaRegHeart } from "react-icons/fa6";
 
 const ProductCard = ({
-  isManageListingPage,
+  isManageListingPage = false,
 }: {
-  isManageListingPage: boolean;
+  isManageListingPage?: boolean;
 }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300">

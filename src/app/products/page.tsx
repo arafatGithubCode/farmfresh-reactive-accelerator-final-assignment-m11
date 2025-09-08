@@ -7,7 +7,6 @@ import { getProducts } from "@/queries/product";
 
 const ProductsPage = async () => {
   const products = await getProducts();
-  console.log("product______page", products);
   return (
     <>
       <div className="bg-primary-600 text-white py-12">

@@ -16,6 +16,7 @@ export const getUserSession = async (): Promise<IUserSession | null> => {
       email: user?.email,
       image: user?.avatar_url,
       role: user?.role,
+      district: user?.district,
     };
   }
 

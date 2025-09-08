@@ -21,6 +21,8 @@ export const validateAddProductForm = (input: IProductForm) => {
     errors.description = "Description is required.";
   } else if (input.description.length < 20) {
     errors.description = "Description length must be 20 characters longer.";
+  } else if (input.description.length > 1000) {
+    errors.description = "Description must be 1000 characters shorter.";
   }
 
   // validate farmLocation
@@ -28,6 +30,8 @@ export const validateAddProductForm = (input: IProductForm) => {
     errors.farmLocation = "Farm location is required.";
   } else if (input.farmLocation.length < 20) {
     errors.farmLocation = "Location length must be 20 characters longer.";
+  } else if (input.farmLocation.length > 100) {
+    errors.farmLocation = "Location cannot be 100 characters upper.";
   }
 
   // validate price
@@ -35,8 +39,8 @@ export const validateAddProductForm = (input: IProductForm) => {
     errors.price = "Product price is required.";
   } else if (input.price < 0) {
     errors.price = "Price cannot be negative.";
-  } else if (input.price < 50) {
-    errors.price = "Minimum amount of price is 50 tk upper";
+  } else if (input.price < 2) {
+    errors.price = "Minimum amount of price per unit is 2tk upper.";
   }
 
   // validate product unit

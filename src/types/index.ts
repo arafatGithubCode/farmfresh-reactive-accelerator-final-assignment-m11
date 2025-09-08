@@ -83,12 +83,15 @@ export interface IUserSession {
   email?: string;
   image?: string;
   role?: string;
+  district?: string;
 }
 
 // Product model Types
 export interface IProductModel {
   id?: string;
   farmerId?: string;
+  farmerName?: string;
+  district?: string;
   name: string;
   category: string;
   description: string;
@@ -99,10 +102,14 @@ export interface IProductModel {
   harvestDate: string;
   features: string[];
   imagesUrl: string[];
+  ratings?: number;
 }
 
 export interface IProductForm
-  extends Omit<IProductModel, "imagesUrl" | "farmerId" | "id"> {
+  extends Omit<
+    IProductModel,
+    "imagesUrl" | "farmerId" | "id" | "ratings" | "farmerName" | "district"
+  > {
   images: File[];
 }
 

@@ -4,16 +4,31 @@ import ManageProductFilter from "@/components/manage-products/ManageProductFilte
 import ManageProductPageTitle from "@/components/manage-products/ManageProductPageTitle";
 import AccessDenied from "@/components/ui/AccessDenied";
 import Toast from "@/components/ui/Toast";
+import { getProducts } from "@/queries/product";
 import { getUserSession } from "@/utils/getUserSession";
 
 const ManageProductPage = async () => {
   const userSession = await getUserSession();
+  const products = await getProducts();
+
   return userSession?.role === "Farmer" ? (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <ManageProductPageTitle />
       <ManageProductFilter />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <ProductCard isManageListingPage={true} />
+        {products && products.length === 0 ? (
+          <p className="text-xs font-semibold text-gray-400">
+            No products listed yet
+          </p>
+        ) : (
+          products.map((product) => (
+            <ProductCard
+              key={product.id}
+              isManageListingPage={true}
+              product={product}
+            />
+          ))
+        )}
       </div>
       <Pagination />
     </div>

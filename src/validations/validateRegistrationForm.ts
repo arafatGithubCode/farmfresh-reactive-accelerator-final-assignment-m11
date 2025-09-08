@@ -56,6 +56,10 @@ export const validateRegistrationForm = (
     errors.address = "Address must be 20 characters longer";
   }
 
+  if (input.bio.length > 250) {
+    errors.bio = "250 is the maximum allowed characters.";
+  }
+
   if (input.role === "Farmer") {
     if (!input.farmName) errors.farmName = "Farm name is required.";
     if (!input.farmSize) errors.farmSize = "Farm size is required.";

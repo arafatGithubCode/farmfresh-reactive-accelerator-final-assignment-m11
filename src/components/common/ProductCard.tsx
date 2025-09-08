@@ -10,6 +10,7 @@ const ProductCard = ({
   isManageListingPage?: boolean;
   product: IProductModel;
 }) => {
+  console.log(product);
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative">
@@ -42,7 +43,8 @@ const ProductCard = ({
           </div>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-          By Rahim&apos;s Farm • Sylhet
+          By {product?.farmerName?.split(" ")[0]}&apos;s Farm •{" "}
+          {product?.district}
         </p>
         <div className="flex items-center justify-between mb-4">
           <div>

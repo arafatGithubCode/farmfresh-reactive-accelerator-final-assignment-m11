@@ -76,7 +76,11 @@ export const doAddingProduct = async (
     };
 
     if (session?.id) {
+      console.log(session, "session");
       payload.farmerId = session.id;
+      payload.ratings = 0;
+      payload.farmerName = session.name;
+      payload.district = session.district;
     }
 
     const createdProduct = await createProduct(payload);

@@ -51,12 +51,12 @@ const Toast = ({
   };
 
   const baseStyle =
-    "px-3 py-2 w-fit rounded font-medium text-sm shadow text-white flex items-center justify-between gap-2 transition-opacity animate-bounce-skew duration-300";
+    "px-3 py-2 w-fit rounded font-medium text-sm shadow text-black flex items-center justify-between gap-2 transition-opacity animate-bounce-skew duration-300";
 
   const modeStyle: Record<ToastMode, string> = {
-    SUCCESS: "bg-green-500",
-    ERROR: "bg-red-500",
-    WARNING: "bg-yellow-500 text-black",
+    SUCCESS: "bg-green-200",
+    ERROR: "bg-red-200",
+    WARNING: "bg-yellow-200 text-black",
   };
 
   useEffect(() => {

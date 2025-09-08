@@ -382,6 +382,7 @@ const RegisterForm = () => {
                 </span>
               </label>
               <textarea
+                disabled={formValues.bio.length === 250}
                 id="bio"
                 name="bio"
                 rows={3}
@@ -396,7 +397,7 @@ const RegisterForm = () => {
                   Brief description
                 </p>
                 <span id="bioCounter" className="text-xs text-gray-400">
-                  0/250
+                  {formValues.bio.length}/250
                 </span>
               </div>
             </Field>
@@ -479,8 +480,9 @@ const RegisterForm = () => {
                   value={formValues.farmSizeUnit}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className="w-24 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
+                  className="w-52 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white text-sm"
                 >
+                  <option value="">Select Size Unit</option>
                   <option value="acres">Acres</option>
                   <option value="hectares">Hectares</option>
                   <option value="sq_ft">Sq Ft</option>

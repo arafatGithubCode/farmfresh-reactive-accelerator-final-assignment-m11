@@ -69,6 +69,9 @@ const userSchema = new Schema<IUserDB>(
     specialization: {
       type: String,
     },
+    district: {
+      type: String,
+    },
   },
   { timestamps: true }
 );

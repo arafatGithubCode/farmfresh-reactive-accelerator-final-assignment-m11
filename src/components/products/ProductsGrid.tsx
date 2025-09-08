@@ -1,12 +1,17 @@
 "use client";
 
+import { IProductModel } from "@/types";
 import { useState } from "react";
 import { FaTh } from "react-icons/fa";
 import { FaList } from "react-icons/fa6";
 import Pagination from "../common/Pagination";
 import ProductCard from "../common/ProductCard";
 
-const ProductsGrid = () => {
+type Props = {
+  products: IProductModel[];
+};
+
+const ProductsGrid = ({ products }: Props) => {
   const [viewType, setViewType] = useState<"GRID" | "LIST">("GRID");
   return (
     <div className="lg:col-span-3">
@@ -47,20 +52,26 @@ const ProductsGrid = () => {
         </div>
       </div>
 
-      <div
-        className={`grid ${
-          viewType === "GRID"
-            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-            : "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
-        } gap-6`}
-      >
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-        <ProductCard />
-      </div>
-
-      <Pagination />
+      {products.length === 0 ? (
+        <p className="text-xs font-semibold text-gray-400">
+          No products listed yet
+        </p>
+      ) : (
+        <>
+          <div
+            className={`grid ${
+              viewType === "GRID"
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                : "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
+            } gap-6`}
+          >
+            {products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          <Pagination />
+        </>
+      )}
     </div>
   );
 };

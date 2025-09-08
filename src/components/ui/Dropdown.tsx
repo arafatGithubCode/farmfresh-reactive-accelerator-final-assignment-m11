@@ -57,7 +57,7 @@ const Dropdown = ({ image, name }: { image: string; name: string }) => {
       {showDropdown && (
         <div
           ref={dropdownRef}
-          className="bg-white dark:bg-gray-800 rounded-b py-2 absolute left-0 right-0 top-12 animate-fade-up shadow divide-x-2"
+          className="bg-white dark:bg-gray-800 rounded-b py-2 min-w-40 absolute left-0 right-0 top-12 animate-fade-up shadow divide-x-2"
         >
           <div className="flex flex-col gap-2 items-start">
             <Link

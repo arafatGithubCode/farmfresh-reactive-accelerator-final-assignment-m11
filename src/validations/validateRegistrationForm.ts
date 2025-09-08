@@ -62,7 +62,10 @@ export const validateRegistrationForm = (
     if (!input.farmSizeUnit)
       errors.farmSizeUnit = "Farm size unit is required.";
     if (!input.specialization)
-      errors.specialization = "Specialization is required";
+      errors.specialization = "Specialization is required.";
+    if (!input.district) {
+      errors.district = "District is required.";
+    }
   }
 
   if (!input.terms) {

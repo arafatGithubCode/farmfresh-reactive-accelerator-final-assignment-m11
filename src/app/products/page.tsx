@@ -3,8 +3,11 @@ import LocationFilter from "@/components/products/LocationFilter";
 import OrganicFilter from "@/components/products/OrganicFilter";
 import PriceFilter from "@/components/products/PriceFilter";
 import ProductsGrid from "@/components/products/ProductsGrid";
+import { getProducts } from "@/queries/product";
 
-const ProductsPage = () => {
+const ProductsPage = async () => {
+  const products = await getProducts();
+  console.log("product______page", products);
   return (
     <>
       <div className="bg-primary-600 text-white py-12">
@@ -29,7 +32,7 @@ const ProductsPage = () => {
               <OrganicFilter />
             </div>
           </div>
-          <ProductsGrid />
+          <ProductsGrid products={products} />
         </div>
       </div>
     </>

@@ -1,6 +1,7 @@
 "use client";
 
 import { doRegistration } from "@/actions/auth";
+import { districts } from "@/data";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
 import { IUserRegistrationForm } from "@/types";
@@ -30,6 +31,7 @@ const initialValues: IUserRegistrationForm = {
   farmSize: "",
   farmSizeUnit: "",
   terms: false,
+  district: "",
 };
 
 const RegisterForm = () => {
@@ -136,6 +138,11 @@ const RegisterForm = () => {
             </label>
           </div>
         </Field>
+        {formValues.role === "Farmer" && (
+          <p className="border-b dark:border-b-gray-600 text-primary-500 border-primary-500">
+            Personal Information:
+          </p>
+        )}
         {/* <!-- Profile Picture Upload - Full Width --> */}
         <Field error={touched.avatar && errors.avatar}>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -233,27 +240,6 @@ const RegisterForm = () => {
                 placeholder="john@example.com"
               />
             </Field>
-
-            {/* <!-- Address --> */}
-            <Field error={touched.address && errors.address}>
-              <label
-                htmlFor="address"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Address
-              </label>
-              <textarea
-                id="address"
-                name="address"
-                value={formValues.address}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                placeholder="Enter your full address"
-              ></textarea>
-            </Field>
-            <div className="w-full h-[3px]" />
             {/* <!-- Password --> */}
             <Field error={touched.password && errors.password}>
               <label
@@ -286,6 +272,27 @@ const RegisterForm = () => {
                 </button>
               </div>
             </Field>
+            {/* <!-- Address --> */}
+            {formValues.role === "Customer" && (
+              <Field error={touched.address && errors.address}>
+                <label
+                  htmlFor="address"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Address
+                </label>
+                <textarea
+                  id="address"
+                  name="address"
+                  value={formValues.address}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                  placeholder="Enter your full address"
+                ></textarea>
+              </Field>
+            )}
           </div>
 
           {/* <!-- Right Column --> */}
@@ -330,37 +337,6 @@ const RegisterForm = () => {
               />
             </Field>
 
-            {/* <!-- Bio --> */}
-            <Field error={touched.bio && errors.bio}>
-              <label
-                htmlFor="bio"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Bio
-                <span className="text-gray-400 text-xs font-normal">
-                  (Optional)
-                </span>
-              </label>
-              <textarea
-                id="bio"
-                name="bio"
-                rows={3}
-                value={formValues.bio}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                placeholder="Tell us about yourself..."
-              ></textarea>
-              <div className="flex justify-between items-center mt-1">
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Brief description
-                </p>
-                <span id="bioCounter" className="text-xs text-gray-400">
-                  0/250
-                </span>
-              </div>
-            </Field>
-
             {/* <!-- Confirm Password --> */}
             <Field error={touched.confirmPassword && errors.confirmPassword}>
               <label
@@ -393,12 +369,46 @@ const RegisterForm = () => {
                 </button>
               </div>
             </Field>
+
+            {/* <!-- Bio --> */}
+            <Field error={touched.bio && errors.bio}>
+              <label
+                htmlFor="bio"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Bio
+                <span className="text-gray-400 text-xs font-normal">
+                  (Optional)
+                </span>
+              </label>
+              <textarea
+                id="bio"
+                name="bio"
+                rows={3}
+                value={formValues.bio}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                placeholder="Tell us about yourself..."
+              ></textarea>
+              <div className="flex justify-between items-center mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Brief description
+                </p>
+                <span id="bioCounter" className="text-xs text-gray-400">
+                  0/250
+                </span>
+              </div>
+            </Field>
           </div>
         </div>
 
         {/* <!-- Farmer-specific fields (hidden by default) --> */}
-        {formValues.role.toLowerCase() === "farmer" && (
+        {formValues.role === "Farmer" && (
           <div id="farmerFields" className="space-y-4">
+            <p className="border-b dark:border-b-gray-600 text-primary-500 border-primary-500">
+              Farm Information:
+            </p>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <Field error={touched.farmName && errors.farmName}>
                 <label
@@ -485,6 +495,48 @@ const RegisterForm = () => {
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                 Enter the total area of your farm
               </p>
+            </Field>
+            <Field error={touched.district && errors.district}>
+              <label
+                htmlFor="district"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                District
+              </label>
+              <select
+                id="district"
+                name="district"
+                value={formValues.district}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Select district</option>
+                {districts.map((district) => (
+                  <option key={district} value={district}>
+                    {district}
+                  </option>
+                ))}
+              </select>
+            </Field>
+
+            <Field error={touched.address && errors.address}>
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Address
+              </label>
+              <textarea
+                id="address"
+                name="address"
+                value={formValues.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                placeholder="Enter your full address"
+              ></textarea>
             </Field>
           </div>
         )}

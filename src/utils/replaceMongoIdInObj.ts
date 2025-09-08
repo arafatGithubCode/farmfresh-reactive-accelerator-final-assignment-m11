@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export const replaceUserIdInObj = <T extends { _id: Types.ObjectId }>(
+export const replaceMongoIdInObj = <T extends { _id: Types.ObjectId }>(
   obj: T
 ) => {
   const { _id, ...rest } = obj;

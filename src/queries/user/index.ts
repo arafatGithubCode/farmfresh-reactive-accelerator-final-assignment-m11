@@ -1,7 +1,7 @@
 import { connectDB } from "@/libs/connectDB";
 import { User } from "@/models/userModel";
 import { IUserDB } from "@/types";
-import { replaceUserIdInObj } from "@/utils/replaceUserIdInObj";
+import { replaceMongoIdInObj } from "@/utils/replaceMongoIdInObj";
 
 // Create a user
 export const createUser = async (payload: IUserDB) => {
@@ -15,5 +15,5 @@ export const getUserByEmail = async (email: string) => {
   const user = await User.findOne({
     email,
   }).lean();
-  return user ? replaceUserIdInObj(user) : null;
+  return user ? replaceMongoIdInObj(user) : null;
 };

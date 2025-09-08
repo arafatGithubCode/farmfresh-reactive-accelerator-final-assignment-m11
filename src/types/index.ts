@@ -15,6 +15,7 @@ type TBaseUser = {
   specialization?: string;
   farmSize?: string;
   farmSizeUnit?: string;
+  district?: string;
   terms: boolean;
 };
 
@@ -36,6 +37,7 @@ export interface IUserRegistrationForm
   specialization: string;
   farmSize: string;
   farmSizeUnit: string;
+  district: string;
 }
 
 // Error type for registration form
@@ -85,6 +87,7 @@ export interface IUserSession {
 
 // Product model Types
 export interface IProductModel {
+  id?: string;
   farmerId?: string;
   name: string;
   category: string;
@@ -99,8 +102,12 @@ export interface IProductModel {
 }
 
 export interface IProductForm
-  extends Omit<IProductModel, "imagesUrl" | "farmerId"> {
+  extends Omit<IProductModel, "imagesUrl" | "farmerId" | "id"> {
   images: File[];
+}
+
+export interface IMongoProduct extends IProductModel {
+  _id: string;
 }
 
 // error type for add product form

@@ -1,8 +1,29 @@
-const FarmersPage = () => {
+import FarmerCard from "@/components/common/FarmerCard";
+import LoadMore from "@/components/common/LoadMore";
+import FarmersPageHeader from "@/components/farmers/FarmersPageHeader";
+import FarmersStats from "@/components/farmers/FarmersStats";
+import { getAllFarmers } from "@/queries/user";
+
+const FarmersPage = async () => {
+  const farmers = await getAllFarmers();
   return (
-    <div>
-      <h1>Welcome to farmers page</h1>
-    </div>
+    <>
+      <FarmersPageHeader />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <FarmersStats />
+        {farmers && farmers.length === 0 ? (
+          <p>No farmers listed yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {farmers.map((farmer) => (
+              <FarmerCard key={farmer.id} farmer={farmer} />
+            ))}
+          </div>
+        )}
+
+        <LoadMore />
+      </div>
+    </>
   );
 };
 

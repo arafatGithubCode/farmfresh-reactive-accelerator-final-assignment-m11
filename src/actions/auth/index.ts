@@ -63,7 +63,7 @@ export const doRegistration = async (formData: FormData) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // build the payload (no farms fields for the customer)
-    const payload: IUserDB = {
+    const payload: Omit<IUserDB, "_id"> = {
       role,
       firstName,
       lastName,

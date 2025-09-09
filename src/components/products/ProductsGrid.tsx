@@ -8,11 +8,12 @@ import Pagination from "../common/Pagination";
 import ProductCard from "../common/ProductCard";
 
 type Props = {
-  products: IProductModel[];
+  products: (Omit<IProductModel, "_id"> & { id: string })[];
 };
 
 const ProductsGrid = ({ products }: Props) => {
   const [viewType, setViewType] = useState<"GRID" | "LIST">("GRID");
+
   return (
     <div className="lg:col-span-3">
       <div className="flex justify-between items-center mb-6">

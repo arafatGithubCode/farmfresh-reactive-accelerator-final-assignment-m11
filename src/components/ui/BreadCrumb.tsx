@@ -4,10 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaChevronRight } from "react-icons/fa6";
 
+const allowedPath = ["/add-product", "/manage-products", "/my-orders"];
+
 const BreadCrumb = () => {
   const pathname = usePathname();
-  if (pathname === "/" || pathname === "/products" || pathname === "/about")
-    return null;
+  if (!allowedPath.includes(pathname)) return null;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">

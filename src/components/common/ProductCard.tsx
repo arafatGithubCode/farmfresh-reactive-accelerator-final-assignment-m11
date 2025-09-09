@@ -8,7 +8,7 @@ const ProductCard = ({
   product,
 }: {
   isManageListingPage?: boolean;
-  product: IProductModel;
+  product: Omit<IProductModel, "_id">;
 }) => {
   console.log(product);
   return (

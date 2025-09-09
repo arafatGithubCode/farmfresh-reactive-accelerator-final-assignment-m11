@@ -62,7 +62,7 @@ export const doAddingProduct = async (
 
     const imagesUrl = uploaded.map((r) => r.secure_url);
 
-    const payload: IProductModel = {
+    const payload: Omit<IProductModel, "_id"> = {
       name,
       category,
       description,

@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 // User Role
 export type TUserRole = "Farmer" | "Customer";
 
@@ -21,6 +23,7 @@ type TBaseUser = {
 
 // User DB type
 export interface IUserDB extends TBaseUser {
+  _id: Types.ObjectId;
   avatar_url?: string;
 }
 
@@ -28,7 +31,7 @@ export interface IUserDB extends TBaseUser {
 export interface IUserRegistrationForm
   extends Omit<
     TBaseUser,
-    "bil" | "farmName" | "specialization" | "farmSize" | "farmSizeUnit"
+    "bio" | "farmName" | "specialization" | "farmSize" | "farmSizeUnit"
   > {
   avatar: File | null;
   confirmPassword: string;
@@ -88,7 +91,7 @@ export interface IUserSession {
 
 // Product model Types
 export interface IProductModel {
-  id?: string;
+  _id: Types.ObjectId;
   farmerId?: string;
   farmerName?: string;
   district?: string;
@@ -108,13 +111,9 @@ export interface IProductModel {
 export interface IProductForm
   extends Omit<
     IProductModel,
-    "imagesUrl" | "farmerId" | "id" | "ratings" | "farmerName" | "district"
+    "imagesUrl" | "farmerId" | "_id" | "ratings" | "farmerName" | "district"
   > {
   images: File[];
-}
-
-export interface IMongoProduct extends IProductModel {
-  _id: string;
 }
 
 // error type for add product form

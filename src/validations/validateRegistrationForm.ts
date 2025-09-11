@@ -67,8 +67,13 @@ export const validateRegistrationForm = (
       errors.farmSizeUnit = "Farm size unit is required.";
     if (!input.specialization)
       errors.specialization = "Specialization is required.";
-    if (!input.district) {
-      errors.district = "District is required.";
+    if (!input.farmDistrict) {
+      errors.farmDistrict = "Farm district is required.";
+    }
+    if (!input.farmAddress) {
+      errors.farmAddress = "Farm address is required.";
+    } else if (input.farmAddress.length < 20) {
+      errors.farmAddress = "Farm address must be 20 characters longer";
     }
   }
 

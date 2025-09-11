@@ -6,6 +6,7 @@ import { IProductForm, IProductModel, TActionResponse } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
+import mongoose from "mongoose";
 
 export const doAddingProduct = async (
   formData: FormData
@@ -21,7 +22,6 @@ export const doAddingProduct = async (
       name: (formData.get("name") as string) ?? "",
       category: (formData.get("category") as string) ?? "",
       description: (formData.get("description") as string) ?? "",
-      farmLocation: (formData.get("farmLocation") as string) ?? "",
       harvestDate: (formData.get("harvestDate") as string) ?? "",
       images: formData.getAll("images") as File[],
       price: Number(formData.get("price")) || 0,
@@ -40,7 +40,6 @@ export const doAddingProduct = async (
       name,
       category,
       description,
-      farmLocation,
       harvestDate,
       images,
       price,
@@ -66,7 +65,6 @@ export const doAddingProduct = async (
       name,
       category,
       description,
-      farmLocation,
       harvestDate,
       imagesUrl,
       price,
@@ -76,11 +74,8 @@ export const doAddingProduct = async (
     };
 
     if (session?.id) {
-      console.log(session, "session");
-      payload.farmerId = session.id;
+      payload.farmer = new mongoose.Types.ObjectId(session.id);
       payload.ratings = 0;
-      payload.farmerName = session.name;
-      payload.district = session.district;
     }
 
     const createdProduct = await createProduct(payload);

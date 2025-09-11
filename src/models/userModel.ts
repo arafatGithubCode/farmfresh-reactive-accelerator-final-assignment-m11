@@ -14,17 +14,21 @@ const userSchema = new Schema<IUserDB>(
       required: [true, "User role is required."],
       enum: Object.values(UserRole),
       default: UserRole.customer,
+      trim: true,
     },
-    avatar_url: {
+    image: {
       type: String,
+      required: [true, "Profile picture is required"],
     },
     firstName: {
       type: String,
       required: [true, "first name is required."],
+      trim: true,
     },
     lastName: {
       type: String,
       required: [true, "last name is required."],
+      trim: true,
     },
     email: {
       type: String,
@@ -37,6 +41,7 @@ const userSchema = new Schema<IUserDB>(
     phone: {
       type: String,
       required: [true, "Phone is required."],
+      trim: true,
     },
     address: {
       type: String,
@@ -49,6 +54,7 @@ const userSchema = new Schema<IUserDB>(
       type: String,
       required: [true, "Password is required."],
       minlength: [6, "Password must be 6 characters or longer"],
+      trim: true,
     },
     terms: {
       type: Boolean,
@@ -69,7 +75,10 @@ const userSchema = new Schema<IUserDB>(
     specialization: {
       type: String,
     },
-    district: {
+    farmDistrict: {
+      type: String,
+    },
+    farmAddress: {
       type: String,
     },
   },

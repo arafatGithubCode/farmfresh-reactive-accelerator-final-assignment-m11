@@ -31,7 +31,6 @@ const initialValues: IProductForm = {
   unit: "",
   stock: 0,
   images: [],
-  farmLocation: "",
   harvestDate: "",
   features: [],
 };
@@ -68,6 +67,7 @@ const AddProductForm = () => {
         }
 
         const response = await doAddingProduct(formData);
+
         if (!response.success) {
           setErr(response.error);
           setLoading(false);
@@ -153,7 +153,24 @@ const AddProductForm = () => {
                 <option value="honey">Honey</option>
               </select>
             </Field>
-
+            <div className="md:col-span-2">
+              <Field error={touched.harvestDate && errors.harvestDate}>
+                <label
+                  htmlFor="harvestDate"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+                >
+                  Harvest Date
+                </label>
+                <input
+                  value={formValues.harvestDate}
+                  onChange={handleChange}
+                  type="date"
+                  id="harvestDate"
+                  name="harvestDate"
+                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+              </Field>
+            </div>
             <div className="md:col-span-2">
               <Field error={touched.description && errors.description}>
                 <label
@@ -242,7 +259,7 @@ const AddProductForm = () => {
                 type="number"
                 id="stock"
                 name="stock"
-                min="0"
+                min="1"
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="100"
               />
@@ -311,48 +328,6 @@ const AddProductForm = () => {
             </div>
           </div>
         </Field>
-
-        <div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-            Farm Information
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Field error={touched.farmLocation && errors.farmLocation}>
-              <label
-                htmlFor="farmLocation"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Farm Location *
-              </label>
-              <input
-                value={formValues.farmLocation}
-                onChange={handleChange}
-                type="text"
-                id="farmLocation"
-                name="farmLocation"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                placeholder="e.g., Sylhet, Bangladesh"
-              />
-            </Field>
-
-            <Field error={touched.harvestDate && errors.harvestDate}>
-              <label
-                htmlFor="harvestDate"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
-              >
-                Harvest Date
-              </label>
-              <input
-                value={formValues.harvestDate}
-                onChange={handleChange}
-                type="date"
-                id="harvestDate"
-                name="harvestDate"
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              />
-            </Field>
-          </div>
-        </div>
 
         <Field error={touched.features && errors.features}>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">

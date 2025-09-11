@@ -1,4 +1,4 @@
-import { IProductModel } from "@/types";
+import { IProductFrontend } from "@/types";
 import { FaEdit } from "react-icons/fa";
 import { FaEye, FaRegHeart, FaStar, FaTrash } from "react-icons/fa6";
 import ProductImageCarousel from "../ui/ProductImageCarousel";
@@ -8,9 +8,8 @@ const ProductCard = ({
   product,
 }: {
   isManageListingPage?: boolean;
-  product: Omit<IProductModel, "_id">;
+  product: IProductFrontend;
 }) => {
-  console.log(product);
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative">
@@ -43,8 +42,8 @@ const ProductCard = ({
           </div>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-          By {product?.farmerName?.split(" ")[0]}&apos;s Farm •{" "}
-          {product?.district}
+          By {product?.farmer?.firstName}&apos;s Farm •{" "}
+          {product?.farmer?.farmDistrict}
         </p>
         <div className="flex items-center justify-between mb-4">
           <div>

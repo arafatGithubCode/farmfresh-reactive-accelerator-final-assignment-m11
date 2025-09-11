@@ -10,7 +10,6 @@ import bcrypt from "bcryptjs";
 
 // Perform registration
 export const doRegistration = async (formData: FormData) => {
-  console.log(formData);
   await connectDB();
   try {
     const formValues = {
@@ -29,7 +28,8 @@ export const doRegistration = async (formData: FormData) => {
       farmSizeUnit: formData.get("farmSizeUnit"),
       specialization: formData.get("specialization"),
       terms: formData.get("terms") === "true" || formData.get("terms") === "on",
-      district: formData.get("district"),
+      farmDistrict: formData.get("farmDistrict"),
+      farmAddress: formData.get("farmAddress"),
     } as IUserRegistrationForm;
 
     // run validation
@@ -52,7 +52,8 @@ export const doRegistration = async (formData: FormData) => {
       farmSize,
       farmSizeUnit,
       specialization,
-      district,
+      farmDistrict,
+      farmAddress,
     } = formValues;
 
     // Reject duplicate
@@ -80,16 +81,17 @@ export const doRegistration = async (formData: FormData) => {
       if (specialization) payload.specialization = specialization;
       if (farmSize) payload.farmSize = farmSize;
       if (farmSizeUnit) payload.farmSizeUnit = farmSizeUnit;
-      if (district) payload.district = district;
+      if (farmDistrict) payload.farmDistrict = farmDistrict;
+      if (farmAddress) payload.farmAddress = farmAddress;
     }
 
     // upload avatar
     if (avatar) {
       const upload = await uploadImage(avatar, "avatar");
       if (!upload.success) throw new Error(upload.error);
-      payload.avatar_url = upload.secure_url;
+      payload.image = upload.secure_url;
     } else {
-      payload.avatar_url = undefined;
+      payload.image = undefined;
     }
 
     // create user

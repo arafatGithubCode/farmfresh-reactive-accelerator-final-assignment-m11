@@ -25,15 +25,6 @@ export const validateAddProductForm = (input: IProductForm) => {
     errors.description = "Description must be 1000 characters shorter.";
   }
 
-  // validate farmLocation
-  if (!input.farmLocation) {
-    errors.farmLocation = "Farm location is required.";
-  } else if (input.farmLocation.length < 20) {
-    errors.farmLocation = "Location length must be 20 characters longer.";
-  } else if (input.farmLocation.length > 100) {
-    errors.farmLocation = "Location cannot be 100 characters upper.";
-  }
-
   // validate price
   if (!input.price) {
     errors.price = "Product price is required.";
@@ -51,6 +42,8 @@ export const validateAddProductForm = (input: IProductForm) => {
   //   stock validation
   if (!input.stock) {
     errors.stock = "Stock is required.";
+  } else if (Number(input.stock) < 1) {
+    errors.stock = "Stock must be greater then 1.";
   }
 
   // validate harvest date

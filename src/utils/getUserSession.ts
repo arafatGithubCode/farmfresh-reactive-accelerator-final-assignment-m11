@@ -1,29 +1,20 @@
 import { auth } from "@/auth";
-import { getUserByEmail } from "@/queries/user";
 import { IUserSession } from "@/types";
 
 export const getUserSession = async (): Promise<IUserSession | null> => {
   const session = await auth();
 
-  if (!session?.user) return null;
+  if (!session) return null;
 
-  if (session?.user?.email && !session?.user?.image) {
-    const user = await getUserByEmail(session.user.email);
-
-    return {
-      id: user?.id,
-      name: `${user?.firstName} ${user?.lastName}`,
-      email: user?.email,
-      image: user?.avatar_url,
-      role: user?.role,
-      district: user?.district,
-    };
-  }
+  const name =
+    session?.user?.name ??
+    session?.user?.firstName + " " + session?.user?.lastName;
 
   return {
-    name: session.user.name!,
+    id: session.user.id,
+    name,
     email: session.user.email!,
     image: session.user.image!,
-    role: "Customer",
+    role: session.user.role,
   };
 };

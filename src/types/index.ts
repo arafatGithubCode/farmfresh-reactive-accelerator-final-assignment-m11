@@ -1,10 +1,21 @@
 import { Types } from "mongoose";
 
-// User Role
+//===== User Types Start =====//
 export type TUserRole = "Farmer" | "Customer";
 
-// Base user type
-type TBaseUser = {
+export interface ICredentialInput {
+  email: string;
+  password: string;
+}
+
+export interface IUserSession {
+  id?: string;
+  name?: string;
+  email?: string;
+  image?: string;
+  role?: string;
+}
+interface TBaseUser {
   role: TUserRole;
   firstName: string;
   email: string;
@@ -12,26 +23,30 @@ type TBaseUser = {
   password: string;
   lastName: string;
   phone: string;
+  farmAddress?: string;
   bio?: string;
   farmName?: string;
   specialization?: string;
   farmSize?: string;
   farmSizeUnit?: string;
-  district?: string;
+  farmDistrict?: string;
   terms: boolean;
-};
-
-// User DB type
-export interface IUserDB extends TBaseUser {
-  _id: Types.ObjectId;
-  avatar_url?: string;
 }
 
-// User registration form
+export interface IUserDB extends TBaseUser {
+  _id: Types.ObjectId;
+  image?: string;
+}
 export interface IUserRegistrationForm
   extends Omit<
     TBaseUser,
-    "bio" | "farmName" | "specialization" | "farmSize" | "farmSizeUnit"
+    | "bio"
+    | "farmName"
+    | "specialization"
+    | "farmSize"
+    | "farmSizeUnit"
+    | "farmAddress"
+    | "farmDistrict"
   > {
   avatar: File | null;
   confirmPassword: string;
@@ -40,13 +55,57 @@ export interface IUserRegistrationForm
   specialization: string;
   farmSize: string;
   farmSizeUnit: string;
-  district: string;
+  farmDistrict: string;
+  farmAddress: string;
 }
 
-// Error type for registration form
 export type TRegistrationFormValidationError = Partial<
   Record<keyof IUserRegistrationForm, string>
 >;
+//===== User Types End =====//
+
+//===== Product Types Start =====//
+export interface IProductBase {
+  _id: Types.ObjectId;
+  farmer: Types.ObjectId;
+  name: string;
+  category: string;
+  description: string;
+  price: number;
+  unit: string;
+  stock: number;
+  harvestDate: string;
+  features: string[];
+  imagesUrl: string[];
+  ratings?: number;
+}
+export interface IFarmerPopulated {
+  _id: Types.ObjectId;
+  firstName: string;
+  farmName: string;
+  farmDistrict: string;
+}
+
+export type IProductWithFarmer = Omit<IProductBase, "farmer"> & {
+  farmer: IFarmerPopulated;
+};
+
+export interface IProductFrontend
+  extends Omit<IProductWithFarmer, "_id" | "farmer"> {
+  id: string;
+  farmer: Omit<IFarmerPopulated, "_id"> & { id: string };
+}
+
+export interface IProductForm
+  extends Omit<IProductBase, "imagesUrl" | "farmer" | "_id" | "ratings"> {
+  images: File[];
+}
+
+export type TAddProductValidationError = Partial<
+  Record<keyof IProductForm, string>
+>;
+
+//===== Product Types End =====//
 
 // Upload Kind
 export type TUploadKind = "avatar" | "product";
@@ -72,54 +131,6 @@ export type UploadResponse = IUploadResult | IUploadError;
 
 // Toast mode type
 export type ToastMode = "SUCCESS" | "ERROR" | "WARNING";
-
-// Credential Input type
-export interface ICredentialInput {
-  email: string;
-  password: string;
-}
-
-// User session type
-export interface IUserSession {
-  id?: string;
-  name?: string;
-  email?: string;
-  image?: string;
-  role?: string;
-  district?: string;
-}
-
-// Product model Types
-export interface IProductModel {
-  _id: Types.ObjectId;
-  farmerId?: string;
-  farmerName?: string;
-  district?: string;
-  name: string;
-  category: string;
-  description: string;
-  price: number;
-  unit: string;
-  stock: number;
-  farmLocation: string;
-  harvestDate: string;
-  features: string[];
-  imagesUrl: string[];
-  ratings?: number;
-}
-
-export interface IProductForm
-  extends Omit<
-    IProductModel,
-    "imagesUrl" | "farmerId" | "_id" | "ratings" | "farmerName" | "district"
-  > {
-  images: File[];
-}
-
-// error type for add product form
-export type TAddProductValidationError = Partial<
-  Record<keyof IProductForm, string>
->;
 
 // file validation options
 export interface IFileValidateOptions {

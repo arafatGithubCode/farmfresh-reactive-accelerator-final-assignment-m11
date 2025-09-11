@@ -31,7 +31,8 @@ const initialValues: IUserRegistrationForm = {
   farmSize: "",
   farmSizeUnit: "",
   terms: false,
-  district: "",
+  farmAddress: "",
+  farmDistrict: "",
 };
 
 const RegisterForm = () => {
@@ -273,26 +274,24 @@ const RegisterForm = () => {
               </div>
             </Field>
             {/* <!-- Address --> */}
-            {formValues.role === "Customer" && (
-              <Field error={touched.address && errors.address}>
-                <label
-                  htmlFor="address"
-                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-                >
-                  Address
-                </label>
-                <textarea
-                  id="address"
-                  name="address"
-                  value={formValues.address}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
-                  placeholder="Enter your full address"
-                ></textarea>
-              </Field>
-            )}
+            <Field error={touched.address && errors.address}>
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+              >
+                Address
+              </label>
+              <textarea
+                id="address"
+                name="address"
+                value={formValues.address}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                placeholder="Enter your full address"
+              ></textarea>
+            </Field>
           </div>
 
           {/* <!-- Right Column --> */}
@@ -382,7 +381,6 @@ const RegisterForm = () => {
                 </span>
               </label>
               <textarea
-                disabled={formValues.bio.length === 250}
                 id="bio"
                 name="bio"
                 rows={3}
@@ -469,7 +467,7 @@ const RegisterForm = () => {
                   value={formValues.farmSize}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  min="0"
+                  min="1"
                   step="0.1"
                   className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="5.5"
@@ -498,17 +496,17 @@ const RegisterForm = () => {
                 Enter the total area of your farm
               </p>
             </Field>
-            <Field error={touched.district && errors.district}>
+            <Field error={touched.farmDistrict && errors.farmDistrict}>
               <label
-                htmlFor="district"
+                htmlFor="farmDistrict"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
-                District
+                Farm District
               </label>
               <select
-                id="district"
-                name="district"
-                value={formValues.district}
+                id="farmDistrict"
+                name="farmDistrict"
+                value={formValues.farmDistrict}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
@@ -522,17 +520,17 @@ const RegisterForm = () => {
               </select>
             </Field>
 
-            <Field error={touched.address && errors.address}>
+            <Field error={touched.farmAddress && errors.farmAddress}>
               <label
-                htmlFor="address"
+                htmlFor="farmAddress"
                 className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
               >
-                Address
+                Farm Address
               </label>
               <textarea
-                id="address"
-                name="address"
-                value={formValues.address}
+                id="farmAddress"
+                name="farmAddress"
+                value={formValues.farmAddress}
                 onChange={handleChange}
                 onBlur={handleBlur}
                 rows={3}

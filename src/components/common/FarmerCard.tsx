@@ -10,10 +10,10 @@ const FarmerCard = async ({
   farmer: Omit<IUserDB, "_id"> & { id: string };
 }) => {
   const {
-    avatar_url,
+    image,
     firstName,
     lastName,
-    district,
+    farmDistrict,
     bio,
     farmSize,
     farmSizeUnit,
@@ -25,7 +25,7 @@ const FarmerCard = async ({
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative">
         <Image
-          src={avatar_url!}
+          src={image!}
           alt="Rahim Ahmed"
           className="w-full h-64 object-cover"
           width={300}
@@ -49,9 +49,11 @@ const FarmerCard = async ({
           </div>
         </div>
         <p className="text-gray-600 dark:text-gray-400 mb-3">
-          <FaMapMarkedAlt className="mr-2" /> {district}, Bangladesh
+          <FaMapMarkedAlt className="mr-2" /> {farmDistrict}, Bangladesh
         </p>
-        <p className="text-gray-700 dark:text-gray-300 mb-4">{bio}</p>
+        <p className="text-gray-700 dark:text-gray-300 mb-4 line-clamp-4">
+          {bio}
+        </p>
         <div className="flex items-center justify-between mb-4">
           <div className="text-sm text-gray-600 dark:text-gray-400">
             <span className="font-medium">Farm Size:</span> {farmSize}{" "}
@@ -62,7 +64,7 @@ const FarmerCard = async ({
           </div>
         </div>
         <div className="flex space-x-2 mb-4">
-          {products[0].features.length > 0 &&
+          {products[0]?.features?.length > 0 ? (
             products[0].features.map((feature, index) => (
               <span
                 key={index}
@@ -76,7 +78,10 @@ const FarmerCard = async ({
               >
                 {feature}
               </span>
-            ))}
+            ))
+          ) : (
+            <div className="w-full h-[22px]" />
+          )}
         </div>
         <div className="flex space-x-3">
           <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition">

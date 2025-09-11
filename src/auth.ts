@@ -140,7 +140,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           accessToken: account?.access_token,
           accessTokenExpires: Date.now() + (account.expires_in ?? 0) * 1000,
           refreshToken: account?.refresh_token,
-          user,
+          user: {
+            ...user,
+            role: user?.role ?? "Customer", // default role = Customer for google sign in user
+          },
         };
       }
 
@@ -159,7 +162,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }) {
       const extendedSession: ExtendedSession = {
         ...session,
-        user: token.user,
+        user: token.user as typeof session.user,
         accessToken: token.accessToken,
         error: token.error,
       };

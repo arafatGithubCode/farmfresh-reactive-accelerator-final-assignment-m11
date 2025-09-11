@@ -1,6 +1,6 @@
 "use client";
 
-import { IProductModel } from "@/types";
+import { IProductFrontend } from "@/types";
 import { useState } from "react";
 import { FaTh } from "react-icons/fa";
 import { FaList } from "react-icons/fa6";
@@ -8,7 +8,7 @@ import Pagination from "../common/Pagination";
 import ProductCard from "../common/ProductCard";
 
 type Props = {
-  products: (Omit<IProductModel, "_id"> & { id: string })[];
+  products: IProductFrontend[];
 };
 
 const ProductsGrid = ({ products }: Props) => {

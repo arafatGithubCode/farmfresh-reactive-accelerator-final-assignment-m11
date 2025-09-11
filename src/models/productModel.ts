@@ -3,9 +3,9 @@ import mongoose from "mongoose";
 
 const productSchema = new mongoose.Schema<IProductModel>(
   {
-    farmerId: {
-      type: String,
-      required: [true, "Farmer ID is required"],
+    farmer: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
     },
     name: {
       type: String,
@@ -22,12 +22,6 @@ const productSchema = new mongoose.Schema<IProductModel>(
       required: [true, "Description is required."],
       minLength: [20, "Description must be 20 characters longer."],
       maxLength: [1000, "Description must be 1000 characters shorter."],
-    },
-    farmLocation: {
-      type: String,
-      required: [true, "Farm location is required"],
-      minLength: [20, "Location must be 20 characters longer"],
-      maxLength: [100, "Location cannot be 100 characters upper."],
     },
     features: {
       type: ["String"],
@@ -58,12 +52,6 @@ const productSchema = new mongoose.Schema<IProductModel>(
     },
     ratings: {
       type: Number,
-    },
-    farmerName: {
-      type: String,
-    },
-    district: {
-      type: String,
     },
   },
   { timestamps: true }

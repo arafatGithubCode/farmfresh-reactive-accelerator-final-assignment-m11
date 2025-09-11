@@ -3,13 +3,16 @@ import ProductCard from "@/components/common/ProductCard";
 import ManageProductFilter from "@/components/manage-products/ManageProductFilter";
 import ManageProductPageTitle from "@/components/manage-products/ManageProductPageTitle";
 import AccessDenied from "@/components/ui/AccessDenied";
-import Toast from "@/components/ui/Toast";
+import { showToast } from "@/providers/ToastProvider";
 import { getProducts } from "@/queries/product";
 import { getUserSession } from "@/utils/getUserSession";
 
 const ManageProductPage = async () => {
   const userSession = await getUserSession();
   const products = await getProducts();
+
+  if (userSession?.role !== "Farmer")
+    showToast("Only farmer can access manage product page.", "WARNING");
 
   return userSession?.role === "Farmer" ? (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -33,13 +36,7 @@ const ManageProductPage = async () => {
       <Pagination />
     </div>
   ) : (
-    <>
-      <AccessDenied allowedRole="Farmer" path="Manage-Product page" />
-      <Toast
-        mode="WARNING"
-        message="Only farmer can access manage product page."
-      />
-    </>
+    <AccessDenied allowedRole="Farmer" path="Manage-Product page" />
   );
 };
 

@@ -1,10 +1,13 @@
 import AddProductForm from "@/components/add-product/AddProductForm";
 import AccessDenied from "@/components/ui/AccessDenied";
-import Toast from "@/components/ui/Toast";
+import { showToast } from "@/providers/ToastProvider";
 import { getUserSession } from "@/utils/getUserSession";
 
 const AddProductPage = async () => {
   const userSession = await getUserSession();
+
+  if (userSession?.role !== "Farmer")
+    showToast("Only farmer can access add product page.", "WARNING");
 
   return userSession?.role === "Farmer" ? (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -19,13 +22,7 @@ const AddProductPage = async () => {
       </div>
     </div>
   ) : (
-    <>
-      <AccessDenied allowedRole="Farmer" path="Add-Product page" />
-      <Toast
-        mode="WARNING"
-        message="Only farmer can access add product page."
-      />
-    </>
+    <AccessDenied allowedRole="Farmer" path="Add-Product page" />
   );
 };
 

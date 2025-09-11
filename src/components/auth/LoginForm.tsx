@@ -1,15 +1,17 @@
 "use client";
 
 import { doCredentialLogIn } from "@/actions/auth";
+import { useCatchErr } from "@/hooks/useCatchErr";
+import { showToast } from "@/providers/ToastProvider";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { FaEnvelope, FaEye, FaLock } from "react-icons/fa6";
 import SubmitBtn from "../ui/SubmitBtn";
-import Toast from "../ui/Toast";
 import GoogleAuth from "./GoogleAuth";
 
 const LoginForm = () => {
-  const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const { catchErr, err } = useCatchErr();
 
   const router = useRouter();
 
@@ -21,15 +23,15 @@ const LoginForm = () => {
       const result = await doCredentialLogIn(formData);
 
       if (result?.error) {
+        showToast("Wrong Credentials!", "ERROR");
         setLoading(false);
-        setError("Wrong Credentials!");
       }
       setLoading(false);
       router.replace("/products");
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      catchErr(error);
+      showToast(err!, "ERROR");
       setLoading(false);
-      setError("Wrong Credentials!");
     }
   };
   return (
@@ -51,7 +53,7 @@ const LoginForm = () => {
               className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="john@example.com"
             />
-            <i className="fas fa-envelope absolute left-3 top-3.5 text-gray-400"></i>
+            <FaEnvelope className="absolute left-3 top-3.5 text-gray-400" />
           </div>
         </div>
 
@@ -71,12 +73,12 @@ const LoginForm = () => {
               className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="••••••••"
             />
-            <i className="fas fa-lock absolute left-3 top-3.5 text-gray-400"></i>
+            <FaLock className="absolute left-3 top-3.5 text-gray-400" />
             <button
               type="button"
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
-              <i className="fas fa-eye text-gray-400 hover:text-gray-600"></i>
+              <FaEye className="absolute left-3 top-3.5 text-gray-400" />
             </button>
           </div>
         </div>
@@ -121,7 +123,6 @@ const LoginForm = () => {
         {/* <!-- Social Login --> */}
         <GoogleAuth />
       </form>
-      {!!error && <Toast mode="ERROR" message={error} />}
     </>
   );
 };

@@ -3,6 +3,7 @@
 import { doAddingProduct } from "@/actions/product";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
+import { showToast } from "@/providers/ToastProvider";
 import { IProductForm } from "@/types";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
 import Image from "next/image";
@@ -10,7 +11,6 @@ import { useState } from "react";
 import { FaCloud, FaTrash } from "react-icons/fa6";
 import Field from "../common/Field";
 import SubmitBtn from "../ui/SubmitBtn";
-import Toast from "../ui/Toast";
 
 const features = [
   "Organic",
@@ -38,7 +38,6 @@ const initialValues: IProductForm = {
 const AddProductForm = () => {
   const { err, setErr, catchErr } = useCatchErr();
   const [loading, setLoading] = useState<boolean>(false);
-  const [successMsg, setSuccessMsg] = useState<string>("");
 
   const {
     values: formValues,
@@ -69,11 +68,12 @@ const AddProductForm = () => {
         const response = await doAddingProduct(formData);
 
         if (!response.success) {
+          showToast(response.error, "ERROR");
           setErr(response.error);
           setLoading(false);
           return;
         }
-        setSuccessMsg(response.message);
+        showToast(response.message, "SUCCESS");
         setLoading(false);
       } catch (error) {
         catchErr(error);
@@ -354,10 +354,6 @@ const AddProductForm = () => {
         </Field>
         <SubmitBtn label="Add Product" loading={loading} />
       </form>
-      {err && <Toast mode="ERROR" message={err} duration={8000} />}
-      {successMsg && (
-        <Toast mode="SUCCESS" message={successMsg} duration={8000} />
-      )}
     </>
   );
 };

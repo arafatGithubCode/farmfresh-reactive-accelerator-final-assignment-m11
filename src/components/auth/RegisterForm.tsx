@@ -4,6 +4,7 @@ import { doRegistration } from "@/actions/auth";
 import { districts } from "@/data";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
+import { showToast } from "@/providers/ToastProvider";
 import { IUserRegistrationForm } from "@/types";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import Image from "next/image";
@@ -12,7 +13,6 @@ import { useRef, useState } from "react";
 import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
 import SubmitBtn from "../ui/SubmitBtn";
-import Toast from "../ui/Toast";
 import GoogleAuth from "./GoogleAuth";
 
 const initialValues: IUserRegistrationForm = {
@@ -70,7 +70,7 @@ const RegisterForm = () => {
         }
         const response = await doRegistration(formData);
         if (!response.success) {
-          console.log(response);
+          showToast(response.error!, "ERROR");
           setErr(response.error!);
           setLoading(false);
           return;
@@ -584,7 +584,6 @@ const RegisterForm = () => {
         </div>
         <GoogleAuth />
       </form>
-      {!!err && <Toast mode="ERROR" message={err} />}
     </>
   );
 };

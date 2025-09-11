@@ -129,9 +129,6 @@ export interface IUploadError {
 // Upload response
 export type UploadResponse = IUploadResult | IUploadError;
 
-// Toast mode type
-export type ToastMode = "SUCCESS" | "ERROR" | "WARNING";
-
 // file validation options
 export interface IFileValidateOptions {
   file: File | File[] | FileList | null | undefined;

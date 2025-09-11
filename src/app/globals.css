@@ -7,3 +7,20 @@
     @apply cursor-not-allowed hover:scale-100;
   }
 }
+
+/* ======= toast style ======== */
+
+.toastBox .Toastify__progress-bar {
+  height: 3px !important;
+  border-radius: 9999px !important;
+}
+
+.progressSuccess {
+  background: linear-gradient(to right, #10b981, #059669) !important;
+}
+.progressError {
+  background: linear-gradient(to right, #ef4444, #b91c1c) !important;
+}
+.progressWarning {
+  background: linear-gradient(to right, #f59e0b, #d97706) !important;
+}

@@ -2,10 +2,13 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar/Navbar";
 import BreadCrumb from "@/components/ui/BreadCrumb";
 import { connectDB } from "@/libs/connectDB";
+
+import { ToastProvider } from "@/providers/ToastProvider";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 import React from "react";
+import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -36,6 +39,7 @@ export default async function RootLayout({
           {authInterceptedModal}
           <BreadCrumb />
           {children}
+          <ToastProvider />
           <Footer />
         </ThemeProvider>
       </body>

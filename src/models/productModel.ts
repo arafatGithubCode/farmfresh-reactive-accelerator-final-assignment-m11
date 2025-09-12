@@ -1,7 +1,7 @@
-import { IProductModel } from "@/types";
+import { IProductBase } from "@/types";
 import mongoose from "mongoose";
 
-const productSchema = new mongoose.Schema<IProductModel>(
+const productSchema = new mongoose.Schema<IProductBase>(
   {
     farmer: {
       type: mongoose.Types.ObjectId,

@@ -67,7 +67,7 @@ export type TRegistrationFormValidationError = Partial<
 //===== Product Types Start =====//
 export interface IProductBase {
   _id: Types.ObjectId;
-  farmer: Types.ObjectId;
+  farmer?: Types.ObjectId;
   name: string;
   category: string;
   description: string;
@@ -78,6 +78,8 @@ export interface IProductBase {
   features: string[];
   imagesUrl: string[];
   ratings?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 export interface IFarmerPopulated {
   _id: Types.ObjectId;
@@ -106,6 +108,17 @@ export type TAddProductValidationError = Partial<
 >;
 
 //===== Product Types End =====//
+
+//===== Cart Types Start =====//
+export interface ICartItem {
+  product: Types.ObjectId;
+  quantity: number;
+}
+export interface ICart {
+  customer: Types.ObjectId;
+  items: ICartItem[];
+}
+//===== Cart Types End =====//
 
 // Upload Kind
 export type TUploadKind = "avatar" | "product";

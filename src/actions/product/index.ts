@@ -1,13 +1,15 @@
 "use server";
 
+import { Cart } from "@/models/CartModel";
 import { createProduct } from "@/queries/product";
 import { uploadImage } from "@/services/UploadImag";
-import { IProductForm, IProductModel, TActionResponse } from "@/types";
+import { IProductBase, IProductForm, TActionResponse } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
+// ===== Add Product ===== //
 export const doAddingProduct = async (
   formData: FormData
 ): Promise<TActionResponse> => {
@@ -61,7 +63,7 @@ export const doAddingProduct = async (
 
     const imagesUrl = uploaded.map((r) => r.secure_url);
 
-    const payload: Omit<IProductModel, "_id"> = {
+    const payload: Omit<IProductBase, "_id"> = {
       name,
       category,
       description,
@@ -86,5 +88,38 @@ export const doAddingProduct = async (
     };
   } catch (err) {
     return catchErr(err, "Failed to Add product!");
+  }
+};
+
+// ===== Add to Cart ===== //
+export const doAddingCart = async (productId: string, customerId: string) => {
+  try {
+    let cart = await Cart.findOne({ customer: customerId });
+    if (!cart) {
+      // create a cart
+      cart = await Cart.create({
+        customer: new Types.ObjectId(customerId),
+        items: [{ product: new Types.ObjectId(productId), quantity: 1 }],
+      });
+
+      return;
+    }
+
+    // check if already in product
+    const existingItem = cart.items.find(
+      (item) => item.product.toString() === productId
+    );
+    if (existingItem) {
+      existingItem.quantity += 1;
+    } else {
+      cart.items.push({
+        product: new Types.ObjectId(productId),
+        quantity: 1,
+      });
+    }
+    await cart.save();
+    return;
+  } catch (error) {
+    console.log(error, "cart err");
   }
 };

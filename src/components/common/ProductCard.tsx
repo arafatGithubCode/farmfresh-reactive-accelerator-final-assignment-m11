@@ -1,4 +1,10 @@
+"use client";
+
+// import { doAddingCart } from "@/actions/product";
+import { doAddingCart } from "@/actions/product";
 import { IProductFrontend } from "@/types";
+import { useSession } from "next-auth/react";
+import { FormEvent } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaEye, FaRegHeart, FaStar, FaTrash } from "react-icons/fa6";
 import ProductImageCarousel from "../ui/ProductImageCarousel";
@@ -10,8 +16,18 @@ const ProductCard = ({
   isManageListingPage?: boolean;
   product: IProductFrontend;
 }) => {
+  const { data: session } = useSession();
+  const customerId = session?.user?.id && session.user.id.toString();
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    await doAddingCart(product.id, customerId!);
+  };
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+    <form
+      onSubmit={handleSubmit}
+      className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
+    >
       <div className="relative">
         {product?.imagesUrl?.length > 0 && (
           <ProductImageCarousel images={product.imagesUrl} />
@@ -72,12 +88,15 @@ const ProductCard = ({
             </button>
           </div>
         ) : (
-          <button className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition">
+          <button
+            type="submit"
+            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition"
+          >
             Add to Cart
           </button>
         )}
       </div>
-    </div>
+    </form>
   );
 };
 

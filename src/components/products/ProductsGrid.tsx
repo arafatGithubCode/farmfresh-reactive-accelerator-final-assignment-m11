@@ -7,11 +7,7 @@ import { FaList } from "react-icons/fa6";
 import Pagination from "../common/Pagination";
 import ProductCard from "../common/ProductCard";
 
-type Props = {
-  products: IProductFrontend[];
-};
-
-const ProductsGrid = ({ products }: Props) => {
+const ProductsGrid = ({ products }: { products: IProductFrontend[] }) => {
   const [viewType, setViewType] = useState<"GRID" | "LIST">("GRID");
 
   return (

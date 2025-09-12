@@ -18,9 +18,12 @@ export const getProducts = async () => {
     .populate("farmer", "firstName farmDistrict farmName")
     .lean<IProductWithFarmer[]>();
 
-  return products.map((p) => ({
+  const updatedProduct = replaceMongoIdInArray(products);
+
+  return updatedProduct.map((p) => ({
     ...p,
-    id: p._id.toString(),
+    createdAt: new Date(p.createdAt!).toISOString(),
+    updatedAt: new Date(p.updatedAt!).toISOString(),
     farmer: {
       id: p.farmer._id.toString(),
       firstName: p.farmer.firstName,

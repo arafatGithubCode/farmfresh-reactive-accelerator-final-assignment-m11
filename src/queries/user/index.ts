@@ -1,8 +1,7 @@
 import { connectDB } from "@/libs/connectDB";
 import { User } from "@/models/userModel";
 import { IUserDB } from "@/types";
-import { replaceMongoIdInArray } from "@/utils/replaceMongoIdInArray";
-import { replaceMongoIdInObj } from "@/utils/replaceMongoIdInObj";
+import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // Create a user
 export const createUser = async (payload: Omit<IUserDB, "_id">) => {
@@ -17,12 +16,12 @@ export const getUserByEmail = async (email: string) => {
     email,
   }).lean();
 
-  return user ? replaceMongoIdInObj(user) : null;
+  return transformMongoDoc(user);
 };
 
 // Get all farmers
 export const getAllFarmers = async () => {
   await connectDB();
   const farmers = await User.find({ role: "Farmer" }).lean();
-  return replaceMongoIdInArray<IUserDB>(farmers);
+  return transformMongoDoc(farmers);
 };

@@ -1,7 +1,7 @@
 "use client";
 
 // import { doAddingCart } from "@/actions/product";
-import { doAddingCart } from "@/actions/product";
+import { doAddingCart } from "@/actions/cart";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { showToast } from "@/providers/ToastProvider";
 import { IProductFrontend } from "@/types";
@@ -42,6 +42,7 @@ const ProductCard = ({
       catchErr(err);
     }
   };
+
   return (
     <form
       onSubmit={handleSubmit}

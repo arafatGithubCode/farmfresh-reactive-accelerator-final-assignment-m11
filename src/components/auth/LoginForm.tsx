@@ -6,7 +6,7 @@ import { showToast } from "@/providers/ToastProvider";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { FaEnvelope, FaEye, FaLock } from "react-icons/fa6";
-import SubmitBtn from "../ui/SubmitBtn";
+import Button from "../ui/Button";
 import GoogleAuth from "./GoogleAuth";
 
 const LoginForm = () => {
@@ -106,7 +106,7 @@ const LoginForm = () => {
           </a>
         </div>
 
-        <SubmitBtn label="Sign In" loading={loading} />
+        <Button label="Sign In" loading={loading} hasSpinner={true} />
 
         {/* <!-- Divider --> */}
         <div className="relative">

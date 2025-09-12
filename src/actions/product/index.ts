@@ -119,7 +119,7 @@ export const doAddingCart = async (productId: string, customerId: string) => {
     }
     await cart.save();
     return;
-  } catch (error) {
-    console.log(error, "cart err");
+  } catch (err) {
+    catchErr(err);
   }
 };

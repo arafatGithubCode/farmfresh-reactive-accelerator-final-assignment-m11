@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { FaCamera, FaEye, FaEyeSlash, FaSeedling } from "react-icons/fa6";
 import Field from "../common/Field";
-import SubmitBtn from "../ui/SubmitBtn";
+import Button from "../ui/Button";
 import GoogleAuth from "./GoogleAuth";
 
 const initialValues: IUserRegistrationForm = {
@@ -569,7 +569,7 @@ const RegisterForm = () => {
         </Field>
 
         {/* <!-- Submit Button --> */}
-        <SubmitBtn label="Create Account" loading={loading} />
+        <Button label="Create Account" loading={loading} hasSpinner={true} />
 
         {/* <!-- Divider --> */}
         <div className="relative">

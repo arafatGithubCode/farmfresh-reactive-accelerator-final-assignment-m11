@@ -2,11 +2,14 @@
 
 // import { doAddingCart } from "@/actions/product";
 import { doAddingCart } from "@/actions/product";
+import { useCatchErr } from "@/hooks/useCatchErr";
+import { showToast } from "@/providers/ToastProvider";
 import { IProductFrontend } from "@/types";
 import { useSession } from "next-auth/react";
-import { FormEvent } from "react";
+import { FormEvent, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { FaEye, FaRegHeart, FaStar, FaTrash } from "react-icons/fa6";
+import Button from "../ui/Button";
 import ProductImageCarousel from "../ui/ProductImageCarousel";
 
 const ProductCard = ({
@@ -19,9 +22,25 @@ const ProductCard = ({
   const { data: session } = useSession();
   const customerId = session?.user?.id && session.user.id.toString();
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const { err, catchErr } = useCatchErr();
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    await doAddingCart(product.id, customerId!);
+    setLoading(true);
+    try {
+      await doAddingCart(product.id, customerId!);
+      if (err) {
+        showToast(err, "ERROR");
+      }
+      if (!err) {
+        showToast(`${product.name} has been added to cart.`, "SUCCESS");
+      }
+      setLoading(false);
+    } catch (err) {
+      setLoading(false);
+      catchErr(err);
+    }
   };
   return (
     <form
@@ -88,12 +107,11 @@ const ProductCard = ({
             </button>
           </div>
         ) : (
-          <button
-            type="submit"
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition"
-          >
-            Add to Cart
-          </button>
+          <Button
+            label="Add to Cart"
+            loading={loading}
+            loadingText="Adding..."
+          />
         )}
       </div>
     </form>

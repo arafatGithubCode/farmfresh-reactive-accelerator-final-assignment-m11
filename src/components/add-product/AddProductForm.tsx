@@ -10,7 +10,7 @@ import Image from "next/image";
 import { useState } from "react";
 import { FaCloud, FaTrash } from "react-icons/fa6";
 import Field from "../common/Field";
-import SubmitBtn from "../ui/SubmitBtn";
+import Button from "../ui/Button";
 
 const features = [
   "Organic",
@@ -352,7 +352,7 @@ const AddProductForm = () => {
             ))}
           </div>
         </Field>
-        <SubmitBtn label="Add Product" loading={loading} />
+        <Button label="Add Product" loading={loading} hasSpinner={true} />
       </form>
     </>
   );

@@ -99,7 +99,10 @@ export interface IProductFrontend
 }
 
 export interface IProductForm
-  extends Omit<IProductBase, "imagesUrl" | "farmer" | "_id" | "ratings"> {
+  extends Omit<
+    IProductBase,
+    "imagesUrl" | "farmer" | "_id" | "ratings" | "createdAt" | "updatedAt"
+  > {
   images: File[];
 }
 

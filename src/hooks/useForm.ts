@@ -1,3 +1,5 @@
+"use client";
+
 import { ChangeEvent, FocusEvent, FormEvent, useState } from "react";
 
 type validationErrors<T> = Partial<Record<keyof T, string>>;

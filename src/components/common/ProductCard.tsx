@@ -7,7 +7,7 @@ import { IProductFrontend } from "@/types";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import {
@@ -37,7 +37,7 @@ const ProductCard = ({
 
   const [loading, setLoading] = useState<boolean>(false);
   const { err, catchErr, setErr } = useCatchErr();
-  const router = useRouter();
+  //   const router = useRouter();
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
@@ -58,7 +58,7 @@ const ProductCard = ({
       );
 
       if (!response.ok) {
-        router.push("/login");
+        // router.push("/login");
         setErr("Failed to update cart!");
       }
       const data = await response.json();
@@ -90,7 +90,7 @@ const ProductCard = ({
     } catch (error) {
       catchErr(error);
       showToast(err!, "ERROR");
-      router.push("/login");
+      //   router.push("/login");
     } finally {
       setLoading(false);
     }

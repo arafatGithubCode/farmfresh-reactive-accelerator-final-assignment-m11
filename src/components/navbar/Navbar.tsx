@@ -1,13 +1,15 @@
 import { getUserSession } from "@/utils/getUserSession";
-import { FaSearch, FaShoppingCart } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { FaBars } from "react-icons/fa6";
 import Logo from "../common/Logo";
+import CartBadge from "./CartBadge";
 import NavItem from "./NavItem";
 import ThemeToggler from "./ThemeToggler";
 import UserMenu from "./UserMenu";
 
 const Navbar = async () => {
   const user = await getUserSession();
+  const customerId = user?.id;
 
   return (
     <nav
@@ -60,12 +62,7 @@ const Navbar = async () => {
             </div>
 
             {/* <!-- Cart --> */}
-            <button className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
-              <FaShoppingCart className="text-xl" />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                3
-              </span>
-            </button>
+            {customerId && <CartBadge customerId={customerId} />}
 
             {/* <!-- User Menu --> */}
             <UserMenu />

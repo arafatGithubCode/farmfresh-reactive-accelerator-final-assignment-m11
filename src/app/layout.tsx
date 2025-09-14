@@ -2,15 +2,14 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar/Navbar";
 import BreadCrumb from "@/components/ui/BreadCrumb";
 import { connectDB } from "@/libs/connectDB";
-
 import { ToastProvider } from "@/providers/ToastProvider";
 import type { Metadata } from "next";
+import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { Inter } from "next/font/google";
 import React from "react";
 import "react-toastify/dist/ReactToastify.css";
 import "./globals.css";
-import SessionProviderWrapper from "./SessionProviderWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,14 +35,14 @@ export default async function RootLayout({
         className={`${inter.className} bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SessionProviderWrapper>
+          <SessionProvider>
             <Navbar />
             {authInterceptedModal}
             <BreadCrumb />
             {children}
             <ToastProvider />
             <Footer />
-          </SessionProviderWrapper>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

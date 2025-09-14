@@ -1,0 +1,112 @@
+import { connectDB } from "@/libs/connectDB";
+import { Cart } from "@/models/CartModel";
+import { getCartByCustomerId } from "@/queries/cart";
+import { catchErr } from "@/utils/catchErr";
+import { NextRequest, NextResponse } from "next/server";
+
+// ===== Create/Add cart ==== //
+export const POST = async (request: NextRequest) => {
+  await connectDB();
+
+  try {
+    const body = await request.json();
+    const { customerId, productId, action } = body;
+
+    let actionType: "ADD" | "INCREMENT" | "DECREMENT" = "ADD";
+    let cart = await Cart.findOne({ customer: customerId });
+    let updatedQuantity: number = 0;
+
+    //    if cart is not exist and action is add
+    if (!cart) {
+      if (action === "ADD") {
+        cart = await Cart.create({
+          customer: customerId,
+          items: [{ product: productId, quantity: 1 }],
+        });
+        updatedQuantity = 1;
+        actionType = "ADD";
+        return NextResponse.json(
+          { success: true, actionType, quantity: updatedQuantity, productId },
+          { status: 201 }
+        );
+      } else {
+        return NextResponse.json(
+          { success: false, message: "Cart not found || Invalid Action" },
+          { status: 400 }
+        );
+      }
+    }
+
+    // check if it is exist
+    const existingItem = cart?.items?.find(
+      (item) => item.product.toString() === productId
+    );
+
+    // increment
+    if (action === "INCREMENT") {
+      if (existingItem) {
+        existingItem.quantity += 1;
+        updatedQuantity = existingItem.quantity;
+      } else {
+        cart.items.push({ product: productId, quantity: 1 });
+        updatedQuantity = 1;
+      }
+      actionType = "INCREMENT";
+    }
+
+    // decrement
+    if (action === "DECREMENT") {
+      if (existingItem) {
+        existingItem.quantity -= 1;
+        if (existingItem.quantity <= 0) {
+          cart.items = cart.items.filter(
+            (item) => item.product.toString() !== productId
+          );
+          updatedQuantity = 0;
+        } else {
+          updatedQuantity = existingItem.quantity;
+        }
+      }
+      actionType = "DECREMENT";
+    }
+
+    if (action === "ADD" && !existingItem) {
+      cart.items.push({ product: productId, quantity: 1 });
+      actionType = "ADD";
+      updatedQuantity = 1;
+    }
+
+    await cart.save();
+
+    return NextResponse.json(
+      { success: true, actionType, quantity: updatedQuantity, productId },
+      { status: 201 }
+    );
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return NextResponse.json({ success: false, errMsg }, { status: 400 });
+  }
+};
+
+// ===== Get Cart by customerId ===== //
+export const GET = async (request: NextRequest) => {
+  await connectDB();
+  try {
+    const { searchParams } = new URL(request.url);
+    const customerId = searchParams.get("customerId");
+
+    if (!customerId) {
+      return NextResponse.json(
+        { success: false, error: "Missing customerID" },
+        { status: 400 }
+      );
+    }
+
+    const cart = await getCartByCustomerId(customerId);
+
+    return NextResponse.json({ success: true, cart }, { status: 200 });
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({ success: false, err: error }, { status: 400 });
+  }
+};

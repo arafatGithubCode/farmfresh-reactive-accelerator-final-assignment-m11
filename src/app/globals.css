@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 @layer utilities {
-  button:disabled {
+  /* button:disabled {
     @apply cursor-not-allowed hover:scale-100 bg-primary-500 hover:bg-primary-500 text-gray-100 scale-100;
-  }
+  } */
 }
 
 /* ======= toast style ======== */

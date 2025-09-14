@@ -2,7 +2,10 @@ import { ICart, ICartItem } from "@/types";
 import mongoose, { Model, Schema } from "mongoose";
 
 const cartItemSchema = new Schema<ICartItem>({
-  product: Schema.Types.ObjectId,
+  product: {
+    type: Schema.Types.ObjectId,
+    ref: "Product",
+  },
   quantity: {
     type: Number,
     min: 1,
@@ -12,7 +15,10 @@ const cartItemSchema = new Schema<ICartItem>({
 
 const cartSchema = new Schema<ICart>(
   {
-    customer: Schema.Types.ObjectId,
+    customer: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     items: [cartItemSchema],
   },
   { timestamps: true }

@@ -3,20 +3,10 @@ import LocationFilter from "@/components/products/LocationFilter";
 import OrganicFilter from "@/components/products/OrganicFilter";
 import PriceFilter from "@/components/products/PriceFilter";
 import ProductsGrid from "@/components/products/ProductsGrid";
-import { getCartByCustomerId } from "@/queries/cart";
 import { getProducts } from "@/queries/product";
-import { getUserSession } from "@/utils/getUserSession";
 
 const ProductsPage = async () => {
   const products = await getProducts();
-  const user = await getUserSession();
-  let customerId;
-  if (user && user.role === "Customer") {
-    customerId = user.id;
-  }
-
-  const cart = await getCartByCustomerId(customerId!);
-  console.log("updated", cart);
   return (
     <>
       <div className="bg-primary-600 text-white py-12">

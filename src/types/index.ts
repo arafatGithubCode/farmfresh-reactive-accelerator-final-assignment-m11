@@ -121,6 +121,16 @@ export interface ICart {
   customer: Types.ObjectId;
   items: ICartItem[];
 }
+
+export interface ICartFrontend {
+  id: string;
+  customer: string;
+  items: {
+    product: string;
+    quantity: number;
+    id?: string;
+  }[];
+}
 //===== Cart Types End =====//
 
 // Upload Kind

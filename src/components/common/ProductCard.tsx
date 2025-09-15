@@ -3,11 +3,12 @@
 // import { doAddingCart } from "@/actions/product";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { showToast } from "@/providers/ToastProvider";
-import { IProductFrontend } from "@/types";
+import { ICartItemFronted, IProductFrontend } from "@/types";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 // import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import {
@@ -19,11 +20,6 @@ import {
   FaTrash,
 } from "react-icons/fa6";
 import ProductImageCarousel from "../ui/ProductImageCarousel";
-
-interface CartItem {
-  product: IProductFrontend;
-  quantity: number;
-}
 
 const ProductCard = ({
   isManageListingPage = false,
@@ -37,9 +33,9 @@ const ProductCard = ({
 
   const [loading, setLoading] = useState<boolean>(false);
   const { err, catchErr, setErr } = useCatchErr();
-  //   const router = useRouter();
+  const router = useRouter();
 
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<ICartItemFronted[]>([]);
 
   const isInCart = cartItems?.some((item) => item?.product?.id === product.id);
   const cartItem = cartItems?.find((item) => item?.product?.id === product.id);
@@ -58,7 +54,7 @@ const ProductCard = ({
       );
 
       if (!response.ok) {
-        // router.push("/login");
+        router.push("/login");
         setErr("Failed to update cart!");
       }
       const data = await response.json();
@@ -90,7 +86,7 @@ const ProductCard = ({
     } catch (error) {
       catchErr(error);
       showToast(err!, "ERROR");
-      //   router.push("/login");
+      router.push("/login");
     } finally {
       setLoading(false);
     }
@@ -180,7 +176,7 @@ const ProductCard = ({
         ) : isInCart ? (
           <div className="bg-white rounded-lg border border-primary-500 flex flex-col">
             <div className="flex items-center justify-between">
-              <div className="font-semibold py-1 px-4 rounded-lg rounded-r-none border-r border-primary-500 text-black">
+              <div className="font-semibold py-1 px-2 rounded-lg rounded-r-none border-r border-primary-500 text-black">
                 {cartItem?.quantity ?? 1} {product.unit}
               </div>
               <div className="flex items-center justify-center gap-4 flex-grow">

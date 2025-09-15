@@ -8,6 +8,10 @@ export const getCartByCustomerId = async (customerId: string) => {
     .populate({
       path: "items.product",
       model: "Product",
+      populate: {
+        path: "farmer",
+        model: "User",
+      },
     })
     .lean();
 

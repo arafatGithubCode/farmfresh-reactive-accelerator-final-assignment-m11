@@ -117,6 +117,11 @@ export interface ICartItem {
   product: Types.ObjectId;
   quantity: number;
 }
+
+export interface ICartItemFronted {
+  product: IProductFrontend;
+  quantity: number;
+}
 export interface ICart {
   customer: Types.ObjectId;
   items: ICartItem[];

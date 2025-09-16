@@ -121,6 +121,7 @@ export interface ICartItem {
 export interface ICartItemFronted {
   product: IProductFrontend;
   quantity: number;
+  id?: string;
 }
 export interface ICart {
   customer: Types.ObjectId;
@@ -131,7 +132,7 @@ export interface ICartFrontend {
   id: string;
   customer: string;
   items: {
-    product: string;
+    product: IProductFrontend;
     quantity: number;
     id?: string;
   }[];

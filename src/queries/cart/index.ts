@@ -1,8 +1,11 @@
 import { Cart } from "@/models/CartModel";
+import { ICartFrontend } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // ====== Get Cart By Customer ID ====== //
-export const getCartByCustomerId = async (customerId: string) => {
+export const getCartByCustomerId = async (
+  customerId: string
+): Promise<ICartFrontend | null> => {
   const cart = await Cart.findOne({ customer: customerId })
     .populate("customer")
     .populate({
@@ -13,7 +16,7 @@ export const getCartByCustomerId = async (customerId: string) => {
         model: "User",
       },
     })
-    .lean();
+    .lean<ICartFrontend>();
 
-  return transformMongoDoc(cart);
+  return cart ? transformMongoDoc(cart) : null;
 };

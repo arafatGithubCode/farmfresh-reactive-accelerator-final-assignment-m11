@@ -8,6 +8,7 @@ import { LiaTimesSolid } from "react-icons/lia";
 import { LuRedoDot } from "react-icons/lu";
 import { TbCurrencyTaka } from "react-icons/tb";
 import useSWR from "swr";
+import Divider from "../ui/Divider";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -99,7 +100,7 @@ const CartBadge = ({ customerId }: { customerId: string }) => {
                   </div>
                 </li>
               ))}
-              <div className="w-full bg-gray-300 dark:bg-gray-500 h-[2px] my-4" />
+              <Divider />
               <Link
                 className="bg-primary-500 px-4 py-3 text-white text-xl font-semibold text-center rounded-lg block w-full"
                 href="/cart"

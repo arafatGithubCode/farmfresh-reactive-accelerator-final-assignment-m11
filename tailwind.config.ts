@@ -40,6 +40,12 @@ const config: Config = {
           "0%": { transform: "translateX(200px)" },
           "100%": { transform: "translateX(0px)" },
         },
+        "fade-horizontal": {
+          "0%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(15px)" },
+          "80%": { transform: "translateX(30px)" },
+          "100%": { transform: "translateX(0)" },
+        },
       },
       animation: {
         "bounce-skew": "bounce-skew 1s ease-in-out",
@@ -47,6 +53,7 @@ const config: Config = {
         "fade-up": "fade-up 500ms ease-in",
         "fade-left": "fade-left 500ms ease-in",
         "fade-right": "fade-right 500ms ease-in",
+        "fade-horizontal": "fade-horizontal 1.5s linear infinite",
       },
       colors: {
         primary: {

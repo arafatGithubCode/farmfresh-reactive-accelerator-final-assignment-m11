@@ -1,15 +1,11 @@
 "use client";
 
 // import { doAddingCart } from "@/actions/product";
-import { useCatchErr } from "@/hooks/useCatchErr";
-import { showToast } from "@/providers/ToastProvider";
-import { ICartItemFronted, IProductFrontend } from "@/types";
-import { useSession } from "next-auth/react";
+import { IProductFrontend } from "@/types";
 import Link from "next/link";
 
 // import { useRouter } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCart } from "@/hooks/useCart";
 import { FaEdit } from "react-icons/fa";
 import {
   FaEye,
@@ -28,89 +24,16 @@ const ProductCard = ({
   isManageListingPage?: boolean;
   product: IProductFrontend;
 }) => {
-  const { data: session } = useSession();
-  const customerId = session?.user?.id;
+  const { cart, updateCart, loading } = useCart();
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const { err, catchErr, setErr } = useCatchErr();
-  const router = useRouter();
+  const isInCart = cart?.items?.some(
+    (item) => item?.product?.id === product.id
+  );
+  const cartItem = cart?.items?.find(
+    (item) => item?.product?.id === product.id
+  );
 
-  const [cartItems, setCartItems] = useState<ICartItemFronted[]>([]);
-
-  const isInCart = cartItems?.some((item) => item?.product?.id === product.id);
-  const cartItem = cartItems?.find((item) => item?.product?.id === product.id);
-
-  const updateCart = async (action: "ADD" | "INCREMENT" | "DECREMENT") => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ customerId, productId: product.id, action }),
-        }
-      );
-
-      if (!response.ok) {
-        router.push("/login");
-        setErr("Failed to update cart!");
-      }
-      const data = await response.json();
-
-      // update cart state instantly
-      setCartItems((prev) => {
-        const exist = prev.find((item) => item.product.id === data?.productId);
-
-        // if quantity 0 -> remove the product
-        if (data?.quantity <= 0) {
-          return prev.filter((item) => item.product.id !== data?.productId);
-        }
-
-        // update quantity if exist
-        if (exist) {
-          return prev.map((item) =>
-            item.product.id === data?.productId
-              ? { ...item, quantity: data?.quantity }
-              : item
-          );
-        } else {
-          // add new product
-          return [...prev, { product, quantity: data?.quantity }];
-        }
-      });
-      if (data?.actionType === "ADD") {
-        showToast(`${product.name} has been added to cart.`, "SUCCESS");
-      }
-    } catch (error) {
-      catchErr(error);
-      showToast(err!, "ERROR");
-      router.push("/login");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!customerId) return;
-
-    const fetchCart = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart?customerId=${customerId}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch cart!");
-        }
-        const data = await response.json();
-        setCartItems(data?.cart?.items);
-      } catch (error) {
-        catchErr(error);
-      }
-    };
-    fetchCart();
-  }, [customerId]);
+  const pending = loading[product.id] || false;
 
   return (
     <form className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
@@ -181,24 +104,26 @@ const ProductCard = ({
               </div>
               <div className="flex items-center justify-center gap-4 flex-grow">
                 <button
-                  disabled={loading}
+                  disabled={pending}
                   type="button"
-                  onClick={() => updateCart("INCREMENT")}
+                  onClick={() => updateCart("INCREMENT", product.id)}
                   className="disabled:cursor-wait"
                 >
                   <FaPlus className="text-xl text-black hover:text-primary-500 duration-200 cursor-pointer" />
                 </button>
                 <button
-                  disabled={loading}
+                  disabled={pending}
                   type="button"
-                  onClick={() => updateCart("DECREMENT")}
+                  onClick={() => updateCart("DECREMENT", product.id)}
                   className="disabled:cursor-wait"
                 >
                   <FaMinus className="text-xl text-black hover:text-primary-500 duration-200 cursor-pointer" />
                 </button>
               </div>
               <button
+                disabled={pending}
                 type="button"
+                onClick={() => updateCart("REMOVE_ITEM", product.id)}
                 className="text-black bg-red-50 py-1 px-2 rounded-lg rounded-l-none border-l border-primary-500"
               >
                 Remove
@@ -213,12 +138,12 @@ const ProductCard = ({
           </div>
         ) : (
           <button
-            disabled={loading}
+            disabled={pending}
             type="button"
-            onClick={() => updateCart("ADD")}
+            onClick={() => updateCart("ADD_ITEM", product)}
             className="w-full text-white py-3 bg-primary-600 hover:bg-primary-700 hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center disabled:cursor-wait"
           >
-            {loading ? "Adding.." : "Add to cart"}
+            {pending ? "Adding.." : "Add to cart"}
           </button>
         )}
       </div>

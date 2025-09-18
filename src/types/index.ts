@@ -129,14 +129,34 @@ export interface ICart {
 }
 
 export interface ICartFrontend {
-  id: string;
-  customer: string;
+  id: string | null;
+  customer: string | TBaseUser | null;
   items: {
     product: IProductFrontend;
     quantity: number;
     id?: string;
   }[];
 }
+
+export type TCartActionType =
+  | "ADD_ITEM"
+  | "INCREMENT"
+  | "DECREMENT"
+  | "REMOVE_ITEM";
+
+export interface CartContextType {
+  cart: ICartFrontend;
+  loading: boolean;
+  error: string | null;
+  updateCart: {
+    (action: "ADD_ITEM", product: IProductFrontend): Promise<void>;
+    (
+      action: Exclude<TCartActionType, "ADD_ITEM">,
+      productId: string
+    ): Promise<void>;
+  };
+}
+
 //===== Cart Types End =====//
 
 // Upload Kind

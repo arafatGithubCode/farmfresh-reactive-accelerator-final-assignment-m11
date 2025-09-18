@@ -12,19 +12,20 @@ export const POST = async (request: NextRequest) => {
     const body = await request.json();
     const { customerId, productId, action } = body;
 
-    let actionType: "ADD" | "INCREMENT" | "DECREMENT" = "ADD";
+    let actionType: "ADD_ITEM" | "INCREMENT" | "DECREMENT" | "REMOVE_ITEM" =
+      action;
     let cart = await Cart.findOne({ customer: customerId });
     let updatedQuantity: number = 0;
 
     //    if cart is not exist and action is add
     if (!cart) {
-      if (action === "ADD") {
+      if (action === "ADD_ITEM") {
         cart = await Cart.create({
           customer: customerId,
           items: [{ product: productId, quantity: 1 }],
         });
         updatedQuantity = 1;
-        actionType = "ADD";
+        actionType = "ADD_ITEM";
         return NextResponse.json(
           { success: true, actionType, quantity: updatedQuantity, productId },
           { status: 201 }
@@ -56,23 +57,26 @@ export const POST = async (request: NextRequest) => {
 
     // decrement
     if (action === "DECREMENT") {
-      if (existingItem) {
+      if (existingItem && existingItem.quantity > 1) {
         existingItem.quantity -= 1;
-        if (existingItem.quantity <= 0) {
-          cart.items = cart.items.filter(
-            (item) => item.product.toString() !== productId
-          );
-          updatedQuantity = 0;
-        } else {
-          updatedQuantity = existingItem.quantity;
-        }
+        updatedQuantity = existingItem.quantity;
       }
       actionType = "DECREMENT";
     }
 
-    if (action === "ADD" && !existingItem) {
+    // remove
+    if (action === "REMOVE_ITEM") {
+      if (existingItem) {
+        cart.items = cart.items.filter(
+          (i) => i.product.toString() !== productId
+        );
+        updatedQuantity = 0;
+      }
+    }
+
+    if (action === "ADD_ITEM" && !existingItem) {
       cart.items.push({ product: productId, quantity: 1 });
-      actionType = "ADD";
+      actionType = "ADD_ITEM";
       updatedQuantity = 1;
     }
 

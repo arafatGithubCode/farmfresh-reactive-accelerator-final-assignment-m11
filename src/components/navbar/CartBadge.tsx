@@ -63,7 +63,7 @@ const CartBadge = ({ customerId }: { customerId: string }) => {
           <h4 className="font-semibold mb-2">Cart</h4>
           {isLoading ? (
             <p className="text-sm text-gray-500">Loading…</p>
-          ) : cartItems.length > 0 ? (
+          ) : cartItems?.length > 0 ? (
             <ul className="divide-y divide-gray-300 dark:divide-gray-500 space-y-2">
               {cartItems?.map((item) => (
                 <li

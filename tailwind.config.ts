@@ -42,8 +42,9 @@ const config: Config = {
         },
         "fade-horizontal": {
           "0%": { transform: "translateX(0)" },
-          "50%": { transform: "translateX(15px)" },
-          "80%": { transform: "translateX(30px)" },
+          "30%": { transform: "translateX(30px)" },
+          "60%": { transform: "translateX(15px)" },
+          "80%": { transform: "translateX(25px)" },
           "100%": { transform: "translateX(0)" },
         },
       },
@@ -53,7 +54,7 @@ const config: Config = {
         "fade-up": "fade-up 500ms ease-in",
         "fade-left": "fade-left 500ms ease-in",
         "fade-right": "fade-right 500ms ease-in",
-        "fade-horizontal": "fade-horizontal 1.5s linear infinite",
+        "fade-horizontal": "fade-horizontal 2.5s linear infinite",
       },
       colors: {
         primary: {

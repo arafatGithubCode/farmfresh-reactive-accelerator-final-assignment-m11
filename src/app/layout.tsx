@@ -2,6 +2,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/navbar/Navbar";
 import BreadCrumb from "@/components/ui/BreadCrumb";
 import { connectDB } from "@/libs/connectDB";
+import CartProvider from "@/providers/CartProvider";
 import { ToastProvider } from "@/providers/ToastProvider";
 import type { Metadata } from "next";
 import { SessionProvider } from "next-auth/react";
@@ -36,12 +37,14 @@ export default async function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <SessionProvider>
-            <Navbar />
-            {authInterceptedModal}
-            <BreadCrumb />
-            {children}
-            <ToastProvider />
-            <Footer />
+            <CartProvider>
+              <Navbar />
+              {authInterceptedModal}
+              <BreadCrumb />
+              {children}
+              <ToastProvider />
+              <Footer />
+            </CartProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

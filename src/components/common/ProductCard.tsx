@@ -1,17 +1,18 @@
 "use client";
 
-// import { doAddingCart } from "@/actions/product";
-import { IProductFrontend } from "@/types";
-import Link from "next/link";
-
-// import { useRouter } from "next/navigation";
 import { useCart } from "@/hooks/useCart";
+import { useCatchErr } from "@/hooks/useCatchErr";
+import { showToast } from "@/providers/ToastProvider";
+import { IProductFrontend } from "@/types";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import {
   FaEye,
+  FaHeart,
   FaMinus,
   FaPlus,
-  FaRegHeart,
   FaStar,
   FaTrash,
 } from "react-icons/fa6";
@@ -25,6 +26,12 @@ const ProductCard = ({
   product: IProductFrontend;
 }) => {
   const { cart, updateCart, loading } = useCart();
+  const { catchErr, err } = useCatchErr();
+
+  const session = useSession();
+  const customerId = session?.data?.user?.id;
+
+  const [favoriteList, setFavoriteList] = useState<string[]>([]);
 
   const isInCart = cart?.items?.some(
     (item) => item?.product?.id === product.id
@@ -33,7 +40,65 @@ const ProductCard = ({
     (item) => item?.product?.id === product.id
   );
 
+  const isFavorite = favoriteList?.includes(product.id);
+
   const pending = loading[product.id] || false;
+
+  const updateFavorite = async (productId: string) => {
+    if (!customerId) return;
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/favorite`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ customerId, productId }),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to create favorite!");
+      }
+      const data = await response.json();
+      if (data?.message === "REMOVE") {
+        showToast(
+          `${product.name} has been removed from the favorite list.`,
+          "WARNING"
+        );
+      } else {
+        showToast(
+          `${product.name} has been added to the favorite list.`,
+          "SUCCESS"
+        );
+      }
+    } catch (error) {
+      catchErr(error);
+      showToast(err!, "ERROR");
+    }
+  };
+
+  useEffect(() => {
+    if (!customerId || !favoriteList) return;
+
+    const fetchFavorite = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/favorite?customerId=${customerId}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch favorite!");
+        }
+        const data = await response.json();
+        setFavoriteList(data?.favoriteList?.items || []);
+      } catch (error) {
+        catchErr(error);
+        showToast(err!, "ERROR");
+      }
+    };
+    fetchFavorite();
+  }, [customerId, favoriteList]);
 
   return (
     <form className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
@@ -49,8 +114,16 @@ const ProductCard = ({
           )}
         </div>
         <div className="absolute top-3 right-3">
-          <button className="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-            <FaRegHeart className="text-gray-600 dark:text-gray-400 text-xl" />
+          <button
+            onClick={() => updateFavorite(product.id)}
+            type="button"
+            className="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+          >
+            <FaHeart
+              className={`text-xl ${
+                isFavorite ? "text-red-500" : "text-gray-600 dark:text-gray-400"
+              }`}
+            />
           </button>
         </div>
       </div>

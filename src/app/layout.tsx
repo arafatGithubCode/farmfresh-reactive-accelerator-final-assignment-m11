@@ -28,7 +28,6 @@ export default async function RootLayout({
   authInterceptedModal: React.ReactNode;
 }>) {
   await connectDB();
-
   return (
     <html lang="en">
       <body

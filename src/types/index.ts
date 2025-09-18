@@ -159,6 +159,14 @@ export interface CartContextType {
 
 //===== Cart Types End =====//
 
+//===== Favorite Types Start =====//
+
+export interface IFavorite {
+  customerId: string;
+  items: string[];
+}
+//===== Favorite Types End =====//
+
 // Upload Kind
 export type TUploadKind = "avatar" | "product";
 

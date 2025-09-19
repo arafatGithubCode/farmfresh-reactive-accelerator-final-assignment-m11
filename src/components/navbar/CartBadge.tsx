@@ -1,5 +1,6 @@
 "use client";
-import { ICartItemFronted } from "@/types";
+
+import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -7,24 +8,13 @@ import { FaShoppingCart } from "react-icons/fa";
 import { LiaTimesSolid } from "react-icons/lia";
 import { LuRedoDot } from "react-icons/lu";
 import { TbCurrencyTaka } from "react-icons/tb";
-import useSWR from "swr";
 import Divider from "../ui/Divider";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
-const CartBadge = ({ customerId }: { customerId: string }) => {
+const CartBadge = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const timerOutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { data, isLoading } = useSWR(
-    customerId
-      ? `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart?customerId=${customerId}`
-      : null,
-    fetcher,
-    { refreshInterval: 5000 }
-  );
-
-  const cartItems: ICartItemFronted[] = data?.cart?.items;
+  const { cart, loading } = useCart();
 
   const handleMouseEnter = () => {
     if (timerOutRef.current) clearInterval(timerOutRef.current);
@@ -35,6 +25,8 @@ const CartBadge = ({ customerId }: { customerId: string }) => {
   const handleMouseLeave = () => {
     timerOutRef.current = setTimeout(() => setShowDropdown(false), 200);
   };
+
+  const pending = cart.items.some((i) => loading[i.product.id]);
   return (
     <div
       className="relative"
@@ -46,13 +38,13 @@ const CartBadge = ({ customerId }: { customerId: string }) => {
         <FaShoppingCart className="text-xl" />
         <span
           className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center ${
-            isLoading ? "animate-pulse" : ""
+            pending ? "animate-pulse" : ""
           }`}
         >
-          {isLoading ? (
+          {pending ? (
             <LuRedoDot className="text-white animate-spin text-xl" />
           ) : (
-            data?.cart?.items?.length ?? 0
+            cart?.items?.length ?? 0
           )}
         </span>
       </button>
@@ -61,11 +53,11 @@ const CartBadge = ({ customerId }: { customerId: string }) => {
       {showDropdown && (
         <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 shadow-lg rounded-lg rounded-t-none py-4 px-2 z-50">
           <h4 className="font-semibold mb-2">Cart</h4>
-          {isLoading ? (
+          {pending ? (
             <p className="text-sm text-gray-500">Loading…</p>
-          ) : cartItems?.length > 0 ? (
+          ) : cart?.items?.length > 0 ? (
             <ul className="divide-y divide-gray-300 dark:divide-gray-500 space-y-2">
-              {cartItems?.map((item) => (
+              {cart?.items?.map((item) => (
                 <li
                   key={item.product.id}
                   className="flex items-center justify-start gap-2 pt-1"

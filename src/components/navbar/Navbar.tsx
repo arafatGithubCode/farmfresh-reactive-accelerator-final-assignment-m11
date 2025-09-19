@@ -9,7 +9,6 @@ import UserMenu from "./UserMenu";
 
 const Navbar = async () => {
   const user = await getUserSession();
-  const customerId = user?.id;
 
   return (
     <nav
@@ -62,7 +61,7 @@ const Navbar = async () => {
             </div>
 
             {/* <!-- Cart --> */}
-            {customerId && <CartBadge customerId={customerId} />}
+            <CartBadge />
 
             {/* <!-- User Menu --> */}
             <UserMenu />

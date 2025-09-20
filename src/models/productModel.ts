@@ -41,6 +41,9 @@ const productSchema = new mongoose.Schema<IProductBase>(
       min: [2, "Minimum amount of price is 2 tk upper"],
       max: [1000, "Maximum amount of price is 1000 tk less"],
     },
+    discountRate: {
+      type: Number,
+    },
     stock: {
       type: Number,
       required: [true, "Stock is required."],

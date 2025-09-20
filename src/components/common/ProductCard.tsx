@@ -47,6 +47,11 @@ const ProductCard = ({
   const updateFavorite = async (productId: string) => {
     if (!customerId) return;
 
+    if (session?.data?.user?.role === "Farmer") {
+      showToast("Only customer can make favorite.");
+      return;
+    }
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/favorite`,
@@ -63,11 +68,14 @@ const ProductCard = ({
       }
       const data = await response.json();
       if (data?.message === "REMOVE") {
+        const filter = favoriteList.filter((id) => id !== productId);
+        setFavoriteList(filter);
         showToast(
           `${product.name} has been removed from the favorite list.`,
           "WARNING"
         );
       } else {
+        setFavoriteList((prev) => [...prev, productId]);
         showToast(
           `${product.name} has been added to the favorite list.`,
           "SUCCESS"
@@ -75,12 +83,12 @@ const ProductCard = ({
       }
     } catch (error) {
       catchErr(error);
-      showToast(err!, "ERROR");
+      console.log(error);
     }
   };
 
   useEffect(() => {
-    if (!customerId || !favoriteList) return;
+    if (!customerId) return;
 
     const fetchFavorite = async () => {
       try {
@@ -98,7 +106,7 @@ const ProductCard = ({
       }
     };
     fetchFavorite();
-  }, [customerId, favoriteList]);
+  }, [customerId]);
 
   return (
     <form className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
@@ -146,10 +154,17 @@ const ProductCard = ({
         <div className="flex items-center justify-between mb-4">
           <div>
             <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
-              ৳{product?.price.toFixed(0)}
+              ৳
+              {Math.round(
+                product?.price - (product?.discountRate / 100) * product.price
+              )}
             </span>
             <span className="text-sm text-gray-500 dark:text-gray-400">
               /{product?.unit}
+            </span>
+            <br />
+            <span className="text-red-400 line-through ml-1">
+              ৳{Math.round(product?.price).toLocaleString()}
             </span>
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">

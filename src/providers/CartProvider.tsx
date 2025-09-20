@@ -6,12 +6,16 @@ import { cartReducer, initialCartState } from "@/reducers/cartReducer";
 import { IProductFrontend } from "@/types";
 import { fetchData } from "@/utils/fetchData";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useReducer, useState } from "react";
+import { showToast } from "./ToastProvider";
 
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
   const [loading, setLoading] = useState<Record<string, boolean>>({});
   const { catchErr, err } = useCatchErr();
+
+  const router = useRouter();
 
   // load initial cart from api
   const session = useSession();
@@ -36,6 +40,15 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     action: "ADD_ITEM" | "INCREMENT" | "DECREMENT" | "REMOVE_ITEM",
     payload: IProductFrontend | string
   ) => {
+    if (!customerId) {
+      router.push("/login");
+      return;
+    }
+
+    if (session?.data?.user?.role === "Farmer") {
+      showToast("Only customer can add to cart.");
+      return;
+    }
     // Optimistic UI
     if (action === "ADD_ITEM") {
       const product = payload as IProductFrontend;

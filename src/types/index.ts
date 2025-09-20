@@ -78,6 +78,7 @@ export interface IProductBase {
   features: string[];
   imagesUrl: string[];
   ratings?: number;
+  discountRate: number;
   createdAt?: string;
   updatedAt?: string;
 }

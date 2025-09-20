@@ -24,9 +24,10 @@ export const getProducts = async () => {
 // Get products by farmerId
 export const getProductsByFarmerId = async (farmerId: string) => {
   await connectDB();
-  const products = await Product.find({ farmer: farmerId }).lean<
-    IProductBase[]
-  >();
+
+  const products = await Product.find({ farmer: farmerId })
+    .populate("farmer", "firstName farmDistrict farmName")
+    .lean<IProductWithFarmer[]>();
 
   return transformMongoDoc(products);
 };

@@ -26,6 +26,7 @@ export const doAddingProduct = async (
       harvestDate: (formData.get("harvestDate") as string) ?? "",
       images: formData.getAll("images") as File[],
       price: Number(formData.get("price")) || 0,
+      discountRate: Number(formData.get("discountRate")) || 0,
       features: formData.getAll("features") as string[],
       stock: Number(formData.get("stock") || 0),
       unit: (formData.get("unit") as string) ?? "",
@@ -47,6 +48,7 @@ export const doAddingProduct = async (
       features,
       stock,
       unit,
+      discountRate,
     } = formValues;
 
     // upload product's images
@@ -72,6 +74,7 @@ export const doAddingProduct = async (
       features,
       stock,
       unit,
+      discountRate,
     };
 
     if (session?.id) {

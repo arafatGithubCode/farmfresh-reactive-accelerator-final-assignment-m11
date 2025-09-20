@@ -4,12 +4,13 @@ import ManageProductFilter from "@/components/manage-products/ManageProductFilte
 import ManageProductPageTitle from "@/components/manage-products/ManageProductPageTitle";
 import AccessDenied from "@/components/ui/AccessDenied";
 import { showToast } from "@/providers/ToastProvider";
-import { getProducts } from "@/queries/product";
+import { getProductsByFarmerId } from "@/queries/product";
 import { getUserSession } from "@/utils/getUserSession";
 
 const ManageProductPage = async () => {
   const userSession = await getUserSession();
-  const products = await getProducts();
+  const farmerId = userSession?.id;
+  const products = await getProductsByFarmerId(farmerId!);
 
   if (userSession?.role !== "Farmer")
     showToast("Only farmer can access manage product page.", "WARNING");

@@ -28,6 +28,7 @@ const initialValues: IProductForm = {
   category: "",
   description: "",
   price: 0,
+  discountRate: 0,
   unit: "",
   stock: 0,
   images: [],
@@ -198,7 +199,7 @@ const AddProductForm = () => {
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Pricing & Inventory
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
             <Field error={touched.price && errors.price}>
               <label
                 htmlFor="price"
@@ -265,6 +266,30 @@ const AddProductForm = () => {
               />
             </Field>
           </div>
+          <Field error={touched.discountRate && errors.discountRate}>
+            <label
+              htmlFor="discount"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 group"
+            >
+              Discount Rate (Optional)
+              <span className="text-xs text-gray-400 block mt-2">
+                This discount rate will be calculated on this all product&apos;s
+                items in the basis of percentage.
+              </span>
+            </label>
+            <input
+              value={formValues.discountRate}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              type="number"
+              id="discountRate"
+              name="discountRate"
+              min={1}
+              max={50}
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              placeholder="8 for 8%"
+            />
+          </Field>
         </div>
 
         <Field error={touched.images && errors.images}>

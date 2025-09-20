@@ -1,6 +1,7 @@
 "use client";
 
 import { useCart } from "@/hooks/useCart";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
@@ -15,6 +16,7 @@ const CartBadge = () => {
   const timerOutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { cart, loading } = useCart();
+  const session = useSession();
 
   const handleMouseEnter = () => {
     if (timerOutRef.current) clearInterval(timerOutRef.current);
@@ -34,20 +36,22 @@ const CartBadge = () => {
       onMouseLeave={handleMouseLeave}
     >
       {/* Trigger button */}
-      <button className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
-        <FaShoppingCart className="text-xl" />
-        <span
-          className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center ${
-            pending ? "animate-pulse" : ""
-          }`}
-        >
-          {pending ? (
-            <LuRedoDot className="text-white animate-spin text-xl" />
-          ) : (
-            cart?.items?.length ?? 0
-          )}
-        </span>
-      </button>
+      {session?.data?.user?.role !== "Farmer" && (
+        <button className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400">
+          <FaShoppingCart className="text-xl" />
+          <span
+            className={`absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center ${
+              pending ? "animate-pulse" : ""
+            }`}
+          >
+            {pending ? (
+              <LuRedoDot className="text-white animate-spin text-xl" />
+            ) : (
+              cart?.items?.length ?? 0
+            )}
+          </span>
+        </button>
+      )}
 
       {/* Dropdown */}
       {showDropdown && (

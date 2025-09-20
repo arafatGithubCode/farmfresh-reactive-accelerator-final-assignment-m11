@@ -4,7 +4,7 @@ const loading = () => {
       <div className="w-24 h-24">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
           <linearGradient id="a11">
-            <stop offset="0" stopColor="#22C55E" stop-opacity="0"></stop>
+            <stop offset="0" stopColor="#22C55E" stopOpacity="0"></stop>
             <stop offset="1" stopColor="#22C55E"></stop>
           </linearGradient>
           <circle

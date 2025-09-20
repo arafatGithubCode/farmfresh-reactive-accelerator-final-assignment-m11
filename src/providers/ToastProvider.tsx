@@ -1,6 +1,5 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { toast, ToastContainer, ToastOptions } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -46,7 +45,9 @@ export const showToast = (
       {mode === "SUCCESS" && <FaCheckCircle className="text-green-600" />}
       {mode === "ERROR" && <MdError className="text-red-600" />}
       {mode === "WARNING" && <MdWarning className="text-yellow-600" />}
-      <span className="text-sm font-medium">{message}</span>
+      <span className="text-sm font-medium text-black dark:text-white">
+        {message}
+      </span>
     </div>,
     {
       ...baseOptions,
@@ -64,9 +65,5 @@ export const showToast = (
 
 // ✅ Toast Provider
 export const ToastProvider = () => {
-  const { theme } = useTheme();
-
-  return (
-    <ToastContainer theme={theme === "dark" ? "dark" : "light"} limit={3} />
-  );
+  return <ToastContainer limit={3} />;
 };

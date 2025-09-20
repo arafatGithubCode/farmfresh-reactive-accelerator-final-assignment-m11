@@ -1,18 +1,38 @@
 "use client";
 
-import { ICartFrontend } from "@/types";
+import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaArrowRightLong, FaMinus, FaPlus, FaTrash } from "react-icons/fa6";
 import { ImCheckmark } from "react-icons/im";
 import { IoCloseSharp, IoWarning } from "react-icons/io5";
+import { LiaTimesSolid } from "react-icons/lia";
 import Amount from "../ui/Amount";
 import Divider from "../ui/Divider";
 
-const CartDetails = ({ cart }: { cart: ICartFrontend }) => {
+const CartDetails = () => {
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [showAlert, setShowAlert] = useState<boolean>(false);
+
+  const { cart, updateCart } = useCart();
+
+  //   amount calculation
+  const subtotal = cart?.items?.reduce(
+    (acc, cur) => acc + cur.product.price * cur.quantity,
+    0
+  );
+  const totalDiscountRate = cart?.items?.reduce(
+    (acc, cur) => acc + Number(cur.product.discountRate ?? 0),
+    0
+  );
+  const totalDiscountAmount = cart?.items?.reduce((acc, cur) => {
+    const discount = ((cur.product.discountRate ?? 0) / 100) * subtotal;
+    return acc + discount;
+  }, 0);
+
+  const total = subtotal - totalDiscountAmount;
+
   const allItemIds = cart?.items?.map((item) => item.id) || [];
 
   const isAtLeastOneSelected = allItemIds.some((id) => checkedItems[id!]);
@@ -70,9 +90,16 @@ const CartDetails = ({ cart }: { cart: ICartFrontend }) => {
             </span>
           </div>
 
-          <div>your total: 3,000 Tk. 2,000 Tk.</div>
+          <div className="flex items-center font-semibold gap-2 capitalize">
+            your total:{" "}
+            <Amount
+              discount={totalDiscountAmount}
+              isRow={true}
+              amount={subtotal}
+            />
+          </div>
         </div>
-        {showAlert && (
+        {showAlert ? (
           <div className="flex items-center p-4 bg-orange-50 justify-between mt-5 rounded-lg">
             <div className="flex items-center justify-start gap-2">
               <IoWarning className="text-orange-500" />
@@ -85,6 +112,8 @@ const CartDetails = ({ cart }: { cart: ICartFrontend }) => {
               className="text-gray-400 hover:text-black cursor-pointer"
             />
           </div>
+        ) : (
+          <div className="bg-transparent w-full mt-5 h-14" />
         )}
         <ul className="my-8 p-4 bg-white dark:bg-gray-800 rounded-lg flex flex-col items-start justify-start gap-1">
           {cart?.items?.length === 0 ? (
@@ -92,7 +121,8 @@ const CartDetails = ({ cart }: { cart: ICartFrontend }) => {
           ) : (
             cart.items.map((item, index) => {
               const isChecked = !!checkedItems[item.id!];
-
+              const amount = item.product.price * item.quantity;
+              const discount = amount * (item.product.discountRate / 100);
               return (
                 <>
                   <li
@@ -135,19 +165,45 @@ const CartDetails = ({ cart }: { cart: ICartFrontend }) => {
                             <h3 className="font-medium text-gray-800 dark:text-gray-100">
                               {item.product.name}
                             </h3>
-                            <FaTrash className="hover:text-red-500 text-gray-400 cursor-pointer self-end" />
+                            <FaTrash
+                              onClick={() =>
+                                updateCart("REMOVE_ITEM", item.product.id)
+                              }
+                              className="hover:text-red-500 text-gray-400 cursor-pointer self-end"
+                            />
                           </div>
                         </div>
 
                         {/* Quantity controls */}
                         <div className="flex items-center gap-2 mt-2">
-                          <FaPlus className="hover:text-primary-500 duration-150 cursor-pointer" />
-                          <span className="px-2">1</span>
-                          <FaMinus className="hover:text-red-400 duration-150 cursor-pointer" />
+                          <FaPlus
+                            onClick={() =>
+                              updateCart("INCREMENT", item.product.id)
+                            }
+                            className="hover:text-primary-500 duration-150 cursor-pointer"
+                          />
+                          <span className="px-2">{item.quantity}</span>
+                          <FaMinus
+                            onClick={() =>
+                              updateCart("DECREMENT", item.product.id)
+                            }
+                            className="hover:text-red-400 duration-150 cursor-pointer"
+                          />
                         </div>
 
                         {/* Price */}
-                        <Amount hasDiscount={true} />
+                        <div className="flex items-start">
+                          <Amount discount={discount} amount={amount} />
+                          <div className="flex gap-1 items-center text-xs ml-1 mt-[7px]">
+                            (<span>{item.product.price}</span>
+                            <LiaTimesSolid />
+                            <span>
+                              {item.quantity}
+                              {item.product.unit}
+                            </span>
+                            )
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </li>
@@ -163,25 +219,24 @@ const CartDetails = ({ cart }: { cart: ICartFrontend }) => {
         <Divider />
         <div className="flex items-center justify-between gap-2">
           <span className="text-gray-700 dark:text-gray-300">Subtotal</span>
-          <Amount />
+          <Amount amount={subtotal} />
         </div>
         <Divider isDotted={true} />
         <div className="flex items-center justify-between gap-2">
           <span className="text-gray-700 dark:text-gray-300">
-            Delivery and <br />
-            Website Service Charge
+            {`Total Discount Applied (${totalDiscountRate}%)`}
           </span>
-          <Amount />
+          <Amount amount={totalDiscountAmount} />
         </div>
         <Divider isDotted={true} />
         <div className="flex items-center justify-between gap-2">
           <span className="text-gray-700 dark:text-gray-300">Total</span>
-          <Amount />
+          <Amount amount={total} />
         </div>
         <Divider isDotted={true} />
         <div className="flex items-center justify-between gap-2">
           <span className="font-semibold">Pay Total</span>
-          <Amount />
+          <Amount amount={total} />
         </div>
         <Divider />
         <Link

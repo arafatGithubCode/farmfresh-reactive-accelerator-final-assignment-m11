@@ -17,6 +17,7 @@ export default function Error({
   return (
     <div className="w-full h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       <h2>Something went wrong!</h2>
+      <br />
       <button
         onClick={
           // Attempt to recover by trying to re-render the segment

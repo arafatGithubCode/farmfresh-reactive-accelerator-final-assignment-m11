@@ -32,6 +32,8 @@ export const useForm = <T extends Record<keyof T, unknown>>(options: {
     let newValue;
     if (type === "file" && files) {
       newValue = Array.from(files);
+    } else if (type === "file" && !files) {
+      newValue = null;
     } else if (type === "checkbox") {
       newValue = checked;
     } else {
@@ -80,7 +82,10 @@ export const useForm = <T extends Record<keyof T, unknown>>(options: {
 
     const validationErrors = validate(values);
 
-    if (Object.keys(validationErrors).length > 0) {
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((field) => field)
+    ) {
       setErrors(validationErrors);
       setTouched(
         Object.keys(values).reduce(
@@ -91,10 +96,8 @@ export const useForm = <T extends Record<keyof T, unknown>>(options: {
           {} as Record<keyof T, boolean>
         )
       );
-
       return;
     }
-
     await onSubmit(values);
   };
 

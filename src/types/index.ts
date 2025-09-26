@@ -15,7 +15,32 @@ export interface IUserSession {
   image?: string;
   role?: string;
 }
-interface TBaseUser {
+
+export type UserFormMode = "register" | "login" | "profile";
+
+export interface UserInput {
+  role?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  phone?: string;
+  address?: string;
+  bio?: string;
+  farmName?: string;
+  farmSize?: string;
+  farmSizeUnit?: string;
+  specialization?: string;
+  farmDistrict?: string;
+  farmAddress?: string;
+  terms?: boolean;
+  avatar?: File | null;
+}
+
+export type TUserValidationErrors = Partial<Record<keyof UserInput, string>>;
+
+export interface TBaseUser {
   role: TUserRole;
   firstName: string;
   email: string;
@@ -59,9 +84,10 @@ export interface IUserRegistrationForm
   farmAddress: string;
 }
 
-export type TRegistrationFormValidationError = Partial<
-  Record<keyof IUserRegistrationForm, string>
->;
+export interface IUserLoginForm {
+  email: string;
+  password: string;
+}
 //===== User Types End =====//
 
 //===== Product Types Start =====//

@@ -7,7 +7,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import { MdError, MdWarning } from "react-icons/md";
 
-// ✅ Custom close button
+// Custom close button
 const CustomCloseButton = ({ closeToast }: { closeToast?: () => void }) => (
   <button
     onClick={closeToast}
@@ -17,7 +17,7 @@ const CustomCloseButton = ({ closeToast }: { closeToast?: () => void }) => (
   </button>
 );
 
-// ✅ Base toast options
+//  Base toast options
 const baseOptions: ToastOptions = {
   position: "bottom-center",
   autoClose: 5000,
@@ -28,7 +28,7 @@ const baseOptions: ToastOptions = {
   closeButton: <CustomCloseButton />,
 };
 
-// ✅ Show toast with per-mode style
+// Show toast with per-mode style
 export const showToast = (
   message: string,
   mode: "SUCCESS" | "WARNING" | "ERROR" = "SUCCESS"
@@ -45,14 +45,14 @@ export const showToast = (
       {mode === "SUCCESS" && <FaCheckCircle className="text-green-600" />}
       {mode === "ERROR" && <MdError className="text-red-600" />}
       {mode === "WARNING" && <MdWarning className="text-yellow-600" />}
-      <span className="text-sm font-medium text-black dark:text-white">
+      <span className="text-sm font-medium !text-black dark:!text-white">
         {message}
       </span>
     </div>,
     {
       ...baseOptions,
       progressClassName: progressClass,
-      className: `!relative !rounded-lg !shadow-md p-3 ${
+      className: `relative rounded-lg shadow-md p-3 ${
         mode === "SUCCESS"
           ? "bg-green-100 dark:bg-green-900"
           : mode === "ERROR"
@@ -63,7 +63,7 @@ export const showToast = (
   );
 };
 
-// ✅ Toast Provider
+// Toast Provider
 export const ToastProvider = () => {
   return <ToastContainer limit={3} />;
 };

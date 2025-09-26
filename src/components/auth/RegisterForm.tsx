@@ -6,6 +6,7 @@ import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
 import { showToast } from "@/providers/ToastProvider";
 import { IUserRegistrationForm } from "@/types";
+
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -65,12 +66,13 @@ const RegisterForm = () => {
             value.forEach((v) =>
               formData.append(key, v instanceof File ? v : String(v))
             );
+          } else {
+            formData.append(key, value);
           }
-          formData.append(key, value);
         }
         const response = await doRegistration(formData);
         if (!response.success) {
-          showToast(response.error!, "ERROR");
+          showToast("Registration Failed", "ERROR");
           setErr(response.error!);
           setLoading(false);
           return;

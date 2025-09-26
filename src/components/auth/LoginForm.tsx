@@ -2,12 +2,21 @@
 
 import { doCredentialLogIn } from "@/actions/auth";
 import { useCatchErr } from "@/hooks/useCatchErr";
+import { useForm } from "@/hooks/useForm";
 import { showToast } from "@/providers/ToastProvider";
+import { IUserLoginForm } from "@/types";
+import { validateLoginForm } from "@/validations/validateLoginForm";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { FaEnvelope, FaEye, FaLock } from "react-icons/fa6";
+import Field from "../common/Field";
 import Button from "../ui/Button";
 import GoogleAuth from "./GoogleAuth";
+
+const initialValues: IUserLoginForm = {
+  email: "",
+  password: "",
+};
 
 const LoginForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -15,29 +24,48 @@ const LoginForm = () => {
 
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const formData = new FormData(e.currentTarget);
-      const result = await doCredentialLogIn(formData);
+  const {
+    values: formValues,
+    resetForm,
+    touched,
+    errors,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+  } = useForm<IUserLoginForm>({
+    initialValues,
+    validate: validateLoginForm,
+    onSubmit: async (values) => {
+      setLoading(true);
+      try {
+        const formData = new FormData();
 
-      if (result?.error) {
-        showToast("Wrong Credentials!", "ERROR");
+        for (const [key, value] of Object.entries(values)) {
+          formData.append(key, value);
+        }
+        const result = await doCredentialLogIn(formData);
+
+        if (result?.error) {
+          showToast("Wrong Credentials!", "ERROR");
+          setLoading(false);
+        }
+        resetForm();
+        setLoading(false);
+        router.replace("/products");
+      } catch (error) {
+        catchErr(error);
+        showToast(err!, "ERROR");
+        setLoading(false);
+      } finally {
         setLoading(false);
       }
-      setLoading(false);
-      router.replace("/products");
-    } catch (error) {
-      catchErr(error);
-      showToast(err!, "ERROR");
-      setLoading(false);
-    }
-  };
+    },
+  });
+
   return (
     <>
       <form className="space-y-6" onSubmit={handleSubmit}>
-        <div>
+        <Field error={touched.email && errors.email}>
           <label
             htmlFor="email"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
@@ -46,6 +74,9 @@ const LoginForm = () => {
           </label>
           <div className="relative">
             <input
+              value={formValues.email}
+              onChange={handleChange}
+              onBlur={handleBlur}
               id="email"
               name="email"
               type="email"
@@ -55,9 +86,9 @@ const LoginForm = () => {
             />
             <FaEnvelope className="absolute left-3 top-3.5 text-gray-400" />
           </div>
-        </div>
+        </Field>
 
-        <div>
+        <Field error={touched.password && errors.password}>
           <label
             htmlFor="password"
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
@@ -66,6 +97,9 @@ const LoginForm = () => {
           </label>
           <div className="relative">
             <input
+              value={formValues.password}
+              onChange={handleChange}
+              onBlur={handleBlur}
               id="password"
               name="password"
               type="password"
@@ -81,7 +115,7 @@ const LoginForm = () => {
               <FaEye className="absolute left-3 top-3.5 text-gray-400" />
             </button>
           </div>
-        </div>
+        </Field>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center">

@@ -284,7 +284,7 @@ const AddProductForm = () => {
               type="number"
               id="discountRate"
               name="discountRate"
-              min={1}
+              min={0}
               max={50}
               className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="8 for 8%"

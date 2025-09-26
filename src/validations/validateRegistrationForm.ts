@@ -1,96 +1,82 @@
-// validations.ts
+import { TUserValidationErrors, UserInput } from "@/types";
 import {
-  IUserRegistrationForm,
-  TRegistrationFormValidationError,
-} from "@/types";
-import { isValidatePhoneNumber } from "@/utils/isValidatePhoneNumber";
-import { isValidEmail } from "@/utils/isValidEmail";
+  emailValidate,
+  maxLength,
+  minLength,
+  minValue,
+  phoneValidate,
+  required,
+} from ".";
 import { validateFile } from "./validateFile";
 
 export const validateRegistrationForm = (
-  input: IUserRegistrationForm
-): TRegistrationFormValidationError => {
-  const errors: TRegistrationFormValidationError = {};
+  input: UserInput
+): TUserValidationErrors => {
+  const {
+    role,
+    firstName,
+    lastName,
+    email,
+    password,
+    confirmPassword,
+    phone,
+    bio,
+    address,
+    farmAddress,
+    farmDistrict,
+    farmName,
+    farmSize,
+    farmSizeUnit,
+    avatar,
+    terms,
+  } = input;
 
-  if (!input.role) {
-    errors.role = "Role is required.";
-  }
-
-  if (!input.firstName) {
-    errors.firstName = "First name is required.";
-  } else if (input.firstName.length < 2) {
-    errors.firstName = "First name must be at least 2 characters long.";
-  }
-
-  if (!input.lastName) {
-    errors.lastName = "Last name is required.";
-  } else if (input.lastName.length < 2) {
-    errors.lastName = "Last name must be at least 2 characters long.";
-  }
-
-  if (!input.email) {
-    errors.email = "Email is required.";
-  } else if (!isValidEmail(input.email)) {
-    errors.email = "Invalid email.";
-  }
-
-  if (!input.password) {
-    errors.password = "Password is required.";
-  } else if (input.password.length < 6) {
-    errors.password = "Password must be at least 6 characters long.";
-  }
-
-  if (input.confirmPassword !== input.password) {
-    errors.confirmPassword = "Confirm password does not match password.";
-  }
-
-  if (!input.phone) {
-    errors.phone = "Phone is required.";
-  } else if (!isValidatePhoneNumber(input.phone)) {
-    errors.phone = "Invalid phone number";
-  }
-
-  if (!input.address) {
-    errors.address = "Address is required.";
-  } else if (input.address.length < 20) {
-    errors.address = "Address must be 20 characters longer";
-  }
-
-  if (input.bio.length > 250) {
-    errors.bio = "250 is the maximum allowed characters.";
-  }
-
-  if (input.role === "Farmer") {
-    if (!input.farmName) errors.farmName = "Farm name is required.";
-    if (!input.farmSize) errors.farmSize = "Farm size is required.";
-    if (!input.farmSizeUnit)
-      errors.farmSizeUnit = "Farm size unit is required.";
-    if (!input.specialization)
-      errors.specialization = "Specialization is required.";
-    if (!input.farmDistrict) {
-      errors.farmDistrict = "Farm district is required.";
-    }
-    if (!input.farmAddress) {
-      errors.farmAddress = "Farm address is required.";
-    } else if (input.farmAddress.length < 20) {
-      errors.farmAddress = "Farm address must be 20 characters longer";
-    }
-  }
-
-  if (!input.terms) {
-    errors.terms =
-      "To continue with us, please accept our terms and conditions.";
-  }
-
+  const isFarmer = role?.toLowerCase() === "farmer";
   const { error: fileErr } = validateFile({
-    file: input.avatar,
-    maxFile: 1,
+    file: Array.isArray(avatar) ? avatar[0] : avatar,
     maxSize: 5 * 1024 * 1024,
+    maxFile: 1,
     isRequired: true,
   });
-  if (fileErr) {
-    errors.avatar = fileErr;
-  }
 
-  return errors;
+  return {
+    role: required(role, "Role is required."),
+    firstName:
+      required(firstName) ??
+      minLength(firstName, 2) ??
+      maxLength(firstName, 20),
+    lastName:
+      required(lastName) ?? minLength(lastName, 2) ?? maxLength(lastName, 20),
+    email: emailValidate(email),
+    phone: phoneValidate(phone),
+    password:
+      required(password) ?? minLength(password, 6) ?? maxLength(password, 100),
+    confirmPassword:
+      required(confirmPassword) ??
+      (password?.trim().toLowerCase() !== confirmPassword?.trim().toLowerCase()
+        ? "Passwords do not match."
+        : undefined),
+    bio: maxLength(bio, 250),
+    address:
+      required(address) ?? minLength(address, 20) ?? maxLength(address, 100),
+    avatar: fileErr ? fileErr : undefined,
+
+    // Farmer-specific fields
+    farmAddress: isFarmer
+      ? required(farmAddress) ??
+        minLength(farmAddress, 20) ??
+        maxLength(farmAddress, 100)
+      : undefined,
+    farmDistrict: isFarmer ? required(farmDistrict) : undefined,
+    farmName: isFarmer
+      ? required(farmName) ?? minLength(farmName, 5) ?? maxLength(farmName, 20)
+      : undefined,
+    farmSize: isFarmer
+      ? required(farmSize) ?? minValue(farmSize, 1)
+      : undefined,
+    farmSizeUnit: isFarmer ? required(farmSizeUnit) : undefined,
+    terms: !terms
+      ? "To continue with us, please accept our terms and conditions."
+      : undefined,
+  };
 };

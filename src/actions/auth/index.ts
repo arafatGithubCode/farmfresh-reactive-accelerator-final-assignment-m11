@@ -33,9 +33,12 @@ export const doRegistration = async (formData: FormData) => {
     } as IUserRegistrationForm;
 
     // run validation
-    const errors = validateRegistrationForm(formValues);
-    if (Object.keys(errors).length > 0) {
-      throw new Error(Object.values(errors)[0]!); // return first err
+    const validationErrors = validateRegistrationForm(formValues);
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((field) => field)
+    ) {
+      throw new Error(Object.values(validationErrors)[0]!); // return first err
     }
 
     const {

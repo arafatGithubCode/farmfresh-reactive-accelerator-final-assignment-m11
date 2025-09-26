@@ -33,9 +33,12 @@ export const doAddingProduct = async (
     };
 
     // run validation
-    const errors = validateAddProductForm(formValues);
-    if (Object.keys(errors).length > 0) {
-      throw new Error(Object.values(errors)[0]!);
+    const validationErrors = validateAddProductForm(formValues);
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((field) => field)
+    ) {
+      throw new Error(Object.values(validationErrors)[0]!);
     }
 
     const {

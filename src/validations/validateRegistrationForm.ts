@@ -10,7 +10,8 @@ import {
 import { validateFile } from "./validateFile";
 
 export const validateRegistrationForm = (
-  input: UserInput
+  input: UserInput,
+  formName?: string
 ): TUserValidationErrors => {
   const {
     role,
@@ -50,16 +51,24 @@ export const validateRegistrationForm = (
     email: emailValidate(email),
     phone: phoneValidate(phone),
     password:
-      required(password) ?? minLength(password, 6) ?? maxLength(password, 100),
+      formName === "REGISTRATION"
+        ? required(password) ??
+          minLength(password, 6) ??
+          maxLength(password, 100)
+        : undefined,
     confirmPassword:
-      required(confirmPassword) ??
-      (password?.trim().toLowerCase() !== confirmPassword?.trim().toLowerCase()
-        ? "Passwords do not match."
-        : undefined),
+      formName === "REGISTRATION"
+        ? required(confirmPassword) ??
+          (password?.trim().toLowerCase() !==
+          confirmPassword?.trim().toLowerCase()
+            ? "Passwords do not match."
+            : undefined)
+        : undefined,
     bio: maxLength(bio, 250),
     address:
       required(address) ?? minLength(address, 20) ?? maxLength(address, 100),
-    avatar: fileErr ? fileErr : undefined,
+    avatar:
+      formName === "REGISTRATION" ? (fileErr ? fileErr : undefined) : undefined,
 
     // Farmer-specific fields
     farmAddress: isFarmer

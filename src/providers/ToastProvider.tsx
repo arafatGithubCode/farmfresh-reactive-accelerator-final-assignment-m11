@@ -45,7 +45,7 @@ export const showToast = (
       {mode === "SUCCESS" && <FaCheckCircle className="text-green-600" />}
       {mode === "ERROR" && <MdError className="text-red-600" />}
       {mode === "WARNING" && <MdWarning className="text-yellow-600" />}
-      <span className="text-sm font-medium !text-black dark:!text-white">
+      <span className="text-sm font-medium text-black dark:text-white">
         {message}
       </span>
     </div>,

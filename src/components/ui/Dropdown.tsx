@@ -47,7 +47,7 @@ const Dropdown = ({ image, name }: { image: string; name: string }) => {
               : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
           }
           alt="User"
-          className="w-8 h-8 rounded-full"
+          className="w-8 h-8 rounded-full border border-primary-500"
           width={50}
           height={50}
         />

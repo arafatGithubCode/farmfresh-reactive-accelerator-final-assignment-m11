@@ -2,11 +2,15 @@
 
 import { signIn, signOut } from "@/auth";
 import { connectDB } from "@/libs/connectDB";
+import { User } from "@/models/userModel";
 import { createUser, getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
 import { IUserDB, IUserRegistrationForm } from "@/types";
+import { catchErr } from "@/utils/catchErr";
+import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import bcrypt from "bcryptjs";
+import { Types } from "mongoose";
 
 // Perform registration
 export const doRegistration = async (formData: FormData) => {
@@ -133,4 +137,60 @@ export const doSignOut = async () => {
 export const doSignIn = async () => {
   await connectDB();
   await signIn("google", { redirectTo: "/products" });
+};
+
+// Perform update profile
+export const doUpdateProfile = async (formData: FormData) => {
+  try {
+    const email = formData.get("email");
+    if (typeof email !== "string") {
+      throw new Error("Email is required and must be string.");
+    }
+    const existingUser = await getUserByEmail(email);
+    if (!existingUser) {
+      throw new Error("Email does not exist.");
+    }
+
+    const userDataForUpdate: Record<string, unknown> = {};
+
+    // upload avatar
+    const avatar = formData.get("avatar");
+    if (avatar && avatar instanceof File) {
+      const upload = await uploadImage(avatar, "avatar");
+      if (!upload.success) throw new Error(upload.error);
+      userDataForUpdate.image = upload.secure_url;
+    } else {
+      userDataForUpdate.image = undefined;
+    }
+
+    for (const [key, value] of Object.entries(
+      Object.fromEntries(formData.entries())
+    )) {
+      if (
+        typeof value === "string" &&
+        existingUser[key as keyof typeof existingUser] !== value
+      ) {
+        userDataForUpdate[key] = value;
+      }
+    }
+
+    delete userDataForUpdate["email"];
+
+    const updatedUserWithMetaData = await User.findByIdAndUpdate(
+      { _id: new Types.ObjectId(existingUser?.id) },
+      userDataForUpdate,
+      { new: true }
+    ).lean();
+
+    const updatedUserWithoutMetaData = transformMongoDoc(
+      updatedUserWithMetaData
+    );
+
+    console.log(updatedUserWithoutMetaData);
+
+    return { success: true, updatedUser: updatedUserWithoutMetaData };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, err: errMsg };
+  }
 };

@@ -55,7 +55,7 @@ const RegisterForm = () => {
     handleSubmit,
   } = useForm<IUserRegistrationForm>({
     initialValues,
-    validate: validateRegistrationForm,
+    validate: (values) => validateRegistrationForm(values, "REGISTRATION"),
     onSubmit: async (values) => {
       setLoading(true);
       try {

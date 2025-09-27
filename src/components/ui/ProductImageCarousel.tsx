@@ -1,10 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { GrFormNext, GrFormPrevious } from "react-icons/gr";
 
-const ProductImageCarousel = ({ images }: { images: string[] }) => {
+const ProductImageCarousel = ({
+  images,
+  productId,
+}: {
+  images: string[];
+  productId: string;
+}) => {
   const [index, setIndex] = useState<number>(0);
   const [animation, setAnimation] = useState<string>("");
 
@@ -37,15 +44,17 @@ const ProductImageCarousel = ({ images }: { images: string[] }) => {
         onClick={handlePrev}
         className="absolute top-1/2 -translate-y-1/2 left-0 bg-primary-500 rounded-full text-white text-xl group-hover:block cursor-pointer hover:bg-primary-700 duration-200"
       />
-      <Image
-        key={images[index]}
-        src={images[index]}
-        alt="Fresh Tomatoes"
-        className={`w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300 ${animation}`}
-        width={200}
-        height={200}
-        onAnimationEnd={() => setAnimation("")}
-      />
+      <Link href={`/products/${productId}`}>
+        <Image
+          key={images[index]}
+          src={images[index]}
+          alt="Fresh Tomatoes"
+          className={`w-full h-48 object-cover transition-transform duration-300 ${animation} cursor-pointer`}
+          width={200}
+          height={200}
+          onAnimationEnd={() => setAnimation("")}
+        />
+      </Link>
 
       <GrFormNext
         aria-label="Next Image"

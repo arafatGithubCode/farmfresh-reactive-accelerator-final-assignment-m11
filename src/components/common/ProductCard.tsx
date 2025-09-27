@@ -109,10 +109,13 @@ const ProductCard = ({
   }, [customerId]);
 
   return (
-    <form className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+    <form className="bg-white dark:bg-gray-800 group rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
       <div className="relative">
         {product?.imagesUrl?.length > 0 && (
-          <ProductImageCarousel images={product.imagesUrl} />
+          <ProductImageCarousel
+            images={product.imagesUrl}
+            productId={product.id}
+          />
         )}
         <div className="absolute top-3 left-3">
           {product?.features?.length > 0 && (
@@ -137,9 +140,11 @@ const ProductCard = ({
       </div>
       <div className="p-6">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-gray-900 dark:text-white">
-            {product?.name}
-          </h3>
+          <Link href={`/products/${product.id}`}>
+            <h3 className="font-semibold text-gray-900 dark:text-white group-hover:underline">
+              {product?.name}
+            </h3>
+          </Link>
           <div className="flex items-center text-yellow-400">
             <FaStar className="text-sm" />
             <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
@@ -173,10 +178,15 @@ const ProductCard = ({
         </div>
         {isManageListingPage ? (
           <div className="flex space-x-2">
-            <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition text-sm">
-              <FaEdit className="mr-1" />
-              Edit
-            </button>
+            <Link
+              href={`/products/edit/${product.id}`}
+              className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition text-sm"
+            >
+              <div className="w-full flex items-center justify-center gap-1">
+                <FaEdit className="mr-1 text-xl" />
+                <span>Edit</span>
+              </div>
+            </Link>
             <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition">
               <FaEye />
             </button>

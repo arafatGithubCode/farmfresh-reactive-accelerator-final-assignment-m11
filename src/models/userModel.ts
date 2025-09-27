@@ -85,5 +85,9 @@ const userSchema = new Schema<IUserDB>(
   { timestamps: true }
 );
 
-export const User: Model<IUserDB> =
-  mongoose.models?.User ?? mongoose.model<IUserDB>("User", userSchema);
+export const User: Model<Omit<IUserDB, "emailVerified"> & { name?: string }> =
+  mongoose.models?.User ??
+  mongoose.model<Omit<IUserDB, "emailVerified" & { name?: string }>>(
+    "User",
+    userSchema
+  );

@@ -8,6 +8,7 @@ import { IUserLoginForm } from "@/types";
 import { validateLoginForm } from "@/validations/validateLoginForm";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { FaEyeSlash } from "react-icons/fa";
 import { FaEnvelope, FaEye, FaLock } from "react-icons/fa6";
 import Field from "../common/Field";
 import Button from "../ui/Button";
@@ -21,6 +22,7 @@ const initialValues: IUserLoginForm = {
 const LoginForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { catchErr, err } = useCatchErr();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -51,7 +53,7 @@ const LoginForm = () => {
         }
         resetForm();
         setLoading(false);
-        router.replace("/products");
+        router.push("/profile");
       } catch (error) {
         catchErr(error);
         showToast(err!, "ERROR");
@@ -102,17 +104,22 @@ const LoginForm = () => {
               onBlur={handleBlur}
               id="password"
               name="password"
-              type="password"
+              type={showPassword ? "text" : "password"}
               required
               className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="••••••••"
             />
             <FaLock className="absolute left-3 top-3.5 text-gray-400" />
             <button
+              onClick={() => setShowPassword((prev) => !prev)}
               type="button"
               className="absolute inset-y-0 right-0 pr-3 flex items-center"
             >
-              <FaEye className="absolute left-3 top-3.5 text-gray-400" />
+              {showPassword ? (
+                <FaEye className="text-gray-400 hover:text-gray-600" />
+              ) : (
+                <FaEyeSlash className="text-gray-400 hover:text-gray-600" />
+              )}
             </button>
           </div>
         </Field>

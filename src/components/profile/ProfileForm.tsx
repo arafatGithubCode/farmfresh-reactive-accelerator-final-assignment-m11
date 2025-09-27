@@ -7,6 +7,7 @@ import { useForm } from "@/hooks/useForm";
 import { showToast } from "@/providers/ToastProvider";
 import { IUserDB } from "@/types";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { FaUserEdit } from "react-icons/fa";
@@ -30,6 +31,10 @@ const ProfileForm = ({
 
   const fileUploadRef = useRef<HTMLInputElement | null>(null);
   const { catchErr } = useCatchErr();
+  const session = useSession();
+  const isGoogleSingIN =
+    session?.data?.user &&
+    Object.keys(session.data.user).includes("emailVerified");
 
   const {
     firstName,
@@ -218,9 +223,13 @@ const ProfileForm = ({
           </select>
           <p className="text-xs text-gray-400 mb-5">
             To become{" "}
-            {formValues.role.toLowerCase() === "farmer" ? "Customer" : "Farmer"}{" "}
+            {formValues.role?.toLowerCase() === "farmer"
+              ? "Customer"
+              : "Farmer"}{" "}
             change your role to{" "}
-            {formValues.role.toLowerCase() === "farmer" ? "Customer" : "Farmer"}
+            {formValues.role?.toLowerCase() === "farmer"
+              ? "Customer"
+              : "Farmer"}
           </p>
         </Field>
         <div className="w-full grid grid-cols-2 gap-4">
@@ -343,7 +352,7 @@ const ProfileForm = ({
           </Field>
 
           {/* <!-- Farmer-specific fields (hidden by default) --> */}
-          {formValues.role.toLowerCase() === "farmer" && (
+          {formValues.role?.toLowerCase() === "farmer" && (
             <>
               <Field error={touched.farmName && errors.farmName}>
                 <label
@@ -498,7 +507,7 @@ const ProfileForm = ({
 
         {isEditable && (
           <Field error={touched.terms && errors.terms}>
-            <div className="flex items-start">
+            <div className="flex items-start mt-4">
               <input
                 id="terms"
                 name="terms"
@@ -527,23 +536,27 @@ const ProfileForm = ({
           )}
         </div>
       </form>
-      <Divider />
-      <div className="flex items-end gap-1">
-        <input
-          type="checkbox"
-          id="change-password"
-          checked={isChangePassword}
-          onChange={() => setIsChangePassword((prev) => !prev)}
-          className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-        />
-        <label
-          htmlFor="change-password"
-          className="text-xs text-orange-400 font-semibold"
-        >
-          Want to change password?
-        </label>
-      </div>
-      {isChangePassword && <ChangePassword />}
+      {!isGoogleSingIN && (
+        <>
+          <Divider />
+          <div className="flex items-end gap-1">
+            <input
+              type="checkbox"
+              id="change-password"
+              checked={isChangePassword}
+              onChange={() => setIsChangePassword((prev) => !prev)}
+              className="mt-1 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
+            />
+            <label
+              htmlFor="change-password"
+              className="text-xs text-orange-400 font-semibold"
+            >
+              Want to change password?
+            </label>
+          </div>
+          {isChangePassword && <ChangePassword />}
+        </>
+      )}
     </div>
   );
 };

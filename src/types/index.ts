@@ -61,6 +61,7 @@ export interface TBaseUser {
 export interface IUserDB extends TBaseUser {
   _id: Types.ObjectId;
   image?: string;
+  name?: string;
 }
 export interface IUserRegistrationForm
   extends Omit<

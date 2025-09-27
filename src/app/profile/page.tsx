@@ -7,6 +7,8 @@ import { RiProfileLine } from "react-icons/ri";
 const ProfilePage = async () => {
   const userSession = await getUserSession();
   const email = userSession?.email;
+  if (!email) return null;
+
   const user = await getUserByEmail(email!);
 
   return (

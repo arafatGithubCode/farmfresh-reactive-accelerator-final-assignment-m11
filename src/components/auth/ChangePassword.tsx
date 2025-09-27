@@ -67,6 +67,7 @@ const ChangePassword = () => {
           </button>
         </div>
       </Field>
+
       <Field error={touched.newPassword && errors.newPassword}>
         <label
           htmlFor="newPassword"

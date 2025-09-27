@@ -10,15 +10,30 @@ export const createUser = async (payload: Omit<IUserDB, "_id">) => {
 };
 
 // Get user by email
+// after transformMongoDoc
 export const getUserByEmail = async (email: string) => {
   await connectDB();
-  const user = await User.findOne({
-    email,
-  }).lean();
+  const user = await User.findOne({ email }).lean();
 
-  return transformMongoDoc(user);
+  if (!user) {
+    return null;
+  }
+
+  const userWithoutMetaData = transformMongoDoc(user);
+
+  return {
+    ...userWithoutMetaData,
+    role: userWithoutMetaData.role ?? "Customer",
+    firstName:
+      userWithoutMetaData.firstName ??
+      userWithoutMetaData.name?.split(" ")[0] ??
+      "",
+    lastName:
+      userWithoutMetaData.lastName ??
+      userWithoutMetaData.name?.split(" ")[1] ??
+      "",
+  };
 };
-
 // Get all farmers
 export const getAllFarmers = async () => {
   await connectDB();

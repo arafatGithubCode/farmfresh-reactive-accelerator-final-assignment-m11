@@ -34,6 +34,11 @@ const initialValues: IProductForm = {
   images: [],
   harvestDate: "",
   features: [],
+  deliveryMethod: "",
+  baseDeliveryFee: 0,
+  perUnitDeliveryFee: 0,
+  serviceFee: 0,
+  isActive: true,
 };
 
 const AddProductForm = () => {
@@ -216,7 +221,8 @@ const AddProductForm = () => {
                 id="price"
                 name="price"
                 step="0.01"
-                min="0"
+                min="1"
+                max={1000}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="45.00"
               />
@@ -261,7 +267,8 @@ const AddProductForm = () => {
                 type="number"
                 id="stock"
                 name="stock"
-                min="1"
+                min="0"
+                max={1000}
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 placeholder="100"
               />
@@ -291,6 +298,107 @@ const AddProductForm = () => {
               placeholder="8 for 8%"
             />
           </Field>
+        </div>
+
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+            Delivery & Service Fee
+          </h2>
+          <div className="grid grid-cols-2 gap-6">
+            <Field error={touched.deliveryMethod && errors.deliveryMethod}>
+              <label
+                htmlFor="deliveryMethod"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Delivery Method *
+                <span className="text-xs text-gray-400 block mt-2">
+                  Express Delivery = 1 day | Regular Delivery = 3 days
+                </span>
+              </label>
+              <select
+                value={formValues.deliveryMethod}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                id="deliveryMethod"
+                name="deliveryMethod"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              >
+                <option value="">Select Delivery Method</option>
+                <option value="same_day_delivery">
+                  Same Day/Express Delivery
+                </option>
+                <option value="regular_delivery">Regular Delivery</option>
+              </select>
+            </Field>
+            <Field error={touched.baseDeliveryFee && errors.baseDeliveryFee}>
+              <label
+                htmlFor="baseDeliveryFee"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Base Delivery Fee
+                <span className="text-xs text-gray-400 block mt-2">
+                  Delivery fee for first unit
+                </span>
+              </label>
+              <input
+                value={formValues.baseDeliveryFee}
+                onChange={handleChange}
+                type="number"
+                min={1}
+                max={500}
+                placeholder="Delivery fee is 100tk for the first unit"
+                id="baseDeliveryFee"
+                name="baseDeliveryFee"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              />
+            </Field>
+            <Field
+              error={touched.perUnitDeliveryFee && errors.perUnitDeliveryFee}
+            >
+              <label
+                htmlFor="perUnitDeliveryFee"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Per Unit Delivery Fee
+                <span className="text-xs text-gray-400 block mt-2">
+                  Per unit delivery fee from second unit.
+                </span>
+              </label>
+              <input
+                value={formValues.perUnitDeliveryFee}
+                onChange={handleChange}
+                type="number"
+                min={1}
+                max={500}
+                id="perUnitDeliveryFee"
+                placeholder="Delivery fee is 20tk from the second unit."
+                name="perUnitDeliveryFee"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              />
+            </Field>
+            <Field error={touched.serviceFee && errors.serviceFee}>
+              <label
+                htmlFor="serviceFee"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                Service Fee
+                <span className="text-xs text-gray-400 block mt-2">
+                  Add service fee including tax, maintenance fee etc.
+                </span>
+              </label>
+              <input
+                value={formValues.serviceFee}
+                onChange={handleChange}
+                type="number"
+                min={1}
+                max={500}
+                id="serviceFee"
+                placeholder="services fee 20tk"
+                name="serviceFee"
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              />
+            </Field>
+          </div>
         </div>
 
         <Field error={touched.images && errors.images}>
@@ -378,7 +486,12 @@ const AddProductForm = () => {
             ))}
           </div>
         </Field>
-        <Button label="Add Product" loading={loading} hasSpinner={true} />
+        <Button
+          label="Add Product"
+          loading={loading}
+          hasSpinner={true}
+          loadingText="Adding..."
+        />
       </form>
     </>
   );

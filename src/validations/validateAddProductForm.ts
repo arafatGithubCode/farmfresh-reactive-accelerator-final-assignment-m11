@@ -15,6 +15,10 @@ export const validateAddProductForm = (
     price,
     stock,
     unit,
+    deliveryMethod,
+    baseDeliveryFee,
+    perUnitDeliveryFee,
+    serviceFee,
   } = input;
 
   //   validate file
@@ -28,6 +32,9 @@ export const validateAddProductForm = (
       minLength(description, 20) ??
       maxLength(description, 1000),
     price: minValue(price, 1),
+    baseDeliveryFee: minValue(baseDeliveryFee, 1),
+    perUnitDeliveryFee: minValue(perUnitDeliveryFee, 1),
+    serviceFee: minValue(serviceFee, 1),
     unit: required(unit),
     stock: minValue(stock, 1),
     harvestDate: required(harvestDate),
@@ -36,5 +43,6 @@ export const validateAddProductForm = (
         ? "Please select at least one feature."
         : undefined,
     images: error ? error : undefined,
+    deliveryMethod: required(deliveryMethod),
   };
 };

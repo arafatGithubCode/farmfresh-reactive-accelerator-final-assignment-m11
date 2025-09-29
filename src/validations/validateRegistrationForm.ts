@@ -28,6 +28,7 @@ export const validateRegistrationForm = (
     farmName,
     farmSize,
     farmSizeUnit,
+    specialization,
     avatar,
     terms,
   } = input;
@@ -84,6 +85,7 @@ export const validateRegistrationForm = (
       ? required(farmSize) ?? minValue(farmSize, 1)
       : undefined,
     farmSizeUnit: isFarmer ? required(farmSizeUnit) : undefined,
+    specialization: isFarmer ? required(specialization) : undefined,
     terms: !terms
       ? "To continue with us, please accept our terms and conditions."
       : undefined,

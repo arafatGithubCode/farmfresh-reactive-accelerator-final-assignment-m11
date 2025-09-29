@@ -96,9 +96,14 @@ const ProductCard = ({
               /{product?.unit}
             </span>
             <br />
-            <span className="text-red-400 line-through ml-1">
-              ৳{Math.round(product?.price).toLocaleString()}
-            </span>
+            {product.discountRate > 0 && (
+              <span className="text-red-400 line-through ml-1">
+                ৳{Math.round(product?.price).toLocaleString()}
+              </span>
+            )}
+            {Number(product.discountRate) === 0 && (
+              <span className="ml-1 text-transparent">no discount</span>
+            )}
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Stock: {`${product?.stock.toFixed(0)}${product?.unit}`}

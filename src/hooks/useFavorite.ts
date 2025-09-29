@@ -1,5 +1,6 @@
 import { showToast } from "@/providers/ToastProvider";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCatchErr } from "./useCatchErr";
 
@@ -9,9 +10,14 @@ export const useFavorite = (productName: string) => {
   const customerId = session?.data?.user?.id;
 
   const { err, catchErr } = useCatchErr();
+  const router = useRouter();
 
   const updateFavorite = async (productId: string) => {
-    if (!customerId) return;
+    if (!customerId) {
+      showToast("Please login to add favorite list.", "WARNING");
+      router.push("/login");
+      return;
+    }
 
     if (session?.data?.user?.role === "Farmer") {
       showToast("Only customer can make favorite.");

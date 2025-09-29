@@ -60,7 +60,7 @@ const Navbar = async () => {
               <FaSearch className="absolute left-3 top-3 text-gray-400" />
             </div>
 
-            {!user || (user?.role?.toLowerCase() !== "Farmer" && <CartBadge />)}
+            {!user || (user?.role?.toLowerCase() !== "farmer" && <CartBadge />)}
             <UserMenu />
 
             <ThemeToggler />

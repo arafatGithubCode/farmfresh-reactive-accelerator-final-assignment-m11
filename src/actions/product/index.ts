@@ -30,6 +30,11 @@ export const doAddingProduct = async (
       features: formData.getAll("features") as string[],
       stock: Number(formData.get("stock") || 0),
       unit: (formData.get("unit") as string) ?? "",
+      deliveryMethod: formData.get("deliveryMethod") as "",
+      baseDeliveryFee: Number(formData.get("baseDeliveryFee")) || 0,
+      perUnitDeliveryFee: Number(formData.get("perUnitDeliveryFee")) || 0,
+      serviceFee: Number(formData.get("serviceFee")) || 0,
+      isActive: true,
     };
 
     // run validation
@@ -52,6 +57,11 @@ export const doAddingProduct = async (
       stock,
       unit,
       discountRate,
+      baseDeliveryFee,
+      deliveryMethod,
+      perUnitDeliveryFee,
+      serviceFee,
+      isActive,
     } = formValues;
 
     // upload product's images
@@ -67,7 +77,7 @@ export const doAddingProduct = async (
 
     const imagesUrl = uploaded.map((r) => r.secure_url);
 
-    const payload: Omit<IProductBase, "_id"> = {
+    const payload: Omit<IProductBase, "id"> = {
       name,
       category,
       description,
@@ -78,11 +88,15 @@ export const doAddingProduct = async (
       stock,
       unit,
       discountRate,
+      baseDeliveryFee,
+      deliveryMethod,
+      perUnitDeliveryFee,
+      serviceFee,
+      isActive,
     };
 
     if (session?.id) {
       payload.farmer = new mongoose.Types.ObjectId(session.id);
-      payload.ratings = 0;
     }
 
     const createdProduct = await createProduct(payload);

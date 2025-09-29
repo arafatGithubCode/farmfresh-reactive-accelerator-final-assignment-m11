@@ -41,6 +41,7 @@ export interface UserInput {
 export type TUserValidationErrors = Partial<Record<keyof UserInput, string>>;
 
 export interface TBaseUser {
+  id?: string;
   role: TUserRole;
   firstName: string;
   email: string;
@@ -56,12 +57,11 @@ export interface TBaseUser {
   farmSizeUnit?: string;
   farmDistrict?: string;
   terms: boolean;
-  image: string;
-  updatedAt: string;
+  image?: string;
+  updatedAt?: string;
 }
 
 export interface IUserDB extends TBaseUser {
-  _id: Types.ObjectId;
   name?: string;
 }
 export interface IUserRegistrationForm
@@ -74,6 +74,8 @@ export interface IUserRegistrationForm
     | "farmSizeUnit"
     | "farmAddress"
     | "farmDistrict"
+    | "image"
+    | "updatedAt"
   > {
   avatar: File | null;
   confirmPassword: string;
@@ -92,9 +94,21 @@ export interface IUserLoginForm {
 }
 //===== User Types End =====//
 
+//===== Review Types Start =====//
+export interface IReview {
+  id: string;
+  customer: string;
+  product: IProductFrontend;
+  rating: number;
+  comment: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+//===== Review Types End =====//
+
 //===== Product Types Start =====//
 export interface IProductBase {
-  _id: Types.ObjectId;
+  id: string;
   farmer?: Types.ObjectId;
   name: string;
   category: string;
@@ -105,8 +119,13 @@ export interface IProductBase {
   harvestDate: string;
   features: string[];
   imagesUrl: string[];
-  ratings?: number;
   discountRate: number;
+  deliveryMethod: "SAME_DAY" | "REGULAR" | "";
+  baseDeliveryFee: number;
+  perUnitDeliveryFee: number;
+  serviceFee: number;
+  isActive: boolean;
+  review?: IReview[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -115,16 +134,14 @@ export type IProductWithFarmer = Omit<IProductBase, "farmer"> & {
   farmer: TBaseUser;
 };
 
-export interface IProductFrontend
-  extends Omit<IProductWithFarmer, "_id" | "farmer"> {
-  id: string;
-  farmer: Omit<TBaseUser, "_id"> & { id: string };
+export interface IProductFrontend extends Omit<IProductWithFarmer, "farmer"> {
+  farmer: TBaseUser;
 }
 
 export interface IProductForm
   extends Omit<
     IProductBase,
-    "imagesUrl" | "farmer" | "_id" | "ratings" | "createdAt" | "updatedAt"
+    "imagesUrl" | "farmer" | "id" | "createdAt" | "updatedAt" | "review"
   > {
   images: File[];
 }

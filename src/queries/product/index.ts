@@ -4,7 +4,7 @@ import { IProductBase, IProductFrontend, IProductWithFarmer } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // Create a product
-export const createProduct = async (payload: Omit<IProductBase, "_id">) => {
+export const createProduct = async (payload: Omit<IProductBase, "id">) => {
   await connectDB();
   const createdProduct = await Product.create(payload);
   return createdProduct;

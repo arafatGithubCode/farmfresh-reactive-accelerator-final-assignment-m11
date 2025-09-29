@@ -3,13 +3,12 @@ import { isValidEmail } from "@/utils/isValidEmail";
 
 export const required = (value?: string, msg = "This field is required.") =>
   !value ? msg : undefined;
-
 export const minLength = (value?: string, len = 2, msg?: string) =>
   value && value.length < len
     ? msg ?? `Must be at least ${len} characters.`
     : undefined;
 
-export const minValue = (value?: number | string, min = 1, msg?: string) =>
+export const minValue = (value?: number | string, min = 0, msg?: string) =>
   value && Number(value) < min
     ? msg ?? `Value must be at least ${min}`
     : undefined;

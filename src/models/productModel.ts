@@ -38,7 +38,7 @@ const productSchema = new mongoose.Schema<IProductBase>(
     price: {
       type: Number,
       required: [true, "Price is required."],
-      min: [2, "Minimum amount of price is 2 tk upper"],
+      min: [1, "Minimum amount of price is 1 tk upper"],
       max: [1000, "Maximum amount of price is 1000 tk less"],
     },
     discountRate: {
@@ -53,8 +53,28 @@ const productSchema = new mongoose.Schema<IProductBase>(
       type: String,
       required: [true, "Unit is required"],
     },
-    ratings: {
+    deliveryMethod: {
+      type: String,
+      required: [true, "Please select the delivery method."],
+    },
+    baseDeliveryFee: {
       type: Number,
+      required: [true, "Base delivery fee is required"],
+    },
+    perUnitDeliveryFee: {
+      type: Number,
+      required: [true, "Per unit delivery fee is required"],
+    },
+    serviceFee: {
+      type: Number,
+      required: [true, "service fee is required"],
+    },
+    review: {
+      type: [{}],
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
     },
   },
   { timestamps: true }

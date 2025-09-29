@@ -41,6 +41,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
     payload: IProductFrontend | string
   ): Promise<void> => {
     if (!customerId) {
+      showToast("Please login to add to cart.", "WARNING");
       router.push("/login");
       return;
     }

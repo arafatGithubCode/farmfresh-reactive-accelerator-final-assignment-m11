@@ -57,9 +57,12 @@ const LoginForm = () => {
         await router.push("/profile");
         router.refresh();
       } catch (error) {
-        console.log(error, "login-form");
         catchErr(error);
-        showToast(err!, "ERROR");
+        if (err) {
+          showToast(err, "ERROR");
+        } else {
+          showToast("Fail to login.", "ERROR");
+        }
         setLoading(false);
       } finally {
         setLoading(false);

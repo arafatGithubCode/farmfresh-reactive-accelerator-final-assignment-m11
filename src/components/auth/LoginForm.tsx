@@ -48,13 +48,16 @@ const LoginForm = () => {
         const result = await doCredentialLogIn(formData);
 
         if (result?.error) {
+          console.log(result, "result-login-form");
           showToast("Wrong Credentials!", "ERROR");
           setLoading(false);
         }
         resetForm();
         setLoading(false);
-        router.push("/profile");
+        await router.push("/profile");
+        router.refresh();
       } catch (error) {
+        console.log(error, "login-form");
         catchErr(error);
         showToast(err!, "ERROR");
         setLoading(false);

@@ -3,6 +3,7 @@ import { IUserDB } from "@/types";
 import Image from "next/image";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { FaCertificate, FaPhone, FaStar } from "react-icons/fa6";
+import Tags from "../ui/Tags";
 
 const FarmerCard = async ({
   farmer,
@@ -65,20 +66,7 @@ const FarmerCard = async ({
         </div>
         <div className="flex space-x-2 mb-4">
           {products[0]?.features?.length > 0 ? (
-            products[0].features.map((feature, index) => (
-              <span
-                key={index}
-                className={`px-2 py-1 rounded-full text-xs ${
-                  index === 0
-                    ? "bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200"
-                    : index === 1
-                    ? "bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200"
-                    : "bg-pink-100 dark:bg-pink-900 text-pink-800 dark:text-pink-200"
-                }`}
-              >
-                {feature}
-              </span>
-            ))
+            <Tags tags={products[0].features} />
           ) : (
             <div className="w-full h-[22px]" />
           )}

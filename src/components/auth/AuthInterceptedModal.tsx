@@ -9,8 +9,9 @@ const AuthInterceptedModal = ({ children }: { children: ReactNode }) => {
   const overlay = useRef<HTMLDivElement | null>(null);
   const wrapper = useRef<HTMLDivElement | null>(null);
 
-  const onDismiss = useCallback(() => {
-    router.back();
+  const onDismiss = useCallback(async () => {
+    await router.back();
+    router.refresh();
   }, [router]);
 
   const handleClick = useCallback(

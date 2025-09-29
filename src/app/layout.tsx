@@ -22,10 +22,12 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-  authInterceptedModal,
+  loginModel,
+  registerModel,
 }: Readonly<{
   children: React.ReactNode;
-  authInterceptedModal: React.ReactNode;
+  loginModel: React.ReactNode;
+  registerModel: React.ReactNode;
 }>) {
   await connectDB();
   return (
@@ -38,7 +40,8 @@ export default async function RootLayout({
           <SessionProvider>
             <CartProvider>
               <Navbar />
-              {authInterceptedModal}
+              {loginModel}
+              {registerModel}
               <BreadCrumb />
               {children}
               <ToastProvider />

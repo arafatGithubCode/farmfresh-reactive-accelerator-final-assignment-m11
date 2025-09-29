@@ -39,7 +39,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   const updateCart = async (
     action: "ADD_ITEM" | "INCREMENT" | "DECREMENT" | "REMOVE_ITEM",
     payload: IProductFrontend | string
-  ) => {
+  ): Promise<void> => {
     if (!customerId) {
       router.push("/login");
       return;

@@ -3,6 +3,7 @@
 import { doSignOut } from "@/actions/auth";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FaAngleDown } from "react-icons/fa6";
 
@@ -10,6 +11,8 @@ const Dropdown = ({ image, name }: { image: string; name: string }) => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownTriggerRef = useRef<HTMLButtonElement>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -77,7 +80,8 @@ const Dropdown = ({ image, name }: { image: string; name: string }) => {
               onClick={async () => {
                 await doSignOut();
                 setShowDropdown(false);
-                window.location.reload();
+                await router.push("/");
+                router.refresh();
               }}
               className="bg-transparent text-gray-600 hover:text-primary-600 w-full dark:text-gray-300 dark:hover:text-primary-600 text-start pl-2 duration-200 ease-linear"
             >

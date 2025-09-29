@@ -1,6 +1,6 @@
 import { connectDB } from "@/libs/connectDB";
 import { Product } from "@/models/productModel";
-import { IProductBase, IProductWithFarmer } from "@/types";
+import { IProductBase, IProductFrontend, IProductWithFarmer } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // Create a product
@@ -26,8 +26,18 @@ export const getProductsByFarmerId = async (farmerId: string) => {
   await connectDB();
 
   const products = await Product.find({ farmer: farmerId })
-    .populate("farmer", "firstName farmDistrict farmName")
+    .populate("farmer")
     .lean<IProductWithFarmer[]>();
 
   return transformMongoDoc(products);
+};
+
+// Get product by its id
+export const getProduct = async (productId: string) => {
+  await connectDB();
+
+  const product = await Product.findById(productId)
+    .populate("farmer")
+    .lean<IProductFrontend>();
+  return transformMongoDoc(product);
 };

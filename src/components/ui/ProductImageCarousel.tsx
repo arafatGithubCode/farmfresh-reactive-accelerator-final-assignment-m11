@@ -50,8 +50,10 @@ const ProductImageCarousel = ({
           src={images[index]}
           alt="Fresh Tomatoes"
           className={`w-full h-48 object-cover transition-transform duration-300 ${animation} cursor-pointer`}
+          placeholder="blur"
           width={200}
           height={200}
+          blurDataURL={images[index]}
           onAnimationEnd={() => setAnimation("")}
         />
       </Link>

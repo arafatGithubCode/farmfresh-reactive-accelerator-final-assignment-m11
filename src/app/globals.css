@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+::selection {
+  background-color: #16a34a;
+  color: #ffffff;
+}
 @layer utilities {
   /* button:disabled {
     @apply cursor-not-allowed hover:scale-100 bg-primary-500 hover:bg-primary-500 text-gray-100 scale-100;

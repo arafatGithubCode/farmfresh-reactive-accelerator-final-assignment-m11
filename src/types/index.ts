@@ -56,11 +56,12 @@ export interface TBaseUser {
   farmSizeUnit?: string;
   farmDistrict?: string;
   terms: boolean;
+  image: string;
+  updatedAt: string;
 }
 
 export interface IUserDB extends TBaseUser {
   _id: Types.ObjectId;
-  image?: string;
   name?: string;
 }
 export interface IUserRegistrationForm
@@ -109,21 +110,15 @@ export interface IProductBase {
   createdAt?: string;
   updatedAt?: string;
 }
-export interface IFarmerPopulated {
-  _id: Types.ObjectId;
-  firstName: string;
-  farmName: string;
-  farmDistrict: string;
-}
 
 export type IProductWithFarmer = Omit<IProductBase, "farmer"> & {
-  farmer: IFarmerPopulated;
+  farmer: TBaseUser;
 };
 
 export interface IProductFrontend
   extends Omit<IProductWithFarmer, "_id" | "farmer"> {
   id: string;
-  farmer: Omit<IFarmerPopulated, "_id"> & { id: string };
+  farmer: Omit<TBaseUser, "_id"> & { id: string };
 }
 
 export interface IProductForm

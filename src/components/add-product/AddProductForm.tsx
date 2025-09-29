@@ -69,6 +69,7 @@ const AddProductForm = () => {
         const response = await doAddingProduct(formData);
 
         if (!response.success) {
+          console.log(response, "add-product");
           showToast(response.error, "ERROR");
           setErr(response.error);
           setLoading(false);

@@ -1,5 +1,5 @@
 import Pagination from "@/components/common/Pagination";
-import ProductCard from "@/components/common/ProductCard";
+import ProductCardWrapper from "@/components/common/ProductCardWrapper";
 import ManageProductFilter from "@/components/manage-products/ManageProductFilter";
 import ManageProductPageTitle from "@/components/manage-products/ManageProductPageTitle";
 import AccessDenied from "@/components/ui/AccessDenied";
@@ -25,13 +25,7 @@ const ManageProductPage = async () => {
             No products listed yet
           </p>
         ) : (
-          products.map((product) => (
-            <ProductCard
-              key={product.id}
-              isManageListingPage={true}
-              product={product}
-            />
-          ))
+          <ProductCardWrapper products={products} isManageListingPage={true} />
         )}
       </div>
       <Pagination />

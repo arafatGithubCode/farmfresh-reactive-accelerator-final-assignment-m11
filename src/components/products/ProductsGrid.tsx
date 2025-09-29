@@ -5,7 +5,7 @@ import { useState } from "react";
 import { FaTh } from "react-icons/fa";
 import { FaList } from "react-icons/fa6";
 import Pagination from "../common/Pagination";
-import ProductCard from "../common/ProductCard";
+import ProductCardWrapper from "../common/ProductCardWrapper";
 
 const ProductsGrid = ({ products }: { products: IProductFrontend[] }) => {
   const [viewType, setViewType] = useState<"GRID" | "LIST">("GRID");
@@ -62,9 +62,7 @@ const ProductsGrid = ({ products }: { products: IProductFrontend[] }) => {
                 : "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
             } gap-6`}
           >
-            {products.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+            <ProductCardWrapper products={products} />
           </div>
           <Pagination />
         </>

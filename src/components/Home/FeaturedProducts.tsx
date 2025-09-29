@@ -1,5 +1,5 @@
 import { getProducts } from "@/queries/product";
-import ProductCard from "../common/ProductCard";
+import ProductCardWrapper from "../common/ProductCardWrapper";
 
 const FeaturedProducts = async () => {
   const products = await getProducts();
@@ -30,13 +30,7 @@ const FeaturedProducts = async () => {
           </p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                isManageListingPage={false}
-                product={product}
-              />
-            ))}
+            <ProductCardWrapper products={products} />
           </div>
         )}
       </div>

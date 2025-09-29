@@ -1,7 +1,26 @@
-import AddProductForm from "@/components/add-product/AddProductForm";
+import ProductForm from "@/components/common/ProductForm";
 import AccessDenied from "@/components/ui/AccessDenied";
 import { showToast } from "@/providers/ToastProvider";
+import { IProductForm } from "@/types";
 import { getUserSession } from "@/utils/getUserSession";
+
+const initialValues: IProductForm<File[]> = {
+  name: "",
+  category: "",
+  description: "",
+  price: 0,
+  discountRate: 0,
+  unit: "",
+  stock: 0,
+  images: [],
+  harvestDate: "",
+  features: [],
+  deliveryMethod: "",
+  baseDeliveryFee: 0,
+  perUnitDeliveryFee: 0,
+  serviceFee: 0,
+  isActive: true,
+};
 
 const AddProductPage = async () => {
   const userSession = await getUserSession();
@@ -18,7 +37,7 @@ const AddProductPage = async () => {
             Share your fresh produce with customers
           </p>
         </div>
-        <AddProductForm />
+        <ProductForm initialValues={initialValues} mode="ADD" />
       </div>
     </div>
   ) : (

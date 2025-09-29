@@ -2,9 +2,9 @@ import { IProductForm, TAddProductValidationError } from "@/types";
 import { maxLength, minLength, minValue, required } from ".";
 import { validateFile } from "./validateFile";
 
-export const validateAddProductForm = (
-  input: IProductForm
-): TAddProductValidationError => {
+export const validateAddProductForm = <T extends string[] | File[]>(
+  input: IProductForm<T>
+): TAddProductValidationError<T> => {
   const {
     name,
     category,
@@ -22,7 +22,11 @@ export const validateAddProductForm = (
   } = input;
 
   //   validate file
-  const { error } = validateFile({ file: images, isRequired: true });
+  let fileErr;
+  if (images instanceof File) {
+    const { error } = validateFile({ file: images, isRequired: true });
+    fileErr = error;
+  }
 
   return {
     name: required(name) ?? minLength(name, 5) ?? maxLength(name, 50),
@@ -42,7 +46,7 @@ export const validateAddProductForm = (
       features?.length === 0
         ? "Please select at least one feature."
         : undefined,
-    images: error ? error : undefined,
+    images: fileErr ? fileErr : undefined,
     deliveryMethod: required(deliveryMethod),
   };
 };

@@ -19,7 +19,7 @@ export const doAddingProduct = async (
       throw new Error("Only farmer can add product.");
     }
 
-    const formValues: IProductForm = {
+    const formValues: IProductForm<File[]> = {
       name: (formData.get("name") as string) ?? "",
       category: (formData.get("category") as string) ?? "",
       description: (formData.get("description") as string) ?? "",
@@ -108,4 +108,9 @@ export const doAddingProduct = async (
   } catch (err) {
     return catchErr(err, "Failed to Add product!");
   }
+};
+
+// ===== Edit Product ===== //
+export const doEditingProduct = async (formData: FormData) => {
+  console.log(formData);
 };

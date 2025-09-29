@@ -1,6 +1,6 @@
 "use client";
 
-import { doAddingProduct } from "@/actions/product";
+import { doAddingProduct, doEditingProduct } from "@/actions/product";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
 import { showToast } from "@/providers/ToastProvider";
@@ -8,9 +8,14 @@ import { IProductForm } from "@/types";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
 import Image from "next/image";
 import { useState } from "react";
-import { FaCloud, FaTrash } from "react-icons/fa6";
-import Field from "../common/Field";
+import { FaCloud, FaTrash } from "react-icons/fa";
 import Button from "../ui/Button";
+import Field from "./Field";
+
+type ProductFormProps<T extends string[] | File[]> = {
+  initialValues: IProductForm<T>;
+  mode: "ADD" | "EDIT";
+};
 
 const features = [
   "Organic",
@@ -23,25 +28,10 @@ const features = [
   "Gluten-Free",
 ];
 
-const initialValues: IProductForm = {
-  name: "",
-  category: "",
-  description: "",
-  price: 0,
-  discountRate: 0,
-  unit: "",
-  stock: 0,
-  images: [],
-  harvestDate: "",
-  features: [],
-  deliveryMethod: "",
-  baseDeliveryFee: 0,
-  perUnitDeliveryFee: 0,
-  serviceFee: 0,
-  isActive: true,
-};
-
-const AddProductForm = () => {
+const ProductForm = <T extends string[] | File[]>({
+  initialValues,
+  mode,
+}: ProductFormProps<T>) => {
   const { err, setErr, catchErr } = useCatchErr();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -53,7 +43,7 @@ const AddProductForm = () => {
     handleChange,
     handleBlur,
     handleSubmit,
-  } = useForm<IProductForm>({
+  } = useForm<IProductForm<T>>({
     initialValues,
     validate: validateAddProductForm,
     onSubmit: async (values) => {
@@ -71,17 +61,24 @@ const AddProductForm = () => {
           }
         }
 
-        const response = await doAddingProduct(formData);
+        if (mode === "ADD") {
+          const response = await doAddingProduct(formData);
 
-        if (!response.success) {
-          console.log(response, "add-product");
-          showToast(response.error, "ERROR");
-          setErr(response.error);
+          if (!response.success) {
+            console.log(response, "add-product");
+            showToast(response.error, "ERROR");
+            setErr(response.error);
+            setLoading(false);
+            return;
+          }
+          showToast(response.message, "SUCCESS");
           setLoading(false);
-          return;
         }
-        showToast(response.message, "SUCCESS");
-        setLoading(false);
+
+        if (mode === "EDIT") {
+          const response = await doEditingProduct(formData);
+          console.log(response);
+        }
       } catch (error) {
         catchErr(error);
         setLoading(false);
@@ -93,7 +90,7 @@ const AddProductForm = () => {
   const removeFile = (index: number) => {
     setValues((prev) => ({
       ...prev,
-      images: prev.images.filter((_, i) => i !== index),
+      images: prev.images.filter((_, i) => i !== index) as T,
     }));
   };
 
@@ -446,15 +443,19 @@ const AddProductForm = () => {
                       className="relative h-60 w-full overflow-hidden scroll-auto"
                     >
                       <Image
-                        src={URL.createObjectURL(image)}
-                        alt={image.name}
+                        src={
+                          image instanceof File
+                            ? URL.createObjectURL(image)
+                            : image
+                        }
+                        alt={image instanceof File ? image.name : image}
                         width={150}
                         height={150}
                         className="rounded object-cover border border-gray-900 dark:border-gray-200"
                       />
                       <FaTrash
                         onClick={() => removeFile(index)}
-                        className="absolute top-4 right-2 hover:text-red-500 cursor-pointer"
+                        className="absolute top-4 right-2 hover:text-red-600 cursor-pointer text-red-500"
                       />
                     </div>
                   ))}
@@ -487,14 +488,14 @@ const AddProductForm = () => {
           </div>
         </Field>
         <Button
-          label="Add Product"
+          label={mode === "ADD" ? "Add Product" : "Update Product"}
           loading={loading}
           hasSpinner={true}
-          loadingText="Adding..."
+          loadingText={mode === "ADD" ? "Adding..." : "Updating..."}
         />
       </form>
     </>
   );
 };
 
-export default AddProductForm;
+export default ProductForm;

@@ -138,16 +138,16 @@ export interface IProductFrontend extends Omit<IProductWithFarmer, "farmer"> {
   farmer: TBaseUser;
 }
 
-export interface IProductForm
+export interface IProductForm<T extends string[] | File[]>
   extends Omit<
     IProductBase,
     "imagesUrl" | "farmer" | "id" | "createdAt" | "updatedAt" | "review"
   > {
-  images: File[];
+  images: T;
 }
 
-export type TAddProductValidationError = Partial<
-  Record<keyof IProductForm, string>
+export type TAddProductValidationError<T extends string[] | File[]> = Partial<
+  Record<keyof IProductForm<T>, string>
 >;
 
 //===== Product Types End =====//

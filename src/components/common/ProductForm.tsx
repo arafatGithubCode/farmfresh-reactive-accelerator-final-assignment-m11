@@ -15,6 +15,7 @@ import Field from "./Field";
 type ProductFormProps<T extends string[] | File[]> = {
   initialValues: IProductForm<T>;
   mode: "ADD" | "EDIT";
+  editProductId?: string;
 };
 
 const features = [
@@ -31,6 +32,7 @@ const features = [
 const ProductForm = <T extends string[] | File[]>({
   initialValues,
   mode,
+  editProductId,
 }: ProductFormProps<T>) => {
   const { err, setErr, catchErr } = useCatchErr();
   const [loading, setLoading] = useState<boolean>(false);
@@ -65,7 +67,18 @@ const ProductForm = <T extends string[] | File[]>({
           const response = await doAddingProduct(formData);
 
           if (!response.success) {
-            console.log(response, "add-product");
+            showToast(response.error, "ERROR");
+            setErr(response.error);
+            setLoading(false);
+            return;
+          }
+          showToast(`${response.message}`, "SUCCESS");
+          setLoading(false);
+        }
+
+        if (mode === "EDIT") {
+          const response = await doEditingProduct(formData, editProductId!);
+          if (!response.success) {
             showToast(response.error, "ERROR");
             setErr(response.error);
             setLoading(false);
@@ -73,11 +86,6 @@ const ProductForm = <T extends string[] | File[]>({
           }
           showToast(response.message, "SUCCESS");
           setLoading(false);
-        }
-
-        if (mode === "EDIT") {
-          const response = await doEditingProduct(formData);
-          console.log(response);
         }
       } catch (error) {
         catchErr(error);

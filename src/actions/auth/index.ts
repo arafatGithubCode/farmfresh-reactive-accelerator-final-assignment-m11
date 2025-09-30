@@ -186,8 +186,6 @@ export const doUpdateProfile = async (formData: FormData) => {
       updatedUserWithMetaData
     );
 
-    console.log(updatedUserWithoutMetaData);
-
     return { success: true, updatedUser: updatedUserWithoutMetaData };
   } catch (error) {
     const errMsg = catchErr(error);

@@ -1,12 +1,14 @@
 "use server";
 
-import { createProduct } from "@/queries/product";
+import { Product } from "@/models/productModel";
+import { createProduct, getProduct } from "@/queries/product";
 import { uploadImage } from "@/services/UploadImag";
 import { IProductBase, IProductForm, TActionResponse } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
+import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
-import mongoose from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 // ===== Add Product ===== //
 export const doAddingProduct = async (
@@ -104,13 +106,81 @@ export const doAddingProduct = async (
     return {
       success: true,
       message: `${createdProduct.name} has been added successfully.`,
+      data: createdProduct,
     };
   } catch (err) {
-    return catchErr(err, "Failed to Add product!");
+    const errMsg = catchErr(err, "Failed to Add product!");
+    return { success: errMsg.success, error: errMsg.error };
   }
 };
 
 // ===== Edit Product ===== //
-export const doEditingProduct = async (formData: FormData) => {
-  console.log(formData);
+export const doEditingProduct = async (
+  formData: FormData,
+  editProductId: string
+): Promise<TActionResponse> => {
+  try {
+    const user = await getUserSession();
+    const userId = user?.id;
+    const product = await getProduct(editProductId);
+
+    if (!product) {
+      throw new Error("This product does not exist.");
+    }
+
+    if (userId !== product.farmer.id) {
+      throw new Error("You are not allowed to edit this product.");
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { farmer, ...originalProduct } = product;
+
+    const productDataForUpdate: Record<string, unknown> = {};
+
+    console.log(originalProduct);
+    console.log(formData);
+
+    for (const [key, value] of Object.entries(
+      Object.fromEntries(formData.entries())
+    )) {
+      const originalValue =
+        originalProduct[key as keyof typeof originalProduct];
+      const parsedValue =
+        typeof originalValue === "number" ? Number(value) : value;
+
+      if (originalValue !== parsedValue) {
+        productDataForUpdate[key] = parsedValue;
+      }
+    }
+
+    if (
+      !productDataForUpdate ||
+      Object.keys(productDataForUpdate).length === 0
+    ) {
+      throw new Error("No changes to update");
+    }
+
+    const updatedProductWithMetaData = await Product.findByIdAndUpdate(
+      { _id: new Types.ObjectId(editProductId) },
+      productDataForUpdate,
+      { new: true }
+    ).lean<IProductBase>();
+
+    const updatedProductWithoutMetaData = transformMongoDoc(
+      updatedProductWithMetaData
+    );
+
+    if (!updatedProductWithoutMetaData) {
+      throw new Error(`${product.name} failed to update.`);
+    }
+
+    return {
+      success: true,
+      data: updatedProductWithoutMetaData!,
+      message: `${updatedProductWithoutMetaData.name} has been updated successfully.`,
+    };
+  } catch (error) {
+    const errMsg = catchErr(error, "Failed to Edit product!");
+    return { success: errMsg.success, error: errMsg.error };
+  }
 };

@@ -49,17 +49,23 @@ const EditProductPage = async ({
   };
 
   return userSession?.role === "Farmer" ? (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
-        <div className="bg-orange-400 text-white px-8 py-6">
-          <h1 className="text-3xl font-bold">Edit Product&apos;s Details</h1>
-          <p className="text-primary-100 mt-2">
-            You are editing {product.name}
-          </p>
+    <>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+          <div className="bg-orange-400 text-white px-8 py-6">
+            <h1 className="text-3xl font-bold">Edit Product&apos;s Details</h1>
+            <p className="text-primary-100 mt-2">
+              You are editing {product.name}
+            </p>
+          </div>
+          <ProductForm
+            initialValues={initialValues}
+            mode="EDIT"
+            editProductId={params.editProductId}
+          />
         </div>
-        <ProductForm initialValues={initialValues} mode="EDIT" />
       </div>
-    </div>
+    </>
   ) : (
     <AccessDenied allowedRole="Farmer" path="Edit-Product page" />
   );

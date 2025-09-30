@@ -4,7 +4,7 @@ import { IUserDB } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // Create a user
-export const createUser = async (payload: Omit<IUserDB, "_id">) => {
+export const createUser = async (payload: Omit<IUserDB, "id">) => {
   await connectDB();
   return await User.create(payload);
 };

@@ -41,7 +41,7 @@ export interface UserInput {
 export type TUserValidationErrors = Partial<Record<keyof UserInput, string>>;
 
 export interface TBaseUser {
-  id?: string;
+  id: string;
   role: TUserRole;
   firstName: string;
   email: string;
@@ -245,5 +245,5 @@ export interface IFileValidationResult {
 
 // Server action response
 export type TActionResponse =
-  | { success: true; message: string }
+  | { success: true; data: object; message: string }
   | { success: false; error: string };

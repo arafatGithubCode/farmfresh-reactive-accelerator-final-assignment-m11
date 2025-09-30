@@ -16,11 +16,7 @@ import Field from "../common/Field";
 import Button from "../ui/Button";
 import Divider from "../ui/Divider";
 
-const ProfileForm = ({
-  user,
-}: {
-  user: Omit<IUserDB, "_id"> & { id: string };
-}) => {
+const ProfileForm = ({ user }: { user: IUserDB }) => {
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isChangePassword, setIsChangePassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);

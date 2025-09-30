@@ -95,6 +95,18 @@ const BreadCrumb = ({
     );
   }
 
+  // case 6: Edit Products
+  if (pathname.startsWith("/products/edit/")) {
+    return (
+      <Wrapper>
+        <Item href="/">Home</Item>
+        <Separator />
+        <Item href="/manage-products">Manage Product</Item>
+        <Current>Edit Product</Current>
+      </Wrapper>
+    );
+  }
+
   return null;
 };
 

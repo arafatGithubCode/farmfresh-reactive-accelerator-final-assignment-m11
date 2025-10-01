@@ -76,6 +76,7 @@ export interface IUserRegistrationForm
     | "farmDistrict"
     | "image"
     | "updatedAt"
+    | "id"
   > {
   avatar: File | null;
   confirmPassword: string;

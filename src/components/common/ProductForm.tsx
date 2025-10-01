@@ -7,6 +7,7 @@ import { showToast } from "@/providers/ToastProvider";
 import { IProductForm } from "@/types";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaCloud, FaTrash } from "react-icons/fa";
 import Button from "../ui/Button";
@@ -36,6 +37,8 @@ const ProductForm = <T extends string[] | File[]>({
 }: ProductFormProps<T>) => {
   const { err, setErr, catchErr } = useCatchErr();
   const [loading, setLoading] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const {
     values: formValues,
@@ -74,6 +77,7 @@ const ProductForm = <T extends string[] | File[]>({
           }
           showToast(`${response.message}`, "SUCCESS");
           setLoading(false);
+          router.refresh();
         }
 
         if (mode === "EDIT") {
@@ -86,6 +90,7 @@ const ProductForm = <T extends string[] | File[]>({
           }
           showToast(response.message, "SUCCESS");
           setLoading(false);
+          router.refresh();
         }
       } catch (error) {
         catchErr(error);

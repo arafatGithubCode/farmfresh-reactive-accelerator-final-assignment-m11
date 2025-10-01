@@ -132,24 +132,63 @@ export const doEditingProduct = async (
       throw new Error("You are not allowed to edit this product.");
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { farmer, ...originalProduct } = product;
+    const formValues: Omit<IProductForm<File[]>, "isActive"> = {
+      name: (formData.get("name") as string) ?? "",
+      category: (formData.get("category") as string) ?? "",
+      description: (formData.get("description") as string) ?? "",
+      harvestDate: (formData.get("harvestDate") as string) ?? "",
+      images: formData.getAll("images") as File[],
+      price: Number(formData.get("price")) || 0,
+      discountRate: Number(formData.get("discountRate")) || 0,
+      features: formData.getAll("features") as string[],
+      stock: Number(formData.get("stock") || 0),
+      unit: (formData.get("unit") as string) ?? "",
+      deliveryMethod: formData.get("deliveryMethod") as "",
+      baseDeliveryFee: Number(formData.get("baseDeliveryFee")) || 0,
+      perUnitDeliveryFee: Number(formData.get("perUnitDeliveryFee")) || 0,
+      serviceFee: Number(formData.get("serviceFee")) || 0,
+    };
+
+    const originalProductData: Omit<
+      IProductForm<File[]>,
+      "isActive" | "images"
+    > = {
+      name: product.name,
+      category: product.category,
+      description: product.description,
+      price: product.price,
+      harvestDate: product.harvestDate,
+      discountRate: product.discountRate,
+      features: product.features,
+      stock: product.stock,
+      unit: product.unit,
+      deliveryMethod: product.deliveryMethod,
+      baseDeliveryFee: product.baseDeliveryFee,
+      perUnitDeliveryFee: product.perUnitDeliveryFee,
+      serviceFee: product.serviceFee,
+    };
 
     const productDataForUpdate: Record<string, unknown> = {};
 
-    console.log(originalProduct);
-    console.log(formData);
-
-    for (const [key, value] of Object.entries(
-      Object.fromEntries(formData.entries())
-    )) {
-      const originalValue =
-        originalProduct[key as keyof typeof originalProduct];
-      const parsedValue =
-        typeof originalValue === "number" ? Number(value) : value;
-
-      if (originalValue !== parsedValue) {
-        productDataForUpdate[key] = parsedValue;
+    for (const [key, value] of Object.entries(formValues)) {
+      if (key === "features" && Array.isArray(value)) {
+        const originalFeatures = originalProductData.features ?? [];
+        if (
+          value.length !== originalFeatures.length ||
+          !value.every((v, i) => v === originalFeatures[i])
+        ) {
+          productDataForUpdate["features"] = value;
+        }
+      } else if (key === "images" && Array.isArray(value)) {
+        if (value.some((file) => file instanceof File)) {
+          productDataForUpdate["images"] = value;
+        }
+      } else if (key !== "images" && key !== "features") {
+        if (
+          value !== originalProductData[key as keyof typeof originalProductData]
+        ) {
+          productDataForUpdate[key] = value;
+        }
       }
     }
 
@@ -157,7 +196,39 @@ export const doEditingProduct = async (
       !productDataForUpdate ||
       Object.keys(productDataForUpdate).length === 0
     ) {
-      throw new Error("No changes to update");
+      throw new Error("No change made to update this product.");
+    }
+
+    // upload updated image
+    let imagesUrl: string[] = [];
+
+    if (
+      Array.isArray(productDataForUpdate.images) &&
+      productDataForUpdate.images.length > 0
+    ) {
+      const images = productDataForUpdate.images as File[];
+
+      const uploadResult = await Promise.all(
+        images.map((file) => uploadImage(file, "product"))
+      );
+
+      const uploaded = uploadResult.filter((r) => r.success);
+      const failed = uploadResult.filter((r) => !r.success);
+
+      if (failed.length > 0) {
+        throw new Error(failed[0].error);
+      }
+
+      imagesUrl = uploaded.map((r) => r.secure_url);
+      if (imagesUrl.length > 0) {
+        productDataForUpdate["imagesUrl"] = [
+          ...product.imagesUrl,
+          ...imagesUrl,
+        ];
+      }
+
+      // remove raw File objects before DB update
+      delete productDataForUpdate.images;
     }
 
     const updatedProductWithMetaData = await Product.findByIdAndUpdate(

@@ -28,7 +28,7 @@ const CartBadge = () => {
     timerOutRef.current = setTimeout(() => setShowDropdown(false), 200);
   };
 
-  const pending = cart.items.some((i) => loading[i.product.id]);
+  const pending = cart.items.some((i) => loading[i.product?.id]);
   return (
     <div
       className="relative"
@@ -61,41 +61,46 @@ const CartBadge = () => {
             <p className="text-sm text-gray-500">Loading…</p>
           ) : cart?.items?.length > 0 ? (
             <ul className="divide-y divide-gray-300 dark:divide-gray-500 space-y-2">
-              {cart?.items?.map((item) => (
-                <li
-                  key={item.product.id}
-                  className="flex items-center justify-start gap-2 pt-1"
-                >
-                  <Image
-                    className="rounded"
-                    src={item.product.imagesUrl[0]}
-                    alt="Cart-Item"
-                    width={80}
-                    height={80}
-                  />
-                  <div className="flex flex-col items-start justify-center">
-                    <h3 className="font-semibold">{item.product.name}</h3>
-                    <p className="text-gray-500 font-semibold text-xs">
-                      {item.product.farmer.farmName}
-                    </p>
-                    <div className="flex items-center mt-1 -ml-1">
-                      <TbCurrencyTaka className="text-xl" />
-                      <div className="font-semibold">
-                        {item.product.price * item.quantity}
-                      </div>
-                      <div className="flex gap-1 items-center text-xs ml-1">
-                        (<span>{item.product.price}</span>
-                        <LiaTimesSolid />
-                        <span>
-                          {item.quantity}
-                          {item.product.unit}
-                        </span>
-                        )
+              {cart?.items?.map((item) => {
+                if (!item.product) {
+                  return null;
+                }
+                return (
+                  <li
+                    key={item.product.id}
+                    className="flex items-center justify-start gap-2 pt-1"
+                  >
+                    <Image
+                      className="rounded"
+                      src={item.product?.imagesUrl[0]?.url}
+                      alt="Cart-Item"
+                      width={80}
+                      height={80}
+                    />
+                    <div className="flex flex-col items-start justify-center">
+                      <h3 className="font-semibold">{item.product.name}</h3>
+                      <p className="text-gray-500 font-semibold text-xs">
+                        {item.product.farmer.farmName}
+                      </p>
+                      <div className="flex items-center mt-1 -ml-1">
+                        <TbCurrencyTaka className="text-xl" />
+                        <div className="font-semibold">
+                          {item.product.price * item.quantity}
+                        </div>
+                        <div className="flex gap-1 items-center text-xs ml-1">
+                          (<span>{item.product.price}</span>
+                          <LiaTimesSolid />
+                          <span>
+                            {item.quantity}
+                            {item.product.unit}
+                          </span>
+                          )
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
               <Divider />
               <Link
                 className="bg-primary-500 px-4 py-3 text-white text-xl font-semibold text-center rounded-lg block w-full"

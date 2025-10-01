@@ -119,7 +119,7 @@ export interface IProductBase {
   stock: number;
   harvestDate: string;
   features: string[];
-  imagesUrl: string[];
+  imagesUrl: { url: string; public_id: string; id?: string }[];
   discountRate: number;
   deliveryMethod: "SAME_DAY" | "REGULAR" | "";
   baseDeliveryFee: number;
@@ -139,17 +139,18 @@ export interface IProductFrontend extends Omit<IProductWithFarmer, "farmer"> {
   farmer: TBaseUser;
 }
 
-export interface IProductForm<T extends string[] | File[]>
-  extends Omit<
+export interface IProductForm<
+  T extends { url: string; public_id: string; id?: string }[] | File[]
+> extends Omit<
     IProductBase,
     "imagesUrl" | "farmer" | "id" | "createdAt" | "updatedAt" | "review"
   > {
   images: T;
 }
 
-export type TAddProductValidationError<T extends string[] | File[]> = Partial<
-  Record<keyof IProductForm<T>, string>
->;
+export type TAddProductValidationError<
+  T extends { url: string; public_id: string; id?: string }[] | File[]
+> = Partial<Record<keyof IProductForm<T>, string>>;
 
 //===== Product Types End =====//
 
@@ -246,5 +247,5 @@ export interface IFileValidationResult {
 
 // Server action response
 export type TActionResponse =
-  | { success: true; data: object; message: string }
+  | { success: true; data?: object; message: string }
   | { success: false; error: string };

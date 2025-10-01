@@ -2,7 +2,9 @@ import { IProductForm, TAddProductValidationError } from "@/types";
 import { maxLength, minLength, minValue, required } from ".";
 import { validateFile } from "./validateFile";
 
-export const validateAddProductForm = <T extends string[] | File[]>(
+export const validateAddProductForm = <
+  T extends { url: string; public_id: string; id?: string }[] | File[]
+>(
   input: IProductForm<T>
 ): TAddProductValidationError<T> => {
   const {

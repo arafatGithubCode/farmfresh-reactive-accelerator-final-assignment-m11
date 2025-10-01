@@ -3,7 +3,11 @@
 import Image from "next/image";
 import { useState } from "react";
 
-const ProductImageGallery = ({ images }: { images: string[] }) => {
+const ProductImageGallery = ({
+  images,
+}: {
+  images: { url: string; public_id: string }[];
+}) => {
   const [currentIndex, setCurrentIndex] = useState<number>(0);
 
   return (
@@ -11,12 +15,12 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
       <div className="aspect-square relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-lg">
         <Image
           id="mainImage"
-          src={images[currentIndex]}
+          src={images[currentIndex]?.url}
           alt="Product's image"
           className="w-full h-full object-cover"
           fill={true}
           placeholder="blur"
-          blurDataURL={images[0]}
+          blurDataURL={images[0]?.url}
           objectFit="contain"
         />
       </div>
@@ -25,7 +29,7 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
           images?.map((image, index) => (
             <button
               onClick={() => setCurrentIndex(index)}
-              key={image}
+              key={image?.public_id}
               className={`aspect-square relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden border-2 ${
                 currentIndex === index
                   ? "border-primary-500"
@@ -33,7 +37,7 @@ const ProductImageGallery = ({ images }: { images: string[] }) => {
               }`}
             >
               <Image
-                src={image}
+                src={image?.url}
                 alt="Product's image"
                 className="w-full h-full object-cover"
                 fill={true}

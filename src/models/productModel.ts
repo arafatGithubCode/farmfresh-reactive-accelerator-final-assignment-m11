@@ -27,10 +27,12 @@ const productSchema = new mongoose.Schema<IProductBase>(
       type: ["String"],
       required: [true, "Please select at least one feature"],
     },
-    imagesUrl: {
-      type: ["String"],
-      required: [true, "Please select at least one image"],
-    },
+    imagesUrl: [
+      {
+        url: { type: String, required: true },
+        public_id: { type: String, required: true },
+      },
+    ],
     harvestDate: {
       type: String,
       required: [true, "Harvest date is required."],

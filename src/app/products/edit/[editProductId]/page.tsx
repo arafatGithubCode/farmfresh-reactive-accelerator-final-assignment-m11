@@ -30,7 +30,9 @@ const EditProductPage = async ({
     redirect("/products");
   }
 
-  const initialValues: IProductForm<string[]> = {
+  const initialValues: IProductForm<
+    { url: string; public_id: string; id?: string }[]
+  > = {
     name: product.name,
     category: product.category,
     description: product.description,

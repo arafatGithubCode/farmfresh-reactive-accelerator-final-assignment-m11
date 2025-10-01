@@ -13,7 +13,9 @@ import { FaCloud, FaTrash } from "react-icons/fa";
 import Button from "../ui/Button";
 import Field from "./Field";
 
-type ProductFormProps<T extends string[] | File[]> = {
+type ProductFormProps<
+  T extends { url: string; public_id: string; id?: string }[] | File[]
+> = {
   initialValues: IProductForm<T>;
   mode: "ADD" | "EDIT";
   editProductId?: string;
@@ -30,7 +32,9 @@ const features = [
   "Gluten-Free",
 ];
 
-const ProductForm = <T extends string[] | File[]>({
+const ProductForm = <
+  T extends { url: string; public_id: string; id?: string }[] | File[]
+>({
   initialValues,
   mode,
   editProductId,
@@ -77,7 +81,6 @@ const ProductForm = <T extends string[] | File[]>({
           }
           showToast(`${response.message}`, "SUCCESS");
           setLoading(false);
-          router.refresh();
         }
 
         if (mode === "EDIT") {
@@ -121,7 +124,7 @@ const ProductForm = <T extends string[] | File[]>({
   return (
     <>
       <form className="p-8 space-y-8" onSubmit={handleSubmit}>
-        {err && <p className="text-red-500 text-sm text-center">{err}</p>}
+        {!!err ? <p className="text-red-500 text-sm text-center">{err}</p> : ""}
         <div>
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
             Basic Information
@@ -450,28 +453,41 @@ const ProductForm = <T extends string[] | File[]>({
               >
                 {formValues.images &&
                   formValues.images.length > 0 &&
-                  formValues.images.map((image, index) => (
-                    <div
-                      key={index + 1}
-                      className="relative h-60 w-full overflow-hidden scroll-auto"
-                    >
-                      <Image
-                        src={
-                          image instanceof File
-                            ? URL.createObjectURL(image)
-                            : image
-                        }
-                        alt={image instanceof File ? image.name : image}
-                        width={150}
-                        height={150}
-                        className="rounded object-cover border border-gray-900 dark:border-gray-200"
-                      />
-                      <FaTrash
-                        onClick={() => removeFile(index)}
-                        className="absolute top-4 right-2 hover:text-red-600 cursor-pointer text-red-500"
-                      />
-                    </div>
-                  ))}
+                  formValues.images.map((image, index) => {
+                    let src = "";
+                    let alt = "";
+
+                    if (image instanceof File) {
+                      // Case: New file upload
+                      src = URL.createObjectURL(image);
+                      alt = image.name;
+                    } else if (typeof image === "string") {
+                      src = image;
+                      alt = "product-image";
+                    } else if (typeof image === "object" && "url" in image) {
+                      src = image.url;
+                      alt = image.public_id || "product-image";
+                    }
+
+                    return (
+                      <div
+                        key={index}
+                        className="relative h-60 w-full overflow-hidden scroll-auto"
+                      >
+                        <Image
+                          src={src}
+                          alt={alt}
+                          width={150}
+                          height={150}
+                          className="rounded object-cover border border-gray-900 dark:border-gray-200"
+                        />
+                        <FaTrash
+                          onClick={() => removeFile(index)}
+                          className="absolute top-4 right-2 hover:text-red-600 cursor-pointer text-red-500"
+                        />
+                      </div>
+                    );
+                  })}
               </div>
             </div>
           </div>

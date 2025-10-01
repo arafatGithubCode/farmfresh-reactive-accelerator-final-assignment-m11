@@ -26,13 +26,17 @@ export const doAddingProduct = async (
       category: (formData.get("category") as string) ?? "",
       description: (formData.get("description") as string) ?? "",
       harvestDate: (formData.get("harvestDate") as string) ?? "",
-      images: formData.getAll("images") as File[],
+      images:
+        (formData.getAll("images") as File[]).filter(
+          (file) => file instanceof File && file.size > 0
+        ) ?? [],
       price: Number(formData.get("price")) || 0,
       discountRate: Number(formData.get("discountRate")) || 0,
       features: formData.getAll("features") as string[],
       stock: Number(formData.get("stock") || 0),
       unit: (formData.get("unit") as string) ?? "",
-      deliveryMethod: formData.get("deliveryMethod") as "",
+      deliveryMethod:
+        (formData.get("deliveryMethod") as "SAME_DAY" | "REGULAR" | "") ?? "",
       baseDeliveryFee: Number(formData.get("baseDeliveryFee")) || 0,
       perUnitDeliveryFee: Number(formData.get("perUnitDeliveryFee")) || 0,
       serviceFee: Number(formData.get("serviceFee")) || 0,
@@ -77,7 +81,10 @@ export const doAddingProduct = async (
       throw new Error(failed[0].error);
     }
 
-    const imagesUrl = uploaded.map((r) => r.secure_url);
+    const imagesUrl = uploaded.map((r) => ({
+      url: r.secure_url,
+      public_id: r.public_id,
+    }));
 
     const payload: Omit<IProductBase, "id"> = {
       name,
@@ -101,12 +108,13 @@ export const doAddingProduct = async (
       payload.farmer = new mongoose.Types.ObjectId(session.id);
     }
 
-    const createdProduct = await createProduct(payload);
+    const createdProduct: Omit<IProductBase, "id"> = await createProduct(
+      payload
+    );
 
     return {
       success: true,
       message: `${createdProduct.name} has been added successfully.`,
-      data: createdProduct,
     };
   } catch (err) {
     const errMsg = catchErr(err, "Failed to Add product!");
@@ -132,12 +140,18 @@ export const doEditingProduct = async (
       throw new Error("You are not allowed to edit this product.");
     }
 
-    const formValues: Omit<IProductForm<File[]>, "isActive"> = {
+    const parseIsActive: boolean =
+      formData.get("isActive") === "true" ? true : false;
+
+    const formValues: IProductForm<File[]> = {
       name: (formData.get("name") as string) ?? "",
       category: (formData.get("category") as string) ?? "",
       description: (formData.get("description") as string) ?? "",
       harvestDate: (formData.get("harvestDate") as string) ?? "",
-      images: formData.getAll("images") as File[],
+      images:
+        (formData.getAll("images") as File[]).filter(
+          (file) => file instanceof File && file.size > 0
+        ) ?? [],
       price: Number(formData.get("price")) || 0,
       discountRate: Number(formData.get("discountRate")) || 0,
       features: formData.getAll("features") as string[],
@@ -147,7 +161,17 @@ export const doEditingProduct = async (
       baseDeliveryFee: Number(formData.get("baseDeliveryFee")) || 0,
       perUnitDeliveryFee: Number(formData.get("perUnitDeliveryFee")) || 0,
       serviceFee: Number(formData.get("serviceFee")) || 0,
+      isActive: parseIsActive,
     };
+
+    // run validation
+    const validationErrors = validateAddProductForm(formValues);
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((field) => field)
+    ) {
+      throw new Error(Object.values(validationErrors)[0]!);
+    }
 
     const originalProductData: Omit<
       IProductForm<File[]>,
@@ -192,6 +216,10 @@ export const doEditingProduct = async (
       }
     }
 
+    if (Object.keys(productDataForUpdate).includes("isActive")) {
+      delete productDataForUpdate["isActive"];
+    }
+
     if (
       !productDataForUpdate ||
       Object.keys(productDataForUpdate).length === 0
@@ -200,7 +228,7 @@ export const doEditingProduct = async (
     }
 
     // upload updated image
-    let imagesUrl: string[] = [];
+    let imagesUrl: { url: string; public_id: string }[] = [];
 
     if (
       Array.isArray(productDataForUpdate.images) &&
@@ -219,7 +247,10 @@ export const doEditingProduct = async (
         throw new Error(failed[0].error);
       }
 
-      imagesUrl = uploaded.map((r) => r.secure_url);
+      imagesUrl = uploaded.map((r) => ({
+        url: r.secure_url,
+        public_id: r.public_id,
+      }));
       if (imagesUrl.length > 0) {
         productDataForUpdate["imagesUrl"] = [
           ...product.imagesUrl,

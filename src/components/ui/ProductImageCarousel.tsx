@@ -9,7 +9,7 @@ const ProductImageCarousel = ({
   images,
   productId,
 }: {
-  images: string[];
+  images: { url: string; public_id: string }[];
   productId: string;
 }) => {
   const [index, setIndex] = useState<number>(0);
@@ -46,14 +46,14 @@ const ProductImageCarousel = ({
       />
       <Link href={`/products/${productId}`}>
         <Image
-          key={images[index]}
-          src={images[index]}
+          key={images[index].public_id}
+          src={images[index].url}
           alt="Fresh Tomatoes"
           className={`w-full h-48 object-cover transition-transform duration-300 ${animation} cursor-pointer`}
           placeholder="blur"
           width={200}
           height={200}
-          blurDataURL={images[index]}
+          blurDataURL={images[index].url}
           onAnimationEnd={() => setAnimation("")}
         />
       </Link>

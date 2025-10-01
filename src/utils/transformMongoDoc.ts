@@ -26,6 +26,12 @@ export const transformMongoDoc = <T>(doc: T): TransformMongoDoc<T> => {
         result[key] = value.toString();
       } else if (value instanceof Date) {
         result[key] = value.toISOString();
+      } else if (key === "imagesUrl" && Array.isArray(value)) {
+        result[key] = value.map((image) => ({
+          url: image.url,
+          public_id: image.public_id,
+          id: image._id.toString(),
+        }));
       } else {
         result[key] = transformMongoDoc(value) as TransformMongoDoc<T>;
       }

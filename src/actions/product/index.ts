@@ -1,9 +1,15 @@
 "use server";
 
+import cloudinary from "@/libs/cloudinary";
 import { Product } from "@/models/productModel";
 import { createProduct, getProduct } from "@/queries/product";
 import { uploadImage } from "@/services/UploadImag";
-import { IProductBase, IProductForm, TActionResponse } from "@/types";
+import {
+  IProductBase,
+  IProductForm,
+  IProductFrontend,
+  TActionResponse,
+} from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
@@ -284,5 +290,41 @@ export const doEditingProduct = async (
   } catch (error) {
     const errMsg = catchErr(error, "Failed to Edit product!");
     return { success: errMsg.success, error: errMsg.error };
+  }
+};
+
+// ===== Delete Product's image ===== //
+export const doDeletingProductImage = async (
+  public_id: string,
+  productId: string
+): Promise<TActionResponse> => {
+  try {
+    const response = await cloudinary.uploader.destroy(public_id);
+
+    if (response && response.result !== "ok") {
+      throw new Error("This image does not exist");
+    }
+
+    const product = await getProduct(productId);
+
+    if (!product) {
+      throw new Error("This image does not exist");
+    }
+    const updatedProduct = await Product.findByIdAndUpdate(
+      { _id: new Types.ObjectId(productId) },
+      {
+        imagesUrl: product.imagesUrl.filter((id) => id.public_id !== public_id),
+      },
+      { new: true }
+    ).lean<IProductFrontend>();
+
+    return {
+      success: true,
+      message: "This image has been deleted successfully.",
+      data: transformMongoDoc(updatedProduct)!,
+    };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, error: errMsg.error };
   }
 };

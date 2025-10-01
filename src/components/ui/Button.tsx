@@ -9,6 +9,7 @@ type ButtonProps = {
   loading: boolean;
   hasSpinner?: boolean;
   loadingText?: string;
+  isDanger?: boolean;
 };
 
 const Button = ({
@@ -16,6 +17,7 @@ const Button = ({
   loading,
   hasSpinner = false,
   loadingText = "Loading...",
+  isDanger = false,
 }: ButtonProps) => {
   const { pending } = useFormStatus();
   const isLoading = pending || loading;
@@ -26,7 +28,11 @@ const Button = ({
       disabled={isLoading}
       aria-busy={isLoading}
       aria-disabled={isLoading}
-      className="w-full text-white py-3 bg-primary-600 hover:bg-primary-700 hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center"
+      className={`w-full text-white py-3 ${
+        isDanger
+          ? "bg-red-600 hover:bg-red-700"
+          : "bg-primary-600 hover:bg-primary-700"
+      } hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center`}
     >
       {isLoading ? (
         hasSpinner ? (

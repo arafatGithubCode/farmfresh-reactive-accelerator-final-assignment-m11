@@ -20,7 +20,7 @@ export const useFavorite = (productName: string) => {
     }
 
     if (session?.data?.user?.role === "Farmer") {
-      showToast("Only customer can make favorite.");
+      showToast("Only customer can make favorite.", "WARNING");
       return;
     }
 

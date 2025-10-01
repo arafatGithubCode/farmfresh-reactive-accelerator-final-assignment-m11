@@ -1,4 +1,4 @@
-import { Types } from "mongoose";
+import { AnyObject, Types } from "mongoose";
 
 //===== User Types Start =====//
 export type TUserRole = "Farmer" | "Customer";
@@ -247,5 +247,5 @@ export interface IFileValidationResult {
 
 // Server action response
 export type TActionResponse =
-  | { success: true; data?: object; message: string }
+  | { success: true; data?: AnyObject; message: string }
   | { success: false; error: string };

@@ -10,7 +10,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaCloud, FaTrash } from "react-icons/fa";
+import DeleteImage from "../edit-product/DeleteImage";
 import Button from "../ui/Button";
+import WarningPopup from "../ui/WarningPopup";
 import Field from "./Field";
 
 type ProductFormProps<
@@ -41,6 +43,10 @@ const ProductForm = <
 }: ProductFormProps<T>) => {
   const { err, setErr, catchErr } = useCatchErr();
   const [loading, setLoading] = useState<boolean>(false);
+
+  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [deletedImage, setDeletedImage] = useState<string>("");
+  const [publicId, setPublicId] = useState<string>("");
 
   const router = useRouter();
 
@@ -103,11 +109,22 @@ const ProductForm = <
   });
 
   //   remove one file by its index
-  const removeFile = (index: number) => {
-    setValues((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index) as T,
-    }));
+  const removeFile = (
+    index: number,
+    image: { url: string; public_id: string } | File
+  ) => {
+    if (image instanceof File) {
+      setValues((prev) => ({
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index) as T,
+      }));
+    }
+
+    if (typeof image === "object" && "url" in image) {
+      setPublicId(image.public_id);
+      setShowWarning(true);
+      setDeletedImage(image.url);
+    }
   };
 
   // toggle feature's check box
@@ -482,7 +499,7 @@ const ProductForm = <
                           className="rounded object-cover border border-gray-900 dark:border-gray-200"
                         />
                         <FaTrash
-                          onClick={() => removeFile(index)}
+                          onClick={() => removeFile(index, image)}
                           className="absolute top-4 right-2 hover:text-red-600 cursor-pointer text-red-500"
                         />
                       </div>
@@ -523,6 +540,16 @@ const ProductForm = <
           loadingText={mode === "ADD" ? "Adding..." : "Updating..."}
         />
       </form>
+      {showWarning && (
+        <WarningPopup>
+          <DeleteImage
+            deletedImage={deletedImage}
+            onClose={() => setShowWarning(false)}
+            public_id={publicId}
+            productId={editProductId!}
+          />
+        </WarningPopup>
+      )}
     </>
   );
 };

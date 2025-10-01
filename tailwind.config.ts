@@ -47,6 +47,10 @@ const config: Config = {
           "80%": { transform: "translateX(25px)" },
           "100%": { transform: "translateX(0)" },
         },
+        "zoom-in": {
+          "0%": { transform: "scale(0.8)" },
+          "100%": { transform: "scale(1.01)" },
+        },
       },
       animation: {
         "bounce-skew": "bounce-skew 1s ease-in-out",
@@ -55,6 +59,7 @@ const config: Config = {
         "fade-left": "fade-left 500ms ease-in",
         "fade-right": "fade-right 500ms ease-in",
         "fade-horizontal": "fade-horizontal 2.5s linear infinite",
+        "zoom-in": "zoom-in 0.5s ease-in",
       },
       colors: {
         primary: {

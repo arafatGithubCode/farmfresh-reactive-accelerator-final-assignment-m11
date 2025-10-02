@@ -8,6 +8,7 @@ import { FaArrowRightLong, FaMinus, FaPlus, FaTrash } from "react-icons/fa6";
 import { ImCheckmark } from "react-icons/im";
 import { IoCloseSharp, IoWarning } from "react-icons/io5";
 import { LiaTimesSolid } from "react-icons/lia";
+import { TbCurrencyTaka } from "react-icons/tb";
 import Amount from "../ui/Amount";
 import Divider from "../ui/Divider";
 
@@ -22,16 +23,30 @@ const CartDetails = () => {
     (acc, cur) => acc + cur.product.price * cur.quantity,
     0
   );
-  const totalDiscountRate = cart?.items?.reduce(
-    (acc, cur) => acc + Number(cur.product.discountRate ?? 0),
-    0
-  );
+
   const totalDiscountAmount = cart?.items?.reduce((acc, cur) => {
-    const discount = ((cur.product.discountRate ?? 0) / 100) * subtotal;
+    const discount =
+      ((cur.product.discountRate ?? 0) / 100) *
+      (cur.product.price * cur.quantity);
     return acc + discount;
   }, 0);
 
-  const total = subtotal - totalDiscountAmount;
+  const serviceFee = cart.items[0]?.product.serviceFee;
+
+  const baseDeliveryFee = cart.items[0]?.product.baseDeliveryFee;
+
+  const totalPerUnitDeliveryFee = cart?.items?.reduce((acc, cur) => {
+    const perUnitDeliveryFee =
+      cur.quantity > 1
+        ? (cur.quantity - 1) * cur.product.perUnitDeliveryFee
+        : 0;
+
+    return acc + perUnitDeliveryFee;
+  }, 0);
+
+  const totalDeliveryFee = baseDeliveryFee + totalPerUnitDeliveryFee;
+
+  const total = subtotal + serviceFee + totalDeliveryFee - totalDiscountAmount;
 
   const allItemIds = cart?.items?.map((item) => item.id) || [];
 
@@ -92,11 +107,20 @@ const CartDetails = () => {
 
           <div className="flex items-center font-semibold gap-2 capitalize">
             your total:{" "}
-            <Amount
-              discount={totalDiscountAmount}
-              isRow={true}
-              amount={subtotal}
-            />
+            <div className="flex text-gray-700 dark:text-gray-300 mt-1">
+              <div className="flex items-center relative">
+                <span className="font-semibold">
+                  {Math.round(total).toLocaleString()}
+                </span>
+                <TbCurrencyTaka />
+              </div>
+              <div className="flex items-center">
+                <span className="line-through text-red-400">
+                  {Math.round(subtotal).toLocaleString()}
+                </span>
+                <TbCurrencyTaka className="text-red-400" />
+              </div>
+            </div>
           </div>
         </div>
         {showAlert ? (
@@ -154,13 +178,15 @@ const CartDetails = () => {
                       {/* Item content */}
                       <div className="flex-1 flex flex-col gap-2">
                         <div className="flex items-center gap-4">
-                          <Image
-                            src={item.product.imagesUrl[0]}
-                            alt={item.product.name}
-                            width={80}
-                            height={80}
-                            className="rounded-lg"
-                          />
+                          <div className="w-full max-w-[80px] h-[80px] relative">
+                            <Image
+                              src={item.product.imagesUrl[0].url}
+                              alt={item.product.name}
+                              fill={true}
+                              className="rounded-lg"
+                              blurDataURL={item.product.imagesUrl[0].url}
+                            />
+                          </div>
                           <div className="flex flex-col justify-between flex-1">
                             <h3 className="font-medium text-gray-800 dark:text-gray-100">
                               {item.product.name}
@@ -198,8 +224,7 @@ const CartDetails = () => {
                             (<span>{item.product.price}</span>
                             <LiaTimesSolid />
                             <span>
-                              {item.quantity}
-                              {item.product.unit}
+                              {item.quantity} {item.product.unit}
                             </span>
                             )
                           </div>
@@ -224,9 +249,19 @@ const CartDetails = () => {
         <Divider isDotted={true} />
         <div className="flex items-center justify-between gap-2">
           <span className="text-gray-700 dark:text-gray-300">
-            {`Total Discount Applied (${totalDiscountRate}%)`}
+            Total Discount Applied
           </span>
           <Amount amount={totalDiscountAmount} />
+        </div>
+        <Divider isDotted={true} />
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-gray-700 dark:text-gray-300">Delivery Fee</span>
+          <Amount amount={totalDeliveryFee} />
+        </div>
+        <Divider isDotted={true} />
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-gray-700 dark:text-gray-300">Service Fee</span>
+          <Amount amount={serviceFee} />
         </div>
         <Divider isDotted={true} />
         <div className="flex items-center justify-between gap-2">

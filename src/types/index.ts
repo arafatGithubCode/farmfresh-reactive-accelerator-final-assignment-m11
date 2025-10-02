@@ -57,8 +57,8 @@ export interface TBaseUser {
   farmSizeUnit?: string;
   farmDistrict?: string;
   terms: boolean;
-  image?: string;
-  updatedAt?: string;
+  image: string;
+  updatedAt: string;
 }
 
 export interface IUserDB extends TBaseUser {

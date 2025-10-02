@@ -1,8 +1,17 @@
 import OrderSummary from "@/components/payment-process/OrderSummary";
 import PaymentForm from "@/components/payment-process/PaymentForm";
 import BreadCrumb from "@/components/ui/BreadCrumb";
+import { getProduct } from "@/queries/product";
 
-const PaymentProcessPage = () => {
+const PaymentProcessPage = async ({
+  params: { productId },
+  searchParams: { q },
+}: {
+  params: { productId: string };
+  searchParams: { q: string };
+}) => {
+  const product = await getProduct(productId);
+  console.log(product, q);
   return (
     <>
       <BreadCrumb productId="68d6b5c494e74b14ec05152a" />

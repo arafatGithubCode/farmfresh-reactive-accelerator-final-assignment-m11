@@ -19,6 +19,7 @@ import Tags from "../ui/Tags";
 
 const ProductInfo = ({ product }: { product: IProductFrontend }) => {
   const [quantity, setQuantity] = useState<number>(0);
+  const [stock, setStock] = useState<number>(product.stock);
 
   const { updateCart, loading } = useCart();
   const pending = loading[product.id] || false;
@@ -30,6 +31,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
   const handleIncrement = () => {
     if (product.stock > quantity) {
       setQuantity((prev) => prev + 1);
+      setStock((prev) => prev - 1);
     } else {
       showToast("This product is stock out.", "WARNING");
     }
@@ -38,6 +40,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
   const handleDecrement = () => {
     if (quantity > 1) {
       setQuantity((prev) => prev - 1);
+      setStock((prev) => prev + 1);
     } else {
       showToast("Minimum quantity is one.", "WARNING");
     }
@@ -88,7 +91,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
               Available Stock
             </p>
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
-              {`${product.stock} ${product.unit}`}
+              {`${stock} ${product.unit}`}
             </p>
           </div>
         </div>

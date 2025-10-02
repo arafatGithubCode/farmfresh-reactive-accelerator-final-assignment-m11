@@ -18,7 +18,9 @@ import {
   FaStar,
   FaTrash,
 } from "react-icons/fa6";
+import DeleteProduct from "../manage-products/DeleteProduct";
 import ProductImageCarousel from "../ui/ProductImageCarousel";
+import WarningPopup from "../ui/WarningPopup";
 
 const ProductCard = ({
   isManageListingPage = false,
@@ -30,6 +32,7 @@ const ProductCard = ({
   const { cart, updateCart, loading } = useCart();
   const { favoriteList, updateFavorite } = useFavorite(product.name);
   const [activeProgress, setActiveProgress] = useState<boolean>(false);
+  const [showWarning, setShowWarning] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -71,6 +74,12 @@ const ProductCard = ({
       }
     }
     setActiveProgress(false);
+  };
+
+  const handleDeleteProduct = async (productId: string) => {
+    if (productId) {
+      setShowWarning(true);
+    }
   };
 
   return (
@@ -169,9 +178,23 @@ const ProductCard = ({
             >
               {product.isActive ? <FaEyeSlash /> : <FaEye />}
             </button>
-            <button className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition">
+            <button
+              type="button"
+              onClick={() => handleDeleteProduct(product.id)}
+              className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition"
+            >
               <FaTrash />
             </button>
+            {showWarning && (
+              <WarningPopup>
+                <DeleteProduct
+                  productId={product.id}
+                  productName={product.name}
+                  productImage={product.imagesUrl}
+                  onClose={() => setShowWarning(false)}
+                />
+              </WarningPopup>
+            )}
           </div>
         ) : isInCart ? (
           <div className="bg-white rounded-lg border border-primary-500 flex flex-col">

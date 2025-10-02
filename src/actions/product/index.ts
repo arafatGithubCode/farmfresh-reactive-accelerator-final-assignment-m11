@@ -1,6 +1,6 @@
 "use server";
 
-import cloudinary from "@/libs/cloudinary";
+import { deleteCloudinaryImage } from "@/libs/deleteCloudinaryImage";
 import { Product } from "@/models/productModel";
 import { createProduct, getProduct } from "@/queries/product";
 import { uploadImage } from "@/services/UploadImag";
@@ -299,7 +299,7 @@ export const doDeletingProductImage = async (
   productId: string
 ): Promise<TActionResponse> => {
   try {
-    const response = await cloudinary.uploader.destroy(public_id);
+    const response = await deleteCloudinaryImage(public_id);
 
     if (response && response.result !== "ok") {
       throw new Error("This image does not exist");
@@ -356,6 +356,31 @@ export const doToggleProductActive = async (
         currentStatus ? "inactivated" : "activated"
       }`,
     };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: errMsg.success, error: errMsg.error };
+  }
+};
+
+// ===== Delete a product ===== //
+export const doDeleteProduct = async (
+  productId: string,
+  productName: string,
+  productImage: { url: string; public_id: string; id?: string }[]
+): Promise<TActionResponse> => {
+  try {
+    const isExist = await getProduct(productId);
+    if (!isExist) {
+      throw new Error("This product does not exist.");
+    }
+
+    await Product.findByIdAndDelete(productId);
+
+    await Promise.all(
+      productImage.map((image) => deleteCloudinaryImage(image.public_id))
+    );
+
+    return { success: true, message: `${productName} has been deleted` };
   } catch (error) {
     const errMsg = catchErr(error);
     return { success: errMsg.success, error: errMsg.error };

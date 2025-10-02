@@ -20,13 +20,7 @@ const ManageProductPage = async () => {
       <ManageProductPageTitle />
       <ManageProductFilter />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products && products.length === 0 ? (
-          <p className="text-xs font-semibold text-gray-400">
-            No products listed yet
-          </p>
-        ) : (
-          <ProductCardWrapper products={products} isManageListingPage={true} />
-        )}
+        <ProductCardWrapper products={products} isManageListingPage={true} />
       </div>
       <Pagination />
     </div>

@@ -24,15 +24,9 @@ const FeaturedProducts = async () => {
           </a>
         </div>
 
-        {products && products.length === 0 ? (
-          <p className="text-xs font-semibold text-gray-400">
-            No products listed yet
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <ProductCardWrapper products={products} />
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <ProductCardWrapper products={products} />
+        </div>
       </div>
     </section>
   );

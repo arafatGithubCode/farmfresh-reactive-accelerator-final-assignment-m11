@@ -48,25 +48,16 @@ const ProductsGrid = ({ products }: { products: IProductFrontend[] }) => {
           </div>
         </div>
       </div>
-
-      {products.length === 0 ? (
-        <p className="text-xs font-semibold text-gray-400">
-          No products listed yet
-        </p>
-      ) : (
-        <>
-          <div
-            className={`grid ${
-              viewType === "GRID"
-                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                : "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
-            } gap-6`}
-          >
-            <ProductCardWrapper products={products} />
-          </div>
-          <Pagination />
-        </>
-      )}
+      <div
+        className={`grid ${
+          viewType === "GRID"
+            ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            : "grid-cols-1 sm:grid-cols-1 lg:grid-cols-1"
+        } gap-6`}
+      >
+        <ProductCardWrapper products={products} />
+      </div>
+      <Pagination />
     </div>
   );
 };

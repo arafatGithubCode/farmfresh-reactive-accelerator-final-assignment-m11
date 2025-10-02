@@ -10,18 +10,19 @@ const ProductCardWrapper = ({
 }) => {
   return (
     <>
-      {products.map((product) => {
-        const isActive = product.isActive;
-        return (
-          isActive && (
-            <ProductCard
-              key={product.id}
-              product={product}
-              isManageListingPage={isManageListingPage}
-            />
-          )
-        );
-      })}
+      {products && products.length === 0 ? (
+        <p className="text-xs font-semibold text-gray-400">
+          No products listed yet
+        </p>
+      ) : (
+        products.map((product) => (
+          <ProductCard
+            key={product.id}
+            product={product}
+            isManageListingPage={isManageListingPage}
+          />
+        ))
+      )}
     </>
   );
 };

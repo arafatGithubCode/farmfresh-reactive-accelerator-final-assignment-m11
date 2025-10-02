@@ -1,10 +1,15 @@
 "use client";
 
+import { doToggleProductActive } from "@/actions/product";
 import { useCart } from "@/hooks/useCart";
+import { useCatchErr } from "@/hooks/useCatchErr";
 import { useFavorite } from "@/hooks/useFavorite";
+import { showToast } from "@/providers/ToastProvider";
 import { IProductFrontend } from "@/types";
 import Link from "next/link";
-import { FaEdit } from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { FaEdit, FaEyeSlash } from "react-icons/fa";
 import {
   FaEye,
   FaHeart,
@@ -24,6 +29,11 @@ const ProductCard = ({
 }) => {
   const { cart, updateCart, loading } = useCart();
   const { favoriteList, updateFavorite } = useFavorite(product.name);
+  const [activeProgress, setActiveProgress] = useState<boolean>(false);
+
+  const router = useRouter();
+
+  const { err, catchErr } = useCatchErr();
 
   const isInCart = cart?.items?.some(
     (item) => item?.product?.id === product.id
@@ -36,8 +46,35 @@ const ProductCard = ({
 
   const pending = loading[product.id] || false;
 
+  const handleToggleActive = async (productId: string) => {
+    setActiveProgress(true);
+    try {
+      const response = await doToggleProductActive(productId);
+      if (!response.success) {
+        showToast(response.error, "ERROR");
+        setActiveProgress(false);
+      } else {
+        showToast(response.message, "SUCCESS");
+        setActiveProgress(false);
+        router.refresh();
+      }
+    } catch (error) {
+      catchErr(error);
+      if (err) {
+        showToast(err, "ERROR");
+      } else {
+        showToast(
+          `${product.name} failed to ${
+            product.isActive ? "inactive" : "active"
+          }`
+        );
+      }
+    }
+    setActiveProgress(false);
+  };
+
   return (
-    <form className="bg-white dark:bg-gray-800 group rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+    <form className="bg-white dark:bg-gray-800 group rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
       <div className="relative">
         {product?.imagesUrl?.length > 0 && (
           <ProductImageCarousel
@@ -69,7 +106,11 @@ const ProductCard = ({
       <div className="p-6">
         <div className="flex items-center justify-between mb-2">
           <Link href={`/products/${product.id}`}>
-            <h3 className="font-semibold text-gray-900 dark:text-white group-hover:underline">
+            <h3
+              className={`font-semibold text-gray-900 dark:text-white ${
+                product.isActive && "group-hover:underline"
+              }`}
+            >
               {product?.name}
             </h3>
           </Link>
@@ -120,8 +161,13 @@ const ProductCard = ({
                 <span>Edit</span>
               </div>
             </Link>
-            <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition">
-              <FaEye />
+            <button
+              disabled={activeProgress}
+              type="button"
+              onClick={() => handleToggleActive(product.id)}
+              className="px-4 disabled:cursor-not-allowed py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg transition"
+            >
+              {product.isActive ? <FaEyeSlash /> : <FaEye />}
             </button>
             <button className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg transition">
               <FaTrash />
@@ -178,6 +224,15 @@ const ProductCard = ({
           </button>
         )}
       </div>
+      {!isManageListingPage && !product.isActive && (
+        <div className="w-full h-full absolute inset-0 bg-gray-500 bg-opacity-60">
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="font-semibold bg-gray-400 p-2 text-gray-700 rounded-lg">
+              Inactive now
+            </span>
+          </div>
+        </div>
+      )}
     </form>
   );
 };

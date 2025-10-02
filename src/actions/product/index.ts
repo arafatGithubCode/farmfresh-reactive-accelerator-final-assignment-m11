@@ -328,3 +328,36 @@ export const doDeletingProductImage = async (
     return { success: false, error: errMsg.error };
   }
 };
+
+// ===== Toggle Product's active (status) ===== //
+export const doToggleProductActive = async (
+  productId: string
+): Promise<TActionResponse> => {
+  try {
+    if (!productId) {
+      throw new Error("Product ID is required.");
+    }
+
+    const existingProduct = await getProduct(productId);
+    if (!existingProduct) {
+      throw new Error("This product doesn't exist.");
+    }
+
+    const currentStatus = existingProduct.isActive;
+
+    const updatedProduct = await Product.findByIdAndUpdate(
+      { _id: new Types.ObjectId(productId) },
+      { isActive: !currentStatus }
+    ).lean<IProductFrontend>();
+
+    return {
+      success: true,
+      message: `${updatedProduct?.name} has been ${
+        currentStatus ? "inactivated" : "activated"
+      }`,
+    };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: errMsg.success, error: errMsg.error };
+  }
+};

@@ -18,24 +18,26 @@ const CartDetails = () => {
 
   const { cart, updateCart } = useCart();
 
+  const selectedItems = cart?.items?.filter((item) => checkedItems[item.id!]);
+
   //   amount calculation
-  const subtotal = cart?.items?.reduce(
+  const subtotal = selectedItems?.reduce(
     (acc, cur) => acc + cur.product.price * cur.quantity,
     0
   );
 
-  const totalDiscountAmount = cart?.items?.reduce((acc, cur) => {
+  const totalDiscountAmount = selectedItems?.reduce((acc, cur) => {
     const discount =
       ((cur.product.discountRate ?? 0) / 100) *
       (cur.product.price * cur.quantity);
     return acc + discount;
   }, 0);
 
-  const serviceFee = cart.items[0]?.product.serviceFee;
+  const serviceFee = selectedItems[0]?.product.serviceFee ?? 0;
 
-  const baseDeliveryFee = cart.items[0]?.product.baseDeliveryFee;
+  const baseDeliveryFee = selectedItems[0]?.product.baseDeliveryFee ?? 0;
 
-  const totalPerUnitDeliveryFee = cart?.items?.reduce((acc, cur) => {
+  const totalPerUnitDeliveryFee = selectedItems?.reduce((acc, cur) => {
     const perUnitDeliveryFee =
       cur.quantity > 1
         ? (cur.quantity - 1) * cur.product.perUnitDeliveryFee

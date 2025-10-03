@@ -6,7 +6,6 @@ import { useForm } from "@/hooks/useForm";
 import { showToast } from "@/providers/ToastProvider";
 import { IUserLoginForm } from "@/types";
 import { validateLoginForm } from "@/validations/validateLoginForm";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEnvelope, FaEye, FaLock } from "react-icons/fa6";
@@ -23,8 +22,6 @@ const LoginForm = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const { catchErr, err } = useCatchErr();
   const [showPassword, setShowPassword] = useState<boolean>(false);
-
-  const router = useRouter();
 
   const {
     values: formValues,
@@ -54,8 +51,7 @@ const LoginForm = () => {
         }
         resetForm();
         setLoading(false);
-        await router.push("/profile");
-        router.refresh();
+        window.location.href = "/profile";
       } catch (error) {
         catchErr(error);
         if (err) {

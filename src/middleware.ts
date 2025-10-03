@@ -1,24 +1,35 @@
-import { authConfig } from "@/auth.config";
 import NextAuth, { type NextAuthConfig } from "next-auth";
+import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-
+import { authConfig } from "./auth.config";
 import { LOGIN, PUBLIC_ROUTE, ROOT } from "./libs/route";
 
 const { auth } = NextAuth(authConfig as NextAuthConfig);
 
-export default auth((req) => {
-  const { nextUrl } = req;
+export function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
 
-  const isAuthenticated = !!req.auth;
+  if (pathname.startsWith("/_next") || pathname.includes(".")) {
+    return NextResponse.next();
+  }
 
   const isPublicRoute =
-    PUBLIC_ROUTE.some((route) => nextUrl.pathname.startsWith(route)) ||
-    nextUrl.pathname === ROOT;
+    PUBLIC_ROUTE.some((route) => pathname.startsWith(route)) ||
+    pathname === ROOT;
 
-  if (!isAuthenticated && !isPublicRoute)
-    return NextResponse.redirect(new URL(LOGIN, nextUrl));
-});
+  if (isPublicRoute) return NextResponse.next();
+
+  if (pathname.startsWith("/api")) return NextResponse.next();
+
+  const isAuthenticated = !!auth;
+
+  if (!isAuthenticated) {
+    return NextResponse.redirect(new URL(LOGIN, req.url));
+  }
+
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/"],
 };

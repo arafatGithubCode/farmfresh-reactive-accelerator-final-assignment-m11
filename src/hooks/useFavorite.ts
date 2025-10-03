@@ -1,3 +1,5 @@
+"use client";
+
 import { showToast } from "@/providers/ToastProvider";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -25,16 +27,13 @@ export const useFavorite = (productName: string) => {
     }
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/favorite`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ customerId, productId }),
-        }
-      );
+      const response = await fetch(`/api/favorite`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ customerId, productId }),
+      });
       if (!response.ok) {
         throw new Error("Failed to create favorite!");
       }
@@ -60,25 +59,30 @@ export const useFavorite = (productName: string) => {
   };
 
   useEffect(() => {
-    if (!customerId) return;
+    if (!customerId) {
+      setFavoriteList([]);
+      return;
+    }
 
-    const fetchFavorite = async () => {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/favorite?customerId=${customerId}`
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch favorite!");
+    if (customerId) {
+      const fetchFavorite = async () => {
+        try {
+          const response = await fetch(
+            `/api/favorite?customerId=${customerId}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch favorite!");
+          }
+          const data = await response.json();
+          setFavoriteList(data?.favoriteList?.items || []);
+        } catch (error) {
+          console.log(error, "product-cart");
+          catchErr(error);
+          showToast(err!, "ERROR");
         }
-        const data = await response.json();
-        setFavoriteList(data?.favoriteList?.items || []);
-      } catch (error) {
-        console.log(error, "product-cart");
-        catchErr(error);
-        showToast(err!, "ERROR");
-      }
-    };
-    fetchFavorite();
+      };
+      fetchFavorite();
+    }
   }, [customerId]);
 
   return { favoriteList, updateFavorite };

@@ -20,6 +20,8 @@ const CartDetails = () => {
 
   const selectedItems = cart?.items?.filter((item) => checkedItems[item.id!]);
 
+  console.log(selectedItems, "selected");
+
   //   amount calculation
   const subtotal = selectedItems?.reduce(
     (acc, cur) => acc + cur.product.price * cur.quantity,

@@ -22,6 +22,7 @@ const Team = () => {
             width={128}
             height={128}
           />
+
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">
             Ahmed Rahman
           </h3>
@@ -36,7 +37,7 @@ const Team = () => {
 
         <div className="text-center">
           <Image
-            src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face"
+            src="https://plus.unsplash.com/premium_photo-1661593195372-874ca9d29713?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8eW91bmclMjBwcm9mZXNzaW9uYWwlMjB3b21hbnxlbnwwfHwwfHx8MA%3D%3D"
             alt="CTO"
             className="w-32 h-32 rounded-full mx-auto mb-4 object-cover"
             width={128}

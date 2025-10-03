@@ -18,38 +18,45 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
 
   // load initial cart from api
-  const session = useSession();
-  const customerId = session?.data?.user?.id;
+  const { data: session, status } = useSession();
+  const customerId = session?.user?.id;
+
   useEffect(() => {
+    if (status !== "authenticated") return;
     if (!customerId) return;
+
     const fetchCart = async () => {
       try {
-        const data = await fetchData(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart?customerId=${customerId}`
-        );
+        const data = await fetchData(`/api/cart?customerId=${customerId}`);
         dispatch({ type: "SET_CART", payload: data?.cart });
       } catch (error) {
         catchErr(error);
       }
     };
     fetchCart();
-  }, [customerId]);
+  }, [status, customerId]);
 
   // helper to update both UI+DB
   const updateCart = async (
     action: "ADD_ITEM" | "INCREMENT" | "DECREMENT" | "REMOVE_ITEM",
     payload: IProductFrontend | string
   ): Promise<void> => {
-    if (!customerId) {
+    if (status === "loading") {
+      showToast("Please wait, checking login...", "WARNING");
+      return;
+    }
+
+    if (status === "unauthenticated" || !customerId) {
       showToast("Please login to add to cart.", "WARNING");
       router.push("/login");
       return;
     }
 
-    if (session?.data?.user?.role === "Farmer") {
+    if (session?.user?.role === "Farmer") {
       showToast("Only customer can add to cart.");
       return;
     }
+
     // Optimistic UI
     if (action === "ADD_ITEM") {
       const product = payload as IProductFrontend;
@@ -57,7 +64,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
       dispatch({ type: "ADD_ITEM", payload: { product: product } });
 
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cart`, {
+        await fetch(`/api/cart`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -65,9 +72,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
           body: JSON.stringify({ customerId, productId: product.id, action }),
         });
       } catch (error) {
-        const data = await fetchData(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart?customerId=${customerId}`
-        );
+        const data = await fetchData(`/api/cart?customerId=${customerId}`);
         dispatch({ type: "SET_CART", payload: data?.cart });
         catchErr(error);
       } finally {
@@ -80,7 +85,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
       dispatch({ type: action, payload: { productId } });
 
       try {
-        await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/cart`, {
+        await fetch(`/api/cart`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -88,9 +93,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
           body: JSON.stringify({ customerId, productId, action }),
         });
       } catch (error) {
-        const data = await fetchData(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/cart?customerId=${customerId}`
-        );
+        const data = await fetchData(`/api/cart?customerId=${customerId}`);
         dispatch({ type: "SET_CART", payload: data?.cart });
         catchErr(error);
       } finally {

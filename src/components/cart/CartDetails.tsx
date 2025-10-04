@@ -22,6 +22,7 @@ const CartDetails = () => {
   const selectedItems = cart?.items?.filter(
     (item) => checkedItems[item.product.id]
   );
+
   const selectedItemProductIds = selectedItems?.map((item) => item.product.id);
 
   const { subtotal, totalDiscountAmount, serviceFee, totalDeliveryFee, total } =

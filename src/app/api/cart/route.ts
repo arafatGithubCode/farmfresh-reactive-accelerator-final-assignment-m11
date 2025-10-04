@@ -1,6 +1,7 @@
 import { connectDB } from "@/libs/connectDB";
 import { Cart } from "@/models/CartModel";
 import { getCartByCustomerId } from "@/queries/cart";
+import { getProduct } from "@/queries/product";
 import { catchErr } from "@/utils/catchErr";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -12,6 +13,15 @@ export const POST = async (request: NextRequest) => {
     const body = await request.json();
     const { customerId, productId, action } = body;
 
+    const product = await getProduct(productId);
+
+    if (!product) {
+      return NextResponse.json(
+        { success: false, message: "Product not found." },
+        { status: 400 }
+      );
+    }
+
     let actionType: "ADD_ITEM" | "INCREMENT" | "DECREMENT" | "REMOVE_ITEM" =
       action;
     let cart = await Cart.findOne({ customer: customerId });
@@ -20,6 +30,13 @@ export const POST = async (request: NextRequest) => {
     //    if cart is not exist and action is add
     if (!cart) {
       if (action === "ADD_ITEM") {
+        if (product.stock < 1) {
+          return NextResponse.json(
+            { success: false, message: "Out of stock." },
+            { status: 404 }
+          );
+        }
+
         cart = await Cart.create({
           customer: customerId,
           items: [{ product: productId, quantity: 1 }],
@@ -46,9 +63,23 @@ export const POST = async (request: NextRequest) => {
     // increment
     if (action === "INCREMENT") {
       if (existingItem) {
+        if (existingItem.quantity + 1 > product.stock) {
+          return NextResponse.json(
+            { success: false, message: "Not enough stock" },
+            { status: 400 }
+          );
+        }
+
         existingItem.quantity += 1;
         updatedQuantity = existingItem.quantity;
       } else {
+        if (product.stock < 1) {
+          return NextResponse.json(
+            { success: false, message: "Out of stock." },
+            { status: 404 }
+          );
+        }
+
         cart.items.push({ product: productId, quantity: 1 });
         updatedQuantity = 1;
       }
@@ -75,6 +106,12 @@ export const POST = async (request: NextRequest) => {
     }
 
     if (action === "ADD_ITEM" && !existingItem) {
+      if (product.stock < 1) {
+        return NextResponse.json(
+          { success: false, message: "Out of stock." },
+          { status: 404 }
+        );
+      }
       cart.items.push({ product: productId, quantity: 1 });
       actionType = "ADD_ITEM";
       updatedQuantity = 1;

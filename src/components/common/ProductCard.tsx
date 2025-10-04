@@ -34,14 +34,16 @@ const ProductCard = ({
   const [activeProgress, setActiveProgress] = useState<boolean>(false);
   const [showWarning, setShowWarning] = useState<boolean>(false);
 
+  const cartItem = cart?.items?.find(
+    (item) => item?.product?.id === product.id
+  );
+  const remainingStock = product.stock - (cartItem?.quantity ?? 1);
+
   const router = useRouter();
 
   const { err, catchErr } = useCatchErr();
 
   const isInCart = cart?.items?.some(
-    (item) => item?.product?.id === product.id
-  );
-  const cartItem = cart?.items?.find(
     (item) => item?.product?.id === product.id
   );
 
@@ -156,7 +158,7 @@ const ProductCard = ({
             )}
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            Stock: {`${product?.stock.toFixed(0)}${product?.unit}`}
+            Stock: {`${(remainingStock ?? 0).toFixed(0)}${product?.unit}`}
           </span>
         </div>
         {isManageListingPage ? (
@@ -206,7 +208,13 @@ const ProductCard = ({
                 <button
                   disabled={pending}
                   type="button"
-                  onClick={() => updateCart("INCREMENT", product.id)}
+                  onClick={() => {
+                    if (remainingStock > 0) {
+                      updateCart("INCREMENT", product.id);
+                    } else {
+                      showToast("Not enough stock", "WARNING");
+                    }
+                  }}
                   className="disabled:cursor-wait"
                 >
                   <FaPlus className="text-xl text-black hover:text-primary-500 duration-200 cursor-pointer" />
@@ -214,7 +222,13 @@ const ProductCard = ({
                 <button
                   disabled={pending}
                   type="button"
-                  onClick={() => updateCart("DECREMENT", product.id)}
+                  onClick={() => {
+                    if ((cartItem?.quantity ?? 1) > 1) {
+                      updateCart("DECREMENT", product.id);
+                    } else {
+                      showToast("Minimum quantity is 1", "WARNING");
+                    }
+                  }}
                   className="disabled:cursor-wait"
                 >
                   <FaMinus className="text-xl text-black hover:text-primary-500 duration-200 cursor-pointer" />
@@ -240,7 +254,13 @@ const ProductCard = ({
           <button
             disabled={pending}
             type="button"
-            onClick={() => updateCart("ADD_ITEM", product)}
+            onClick={() => {
+              if (remainingStock > 0) {
+                updateCart("ADD_ITEM", product);
+              } else {
+                showToast("This product is out of stock.", "WARNING");
+              }
+            }}
             className="w-full text-white py-3 bg-primary-600 hover:bg-primary-700 hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center disabled:cursor-wait"
           >
             {pending ? "Adding.." : "Add to cart"}

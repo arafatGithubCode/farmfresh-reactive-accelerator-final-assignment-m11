@@ -70,13 +70,14 @@ const CartBadge = () => {
                     key={item.product.id}
                     className="flex items-center justify-start gap-2 pt-1"
                   >
-                    <Image
-                      className="rounded"
-                      src={item.product?.imagesUrl[0]?.url}
-                      alt="Cart-Item"
-                      width={80}
-                      height={80}
-                    />
+                    <div className="relative w-20 h-20 rounded-lg">
+                      <Image
+                        className="relative w-20 h-20 rounded-lg"
+                        src={item.product?.imagesUrl[0]?.url}
+                        alt="Cart-Item"
+                        fill={true}
+                      />
+                    </div>
                     <div className="flex flex-col items-start justify-center">
                       <h3 className="font-semibold">{item.product.name}</h3>
                       <p className="text-gray-500 font-semibold text-xs">

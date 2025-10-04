@@ -33,7 +33,11 @@ const cartReducer = (
           ...state,
           items: state.items.map((i) =>
             i.product.id === action.payload.product.id
-              ? { ...i, quantity: i.quantity + 1 }
+              ? {
+                  ...i,
+                  quantity: i.quantity + 1,
+                  product: { ...i.product, stock: i.product.stock - 1 },
+                }
               : i
           ),
         };
@@ -43,7 +47,13 @@ const cartReducer = (
         ...state,
         items: [
           ...state.items,
-          { product: action.payload.product, quantity: 1 },
+          {
+            product: {
+              ...action.payload.product,
+              stock: action.payload.product.stock - 1,
+            },
+            quantity: 1,
+          },
         ],
       };
     }
@@ -52,7 +62,11 @@ const cartReducer = (
         ...state,
         items: state.items.map((i) =>
           i.product.id === action.payload.productId
-            ? { ...i, quantity: i.quantity + 1 }
+            ? {
+                ...i,
+                quantity: i.quantity + 1,
+                product: { ...i.product, stock: i.product.stock - 1 },
+              }
             : i
         ),
       };
@@ -62,7 +76,11 @@ const cartReducer = (
         ...state,
         items: state.items.map((i) =>
           i.product.id === action.payload.productId && i.quantity > 1
-            ? { ...i, quantity: i.quantity - 1 }
+            ? {
+                ...i,
+                quantity: i.quantity - 1,
+                product: { ...i.product, stock: i.product.stock + 1 },
+              }
             : i
         ),
       };

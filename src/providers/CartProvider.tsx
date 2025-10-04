@@ -97,7 +97,7 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
         dispatch({ type: "SET_CART", payload: data?.cart });
         catchErr(error);
       } finally {
-        setLoading((prev) => ({ ...prev, productId: true }));
+        setLoading((prev) => ({ ...prev, productId: false }));
       }
     }
   };

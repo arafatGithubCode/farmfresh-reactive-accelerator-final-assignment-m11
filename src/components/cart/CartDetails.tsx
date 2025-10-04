@@ -1,5 +1,6 @@
 "use client";
 
+import { useBalance } from "@/hooks/useBalance";
 import { useCart } from "@/hooks/useCart";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,59 +19,36 @@ const CartDetails = () => {
 
   const { cart, updateCart } = useCart();
 
-  const selectedItems = cart?.items?.filter((item) => checkedItems[item.id!]);
-
-  console.log(selectedItems, "selected");
-
-  //   amount calculation
-  const subtotal = selectedItems?.reduce(
-    (acc, cur) => acc + cur.product.price * cur.quantity,
-    0
+  const selectedItems = cart?.items?.filter(
+    (item) => checkedItems[item.product.id]
   );
+  const selectedItemProductIds = selectedItems?.map((item) => item.product.id);
 
-  const totalDiscountAmount = selectedItems?.reduce((acc, cur) => {
-    const discount =
-      ((cur.product.discountRate ?? 0) / 100) *
-      (cur.product.price * cur.quantity);
-    return acc + discount;
-  }, 0);
+  const { subtotal, totalDiscountAmount, serviceFee, totalDeliveryFee, total } =
+    useBalance(selectedItems);
 
-  const serviceFee = selectedItems[0]?.product.serviceFee ?? 0;
+  const allItemProductIds = cart?.items?.map((item) => item.product.id) || [];
 
-  const baseDeliveryFee = selectedItems[0]?.product.baseDeliveryFee ?? 0;
-
-  const totalPerUnitDeliveryFee = selectedItems?.reduce((acc, cur) => {
-    const perUnitDeliveryFee =
-      cur.quantity > 1
-        ? (cur.quantity - 1) * cur.product.perUnitDeliveryFee
-        : 0;
-
-    return acc + perUnitDeliveryFee;
-  }, 0);
-
-  const totalDeliveryFee = baseDeliveryFee + totalPerUnitDeliveryFee;
-
-  const total = subtotal + serviceFee + totalDeliveryFee - totalDiscountAmount;
-
-  const allItemIds = cart?.items?.map((item) => item.id) || [];
-
-  const isAtLeastOneSelected = allItemIds.some((id) => checkedItems[id!]);
+  const isAtLeastOneSelected = allItemProductIds.some(
+    (id) => checkedItems[id!]
+  );
   const isAllSelected =
-    allItemIds.length > 0 && allItemIds.every((id) => checkedItems[id!]);
+    allItemProductIds.length > 0 &&
+    allItemProductIds.every((id) => checkedItems[id!]);
 
   //   Select All Toggler
   const handleSelectAll = () => {
-    const allSelected = allItemIds.every((id) => checkedItems[id!]);
+    const allSelected = allItemProductIds.every((id) => checkedItems[id!]);
 
     if (allSelected) {
       // unselect all
       const newState: Record<string, boolean> = {};
-      allItemIds.forEach((id) => (newState[id!] = false));
+      allItemProductIds.forEach((id) => (newState[id!] = false));
       setCheckedItems(newState);
     } else {
       // select all
       const newState: Record<string, boolean> = {};
-      allItemIds.forEach((id) => (newState[id!] = true));
+      allItemProductIds.forEach((id) => (newState[id!] = true));
       setCheckedItems(newState);
     }
   };
@@ -105,7 +83,7 @@ const CartDetails = () => {
             </div>
 
             <span className={`${isAllSelected ? "text-primary-500" : ""}`}>
-              Select All (0 Items)
+              Select All ({cart?.items?.length} Items)
             </span>
           </div>
 
@@ -147,14 +125,14 @@ const CartDetails = () => {
           {cart?.items?.length === 0 ? (
             <p>There are no cart items.</p>
           ) : (
-            cart.items.map((item, index) => {
-              const isChecked = !!checkedItems[item.id!];
-              const amount = item.product.price * item.quantity;
-              const discount = amount * (item.product.discountRate / 100);
+            cart?.items?.map((item, index) => {
+              const isChecked = !!checkedItems[item.product.id];
+              const amount = item?.product?.price * item?.quantity;
+              const discount = amount * (item?.product?.discountRate / 100);
               return (
                 <>
                   <li
-                    key={item.id}
+                    key={item.product.id}
                     className={`flex flex-col w-full rounded-lg transition-colors ${
                       isChecked
                         ? "bg-primary-50 bg-opacity-40 dark:bg-opacity-5"
@@ -170,7 +148,7 @@ const CartDetails = () => {
 
                       {/* Custom checkbox */}
                       <div
-                        onClick={() => handleSingleSelect(item.id!)}
+                        onClick={() => handleSingleSelect(item.product.id)}
                         className={`w-5 h-5 rounded border-2 border-primary-500 flex items-center justify-center cursor-pointer
                               ${isChecked ? "bg-primary-500" : "bg-white"}`}
                       >
@@ -184,20 +162,20 @@ const CartDetails = () => {
                         <div className="flex items-center gap-4">
                           <div className="w-full max-w-[80px] h-[80px] relative">
                             <Image
-                              src={item.product.imagesUrl[0].url}
-                              alt={item.product.name}
+                              src={item?.product?.imagesUrl[0].url}
+                              alt={item?.product?.name}
                               fill={true}
                               className="rounded-lg"
-                              blurDataURL={item.product.imagesUrl[0].url}
+                              blurDataURL={item?.product?.imagesUrl[0]?.url}
                             />
                           </div>
                           <div className="flex flex-col justify-between flex-1">
                             <h3 className="font-medium text-gray-800 dark:text-gray-100">
-                              {item.product.name}
+                              {item?.product?.name}
                             </h3>
                             <FaTrash
                               onClick={() =>
-                                updateCart("REMOVE_ITEM", item.product.id)
+                                updateCart("REMOVE_ITEM", item?.product?.id)
                               }
                               className="hover:text-red-500 text-gray-400 cursor-pointer self-end"
                             />
@@ -208,14 +186,14 @@ const CartDetails = () => {
                         <div className="flex items-center gap-2 mt-2">
                           <FaPlus
                             onClick={() =>
-                              updateCart("INCREMENT", item.product.id)
+                              updateCart("INCREMENT", item?.product?.id)
                             }
                             className="hover:text-primary-500 duration-150 cursor-pointer"
                           />
-                          <span className="px-2">{item.quantity}</span>
+                          <span className="px-2">{item?.quantity}</span>
                           <FaMinus
                             onClick={() =>
-                              updateCart("DECREMENT", item.product.id)
+                              updateCart("DECREMENT", item?.product?.id)
                             }
                             className="hover:text-red-400 duration-150 cursor-pointer"
                           />
@@ -225,10 +203,10 @@ const CartDetails = () => {
                         <div className="flex items-start">
                           <Amount discount={discount} amount={amount} />
                           <div className="flex gap-1 items-center text-xs ml-1 mt-[7px]">
-                            (<span>{item.product.price}</span>
+                            (<span>{item?.product?.price}</span>
                             <LiaTimesSolid />
                             <span>
-                              {item.quantity} {item.product.unit}
+                              {item?.quantity} {item?.product?.unit}
                             </span>
                             )
                           </div>
@@ -277,14 +255,20 @@ const CartDetails = () => {
           <span className="font-semibold">Pay Total</span>
           <Amount amount={total} />
         </div>
-        <Divider />
-        <Link
-          className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 hover:scale-105 p-4 rounded-lg duration-200 my-2"
-          href="/checkout"
-        >
-          <span className="text-white text-xl">Proceed to Checkout</span>
-          <FaArrowRightLong className="text-white text-xl animate-fade-horizontal" />
-        </Link>
+        {selectedItemProductIds?.length > 0 && (
+          <>
+            <Divider />
+            <Link
+              className="w-full flex items-center justify-center gap-2 bg-primary-500 hover:bg-primary-600 hover:scale-105 p-4 rounded-lg duration-200 my-2"
+              href={`/payment-process?items=${selectedItemProductIds.join(
+                ","
+              )}`}
+            >
+              <span className="text-white text-xl">Proceed to Checkout</span>
+              <FaArrowRightLong className="text-white text-xl animate-fade-horizontal" />
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

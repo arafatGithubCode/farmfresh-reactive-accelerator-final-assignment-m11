@@ -57,8 +57,8 @@ export interface TBaseUser {
   farmSizeUnit?: string;
   farmDistrict?: string;
   terms: boolean;
-  image: string;
-  updatedAt: string;
+  image?: string;
+  updatedAt?: string;
 }
 
 export interface IUserDB extends TBaseUser {
@@ -121,7 +121,7 @@ export interface IProductBase {
   features: string[];
   imagesUrl: { url: string; public_id: string; id?: string }[];
   discountRate: number;
-  deliveryMethod: "SAME_DAY" | "REGULAR" | "";
+  deliveryMethod: "same_day_delivery" | "regular_delivery" | "";
   baseDeliveryFee: number;
   perUnitDeliveryFee: number;
   serviceFee: number;

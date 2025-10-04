@@ -5,7 +5,8 @@ type cartAction =
   | { type: "ADD_ITEM"; payload: { product: IProductFrontend } }
   | { type: "INCREMENT"; payload: { productId: string } }
   | { type: "DECREMENT"; payload: { productId: string } }
-  | { type: "REMOVE_ITEM"; payload: { productId: string } };
+  | { type: "REMOVE_ITEM"; payload: { productId: string } }
+  | { type: "SELECT_ITEM"; payload: { product: IProductFrontend } };
 
 const initialCartState: ICartFrontend = {
   customer: null,

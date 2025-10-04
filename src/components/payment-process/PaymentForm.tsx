@@ -2,10 +2,10 @@
 
 import { useBalance } from "@/hooks/useBalance";
 import { useCart } from "@/hooks/useCart";
-import { ICartItemFronted } from "@/types";
+import { ICartItemFronted, TPaymentMethod } from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
 import Image from "next/image";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import {
   FaCreditCard,
   FaLock,
@@ -53,6 +53,19 @@ const PaymentForm = ({
 }) => {
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
 
+  const [paymentMethod, setPaymentMethod] = useState<TPaymentMethod>({
+    method: "card",
+    cardDetails: {
+      nameOnCard: "",
+      cardNumber: "",
+      cvv: "",
+      expiry: "",
+    },
+    mobileDetails: {
+      number: "",
+    },
+  });
+
   const { cart } = useCart();
   const selectedItems = cart?.items?.filter(
     (item, index) => item.product.id === selectedItemProductIds[index]
@@ -82,6 +95,32 @@ const PaymentForm = ({
   if (typeof regularDeliveryDate === "object") {
     regularDeliveryDate.setDate(regularDeliveryDate.getDate() + 3);
   }
+
+  const handlePaymentMethodChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setPaymentMethod((prev) => ({
+      ...prev,
+      method: e.target.value as "card" | "bkash" | "nagad",
+    }));
+  };
+
+  const handleCardDetailsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPaymentMethod((prev) => ({
+      ...prev,
+      cardDetails: {
+        ...prev.cardDetails,
+        [name]: value,
+      },
+    }));
+  };
+
+  const handleMobileDetails = (e: ChangeEvent<HTMLInputElement>) => {
+    setPaymentMethod((prev) => ({
+      ...prev,
+      mobileDetails: { number: e.target.value },
+    }));
+  };
+
   return (
     <form className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       {/* Order Summary */}
@@ -191,24 +230,33 @@ const PaymentForm = ({
               Payment Method
             </label>
             <div className="space-y-3">
-              <label className="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+              <label
+                htmlFor="card"
+                className="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
                 <input
                   type="radio"
-                  name="paymentMethod"
                   value="card"
+                  id="card"
                   className="text-primary-600 focus:ring-primary-500"
-                  checked
+                  checked={paymentMethod.method === "card"}
+                  onChange={handlePaymentMethodChange}
                 />
                 <div className="ml-3 flex items-center">
                   <FaCreditCard className="mr-2 text-lg" />
                   <span className="font-medium">Credit/Debit Card</span>
                 </div>
               </label>
-              <label className="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+              <label
+                htmlFor="bkash"
+                className="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
                 <input
                   type="radio"
-                  name="paymentMethod"
                   value="bkash"
+                  id="bkash"
+                  checked={paymentMethod.method === "bkash"}
+                  onChange={handlePaymentMethodChange}
                   className="text-primary-600 focus:ring-primary-500"
                 />
                 <div className="ml-3 flex items-center">
@@ -216,11 +264,16 @@ const PaymentForm = ({
                   <span className="font-medium">bKash</span>
                 </div>
               </label>
-              <label className="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+              <label
+                htmlFor="nagad"
+                className="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              >
                 <input
                   type="radio"
-                  name="paymentMethod"
                   value="nagad"
+                  id="nagad"
+                  checked={paymentMethod.method === "nagad"}
+                  onChange={handlePaymentMethodChange}
                   className="text-primary-600 focus:ring-primary-500"
                 />
                 <div className="ml-3 flex items-center">
@@ -231,95 +284,110 @@ const PaymentForm = ({
             </div>
           </div>
 
-          <div id="cardDetails" className="space-y-4">
-            <div>
-              <label
-                htmlFor="cardName"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Name on Card
-              </label>
-              <input
-                type="text"
-                id="cardName"
-                name="cardName"
-                required
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                placeholder="John Doe"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="cardNumber"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Card Number
-              </label>
-              <input
-                type="text"
-                id="cardNumber"
-                name="cardNumber"
-                required
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                placeholder="1234 5678 9012 3456"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          {paymentMethod.method === "card" && (
+            <div id="cardDetails" className="space-y-4">
               <div>
                 <label
-                  htmlFor="expiry"
+                  htmlFor="nameOnCard"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  Expiry Date
+                  Name on Card
                 </label>
                 <input
                   type="text"
-                  id="expiry"
-                  name="expiry"
+                  id="nameOnCard"
+                  name="nameOnCard"
                   required
+                  value={paymentMethod.cardDetails.nameOnCard}
+                  onChange={handleCardDetailsChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  placeholder="MM/YY"
+                  placeholder="John Doe"
                 />
               </div>
+
               <div>
                 <label
-                  htmlFor="cvv"
+                  htmlFor="cardNumber"
                   className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
                 >
-                  CVV
+                  Card Number
                 </label>
                 <input
-                  type="password"
-                  id="cvv"
-                  name="cvv"
-                  maxLength={4}
+                  type="text"
+                  id="cardNumber"
+                  name="cardNumber"
+                  value={paymentMethod.cardDetails.cardNumber}
+                  onChange={handleCardDetailsChange}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  placeholder="123"
+                  placeholder="1234 5678 9012 3456"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label
+                    htmlFor="expiry"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    Expiry Date
+                  </label>
+                  <input
+                    type="text"
+                    id="expiry"
+                    name="expiry"
+                    value={paymentMethod.cardDetails.expiry}
+                    onChange={handleCardDetailsChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    placeholder="MM/YY"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="cvv"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                  >
+                    CVV
+                  </label>
+                  <input
+                    type="password"
+                    id="cvv"
+                    name="cvv"
+                    maxLength={4}
+                    value={paymentMethod.cardDetails.cvv}
+                    onChange={handleCardDetailsChange}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    placeholder="123"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(paymentMethod.method === "bkash" ||
+            paymentMethod.method === "nagad") && (
+            <div id="mobileDetails" className="space-y-4">
+              <div>
+                <label
+                  htmlFor="mobileNumber"
+                  className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
+                >
+                  Mobile Number
+                </label>
+                <input
+                  type="tel"
+                  id="mobileNumber"
+                  name="mobileNumber"
+                  value={paymentMethod.mobileDetails.number}
+                  onChange={handleMobileDetails}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  placeholder="+880 1234 567890"
                 />
               </div>
             </div>
-          </div>
-
-          <div id="mobileDetails" className="hidden space-y-4">
-            <div>
-              <label
-                htmlFor="mobileNumber"
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-              >
-                Mobile Number
-              </label>
-              <input
-                type="tel"
-                id="mobileNumber"
-                name="mobileNumber"
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                placeholder="+880 1234 567890"
-              />
-            </div>
-          </div>
+          )}
 
           <button
             type="submit"

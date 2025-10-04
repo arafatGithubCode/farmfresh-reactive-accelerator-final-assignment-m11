@@ -249,3 +249,17 @@ export interface IFileValidationResult {
 export type TActionResponse =
   | { success: true; data?: AnyObject; message: string }
   | { success: false; error: string };
+
+// payment method
+export interface TPaymentMethod {
+  method: "card" | "bkash" | "nagad";
+  cardDetails: {
+    nameOnCard: string;
+    cardNumber: string;
+    cvv: string;
+    expiry: string;
+  };
+  mobileDetails: {
+    number: string;
+  };
+}

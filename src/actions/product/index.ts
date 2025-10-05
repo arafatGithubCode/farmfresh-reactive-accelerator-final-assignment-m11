@@ -1,20 +1,23 @@
 "use server";
 
 import { deleteCloudinaryImage } from "@/libs/deleteCloudinaryImage";
+import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
 import { createProduct, getProduct } from "@/queries/product";
+import { getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
 import {
   IProductBase,
   IProductForm,
   IProductFrontend,
   TActionResponse,
+  TPaymentData,
 } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
-import mongoose, { AnyObject, Types } from "mongoose";
+import mongoose, { Types } from "mongoose";
 
 // ===== Add Product ===== //
 export const doAddingProduct = async (
@@ -391,6 +394,64 @@ export const doDeleteProduct = async (
 };
 
 // ===== Make Payment ===== //
-export const doPayment = async (paymentData: AnyObject) => {
-  console.log(paymentData);
+export const doPayment = async (
+  paymentData: TPaymentData
+): Promise<{ success: boolean; message: string; orderId?: string }> => {
+  try {
+    const {
+      bookingDate,
+      deliveryAddress,
+      paymentMethod,
+      selectedItems,
+      regularDeliveryDate,
+      sameDayDeliveryDate,
+    } = paymentData;
+
+    const customer = await getUserSession();
+
+    if (!customer || !customer.email) {
+      throw new Error("Please login to place an order");
+    }
+
+    const customerId = customer.id;
+    const isExistCustomer = await getUserByEmail(customer.email);
+    if (!isExistCustomer) {
+      throw new Error("Please login to place an order.");
+    }
+
+    await Promise.all(
+      selectedItems?.map((item) =>
+        Product.findByIdAndUpdate(
+          { _id: new Types.ObjectId(item.product.id) },
+          { stock: item.product.stock - item.quantity },
+          { new: true }
+        )
+      )
+    );
+
+    const itemWithProductIdsAndQuantity = selectedItems?.map((item) => ({
+      product: item.product.id,
+      quantity: item.quantity,
+    }));
+
+    const order = await Order.create({
+      customer: new Types.ObjectId(customerId),
+      items: itemWithProductIdsAndQuantity,
+      status: "PLACED",
+      bookingDate,
+      deliveryAddress,
+      paymentMethod,
+      regularDeliveryDate,
+      sameDayDeliveryDate,
+    });
+
+    return {
+      success: true,
+      message: "Order placed successfully.",
+      orderId: order._id.toString(),
+    };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, message: errMsg.error };
+  }
 };

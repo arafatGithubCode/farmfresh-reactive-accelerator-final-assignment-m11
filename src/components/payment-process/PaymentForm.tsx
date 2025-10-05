@@ -3,11 +3,13 @@
 import { doPayment } from "@/actions/product";
 import { useBalance } from "@/hooks/useBalance";
 import { useCart } from "@/hooks/useCart";
+import { useCatchErr } from "@/hooks/useCatchErr";
 import { showToast } from "@/providers/ToastProvider";
 import { ICartItemFronted, TPaymentData, TPaymentMethod } from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
 import { validatePaymentForm } from "@/validations/validatePaymentForm";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
 import {
   FaCreditCard,
@@ -91,6 +93,10 @@ const PaymentForm = ({
     (item) => item.product.deliveryMethod === "regular_delivery"
   );
 
+  const { err, catchErr } = useCatchErr();
+
+  const router = useRouter();
+
   //   Delivery Date
   const bookingDate = new Date();
 
@@ -151,6 +157,7 @@ const PaymentForm = ({
       // handle top level errors
       if (validationErr.deliveryAddress) {
         flattenedErrors["deliveryAddress"] = validationErr.deliveryAddress;
+        return;
       }
 
       // handle nested payment method errors
@@ -171,10 +178,24 @@ const PaymentForm = ({
       }
 
       const response = await doPayment(paymentData);
-      console.log(response);
+      console.log(response, "res");
+
+      if (!response.success) {
+        showToast("Failed to place the order.", "ERROR");
+        setLoading(false);
+        return;
+      }
+      showToast(response.message, "SUCCESS");
       setLoading(false);
+      router.push(`/order/${response.orderId}`);
     } catch (error) {
       console.log(error);
+      catchErr(error);
+      if (err) {
+        showToast(err, "ERROR");
+      } else {
+        showToast("Failed to place the order", "ERROR");
+      }
     } finally {
       setLoading(false);
     }

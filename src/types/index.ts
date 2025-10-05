@@ -272,3 +272,21 @@ export interface TPaymentData {
   paymentMethod: TPaymentMethod;
   selectedItems: ICartItemFronted[];
 }
+
+// DB Order Types Start
+export interface IOrderItem {
+  product: Types.ObjectId;
+  quantity: number;
+}
+export interface IOrder {
+  customer: string | TBaseUser;
+  items: IOrderItem[];
+  status: "PLACED" | "CONFIRMED" | "SHIPPED" | "DELIVERED";
+  bookingDate: Date;
+  sameDayDeliveryDate?: Date | boolean;
+  regularDeliveryDate?: Date | boolean;
+  deliveryAddress: string;
+  paymentMethod: TPaymentMethod;
+}
+
+// Order Types End

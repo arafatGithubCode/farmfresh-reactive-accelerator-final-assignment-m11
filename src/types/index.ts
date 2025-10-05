@@ -263,3 +263,12 @@ export interface TPaymentMethod {
     number: string;
   };
 }
+
+export interface TPaymentData {
+  bookingDate: Date;
+  sameDayDeliveryDate?: Date | boolean;
+  regularDeliveryDate?: Date | boolean;
+  deliveryAddress: string;
+  paymentMethod: TPaymentMethod;
+  selectedItems: ICartItemFronted[];
+}

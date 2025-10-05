@@ -14,7 +14,7 @@ import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
-import mongoose, { Types } from "mongoose";
+import mongoose, { AnyObject, Types } from "mongoose";
 
 // ===== Add Product ===== //
 export const doAddingProduct = async (
@@ -42,7 +42,10 @@ export const doAddingProduct = async (
       stock: Number(formData.get("stock") || 0),
       unit: (formData.get("unit") as string) ?? "",
       deliveryMethod:
-        (formData.get("deliveryMethod") as "SAME_DAY" | "REGULAR" | "") ?? "",
+        (formData.get("deliveryMethod") as
+          | "same_day_delivery"
+          | "regular_delivery"
+          | "") ?? "",
       baseDeliveryFee: Number(formData.get("baseDeliveryFee")) || 0,
       perUnitDeliveryFee: Number(formData.get("perUnitDeliveryFee")) || 0,
       serviceFee: Number(formData.get("serviceFee")) || 0,
@@ -385,4 +388,9 @@ export const doDeleteProduct = async (
     const errMsg = catchErr(error);
     return { success: errMsg.success, error: errMsg.error };
   }
+};
+
+// ===== Make Payment ===== //
+export const doPayment = async (paymentData: AnyObject) => {
+  console.log(paymentData);
 };

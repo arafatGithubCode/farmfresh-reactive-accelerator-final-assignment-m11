@@ -70,9 +70,9 @@ const CartBadge = () => {
                     key={item.product.id}
                     className="flex items-center justify-start gap-2 pt-1"
                   >
-                    <div className="relative w-20 h-20 rounded-lg">
+                    <div className="relative w-16 h-16 rounded-lg">
                       <Image
-                        className="relative w-20 h-20 rounded-lg"
+                        className="relative w-16 h-16 rounded-lg"
                         src={item.product?.imagesUrl[0]?.url}
                         alt="Cart-Item"
                         fill={true}

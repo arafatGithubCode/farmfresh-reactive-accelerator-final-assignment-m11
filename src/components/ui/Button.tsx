@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import MiniSpinner from "./MiniSpinner";
 
@@ -10,6 +10,7 @@ type ButtonProps = {
   hasSpinner?: boolean;
   loadingText?: string;
   isDanger?: boolean;
+  icon?: ReactNode;
 };
 
 const Button = ({
@@ -18,6 +19,7 @@ const Button = ({
   hasSpinner = false,
   loadingText = "Loading...",
   isDanger = false,
+  icon,
 }: ButtonProps) => {
   const { pending } = useFormStatus();
   const isLoading = pending || loading;
@@ -32,7 +34,7 @@ const Button = ({
         isDanger
           ? "bg-red-600 hover:bg-red-700"
           : "bg-primary-600 hover:bg-primary-700"
-      } hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center`}
+      } hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center gap-2`}
     >
       {isLoading ? (
         hasSpinner ? (
@@ -40,10 +42,16 @@ const Button = ({
             <MiniSpinner /> <span>{loadingText ?? label}</span>
           </div>
         ) : (
-          <span>{loadingText}</span>
+          <>
+            {icon && icon}
+            <span>{loadingText}</span>
+          </>
         )
       ) : (
-        label
+        <>
+          {icon && icon}
+          <span>{label}</span>
+        </>
       )}
     </button>
   );

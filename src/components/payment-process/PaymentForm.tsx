@@ -1,11 +1,14 @@
 "use client";
 
+import { doPayment } from "@/actions/product";
 import { useBalance } from "@/hooks/useBalance";
 import { useCart } from "@/hooks/useCart";
-import { ICartItemFronted, TPaymentMethod } from "@/types";
+import { showToast } from "@/providers/ToastProvider";
+import { ICartItemFronted, TPaymentData, TPaymentMethod } from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
+import { validatePaymentForm } from "@/validations/validatePaymentForm";
 import Image from "next/image";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import {
   FaCreditCard,
   FaLock,
@@ -13,6 +16,7 @@ import {
   FaShieldAlt,
   FaWallet,
 } from "react-icons/fa";
+import Button from "../ui/Button";
 
 const Item = ({ cartItem }: { cartItem: ICartItemFronted }) => (
   <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg mb-6">
@@ -65,6 +69,12 @@ const PaymentForm = ({
       number: "",
     },
   });
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const [validationErrors, setValidationErrors] = useState<
+    Partial<Record<string, string>>
+  >({});
 
   const { cart } = useCart();
   const selectedItems = cart?.items?.filter(
@@ -121,8 +131,60 @@ const PaymentForm = ({
     }));
   };
 
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const paymentData: TPaymentData = {
+        bookingDate,
+        sameDayDeliveryDate,
+        regularDeliveryDate,
+        deliveryAddress,
+        paymentMethod,
+        selectedItems,
+      };
+
+      const validationErr = validatePaymentForm(paymentData);
+      const flattenedErrors: Record<string, string> = {};
+
+      // handle top level errors
+      if (validationErr.deliveryAddress) {
+        flattenedErrors["deliveryAddress"] = validationErr.deliveryAddress;
+      }
+
+      // handle nested payment method errors
+      const methodErrors = validationErr.paymentMethod;
+      if (methodErrors && typeof methodErrors === "object") {
+        for (const [key, value] of Object.entries(methodErrors)) {
+          if (key !== "method" && value) {
+            flattenedErrors[`paymentMethod.${key}`] = value as string;
+          }
+        }
+      }
+      setValidationErrors(flattenedErrors);
+
+      if (Object.keys(validationErrors).length > 0) {
+        showToast("Please fill up the form details carefully.", "WARNING");
+        setLoading(false);
+        return;
+      }
+
+      const response = await doPayment(paymentData);
+      console.log(response);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <form className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <form
+      onSubmit={handleSubmit}
+      className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+    >
       {/* Order Summary */}
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
@@ -179,6 +241,11 @@ const PaymentForm = ({
               placeholder="Enter product's delivery address..."
               className="font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 placeholder:font-normal placeholder:text-sm px-2 py-1 border border-primary-500"
             />
+            {validationErrors["deliveryAddress"] && (
+              <p className="text-red-400 text-sm">
+                {validationErrors["deliveryAddress"]}
+              </p>
+            )}
           </div>
         </div>
 
@@ -297,12 +364,16 @@ const PaymentForm = ({
                   type="text"
                   id="nameOnCard"
                   name="nameOnCard"
-                  required
                   value={paymentMethod.cardDetails.nameOnCard}
                   onChange={handleCardDetailsChange}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="John Doe"
                 />
+                {validationErrors["paymentMethod.nameOnCard"] && (
+                  <p className="text-red-400 text-sm">
+                    {validationErrors["paymentMethod.nameOnCard"]}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -318,10 +389,14 @@ const PaymentForm = ({
                   name="cardNumber"
                   value={paymentMethod.cardDetails.cardNumber}
                   onChange={handleCardDetailsChange}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="1234 5678 9012 3456"
                 />
+                {validationErrors["paymentMethod.cardNumber"] && (
+                  <p className="text-red-400 text-sm">
+                    {validationErrors["paymentMethod.cardNumber"]}
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -338,10 +413,14 @@ const PaymentForm = ({
                     name="expiry"
                     value={paymentMethod.cardDetails.expiry}
                     onChange={handleCardDetailsChange}
-                    required
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder="MM/YY"
                   />
+                  {validationErrors["paymentMethod.expiry"] && (
+                    <p className="text-red-400 text-sm">
+                      {validationErrors["paymentMethod.expiry"]}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label
@@ -357,10 +436,14 @@ const PaymentForm = ({
                     maxLength={4}
                     value={paymentMethod.cardDetails.cvv}
                     onChange={handleCardDetailsChange}
-                    required
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder="123"
                   />
+                  {validationErrors["paymentMethod.cvv"] && (
+                    <p className="text-red-400 text-sm">
+                      {validationErrors["paymentMethod.cvv"]}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -382,6 +465,7 @@ const PaymentForm = ({
                   name="mobileNumber"
                   value={paymentMethod.mobileDetails.number}
                   onChange={handleMobileDetails}
+                  required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="+880 1234 567890"
                 />
@@ -389,13 +473,13 @@ const PaymentForm = ({
             </div>
           )}
 
-          <button
-            type="submit"
-            className="w-full flex items-center justify-center bg-primary-600 hover:bg-primary-700 text-white py-3 px-4 rounded-lg font-medium text-lg transition duration-200 transform hover:scale-105"
-          >
-            <FaLock className="mr-2" />
-            <span>Complete Payment - ৳{total}</span>
-          </button>
+          <Button
+            label={`Compete Payment - ৳${total}`}
+            loading={loading}
+            hasSpinner={true}
+            icon={<FaLock />}
+            loadingText="Processing..."
+          />
 
           <div className="flex items-center justify-center text-sm text-gray-500 dark:text-gray-400">
             <FaShieldAlt className="mr-2" />

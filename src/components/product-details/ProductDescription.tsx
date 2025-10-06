@@ -97,7 +97,7 @@ const ProductDescription = ({
           {/* Header */}
           <div className="flex items-center gap-4">
             <Image
-              src={farmer.image}
+              src={farmer.image!}
               alt={farmer.firstName}
               className="w-20 h-20 rounded-full border-4 border-primary-500 object-cover"
               width={80}

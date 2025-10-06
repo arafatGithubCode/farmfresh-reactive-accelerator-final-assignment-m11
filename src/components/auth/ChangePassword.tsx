@@ -1,6 +1,9 @@
 "use client";
 
+import { doChangePassword } from "@/actions/auth";
+import { useCatchErr } from "@/hooks/useCatchErr";
 import { useForm } from "@/hooks/useForm";
+import { showToast } from "@/providers/ToastProvider";
 import { validateChangePassword } from "@/validations/validateChangePassword";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -19,6 +22,8 @@ const ChangePassword = () => {
   const [showNewConfirmPass, setShowNewConfirmPass] = useState<boolean>(false);
   const [loading, setLoading] = useState(false);
 
+  const { err, catchErr } = useCatchErr();
+
   const {
     values: formValues,
     touched,
@@ -30,8 +35,34 @@ const ChangePassword = () => {
   } = useForm({
     initialValues,
     validate: validateChangePassword,
-    onSubmit: () => {
-      console.log("ok");
+    onSubmit: async () => {
+      setLoading(true);
+      try {
+        const formData = new FormData();
+
+        for (const [key, value] of Object.entries(formValues)) {
+          formData.append(key, value);
+        }
+
+        const response = await doChangePassword(formData);
+
+        if (!response.success) {
+          showToast(response.message, "ERROR");
+          setLoading(false);
+          return;
+        }
+        showToast(response.message, "SUCCESS");
+        resetForm();
+        setLoading(false);
+      } catch (error) {
+        catchErr(error);
+        if (err) {
+          showToast(err, "ERROR");
+        } else {
+          showToast("Failed to update password.", "ERROR");
+        }
+        setLoading(false);
+      }
     },
   });
   return (

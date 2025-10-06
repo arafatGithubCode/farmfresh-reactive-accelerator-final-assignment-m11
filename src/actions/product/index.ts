@@ -1,5 +1,6 @@
 "use server";
 
+import { connectDB } from "@/libs/connectDB";
 import { deleteCloudinaryImage } from "@/libs/deleteCloudinaryImage";
 import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
@@ -23,6 +24,7 @@ import mongoose, { Types } from "mongoose";
 export const doAddingProduct = async (
   formData: FormData
 ): Promise<TActionResponse> => {
+  await connectDB();
   try {
     // Only allow if the role is Farmer
     const session = await getUserSession();
@@ -139,6 +141,7 @@ export const doEditingProduct = async (
   formData: FormData,
   editProductId: string
 ): Promise<TActionResponse> => {
+  await connectDB();
   try {
     const user = await getUserSession();
     const userId = user?.id;
@@ -304,6 +307,7 @@ export const doDeletingProductImage = async (
   public_id: string,
   productId: string
 ): Promise<TActionResponse> => {
+  await connectDB();
   try {
     const response = await deleteCloudinaryImage(public_id);
 
@@ -339,6 +343,7 @@ export const doDeletingProductImage = async (
 export const doToggleProductActive = async (
   productId: string
 ): Promise<TActionResponse> => {
+  await connectDB();
   try {
     if (!productId) {
       throw new Error("Product ID is required.");
@@ -374,6 +379,7 @@ export const doDeleteProduct = async (
   productName: string,
   productImage: { url: string; public_id: string; id?: string }[]
 ): Promise<TActionResponse> => {
+  await connectDB();
   try {
     const isExist = await getProduct(productId);
     if (!isExist) {
@@ -397,6 +403,7 @@ export const doDeleteProduct = async (
 export const doPayment = async (
   paymentData: TPaymentData
 ): Promise<{ success: boolean; message: string; orderId?: string }> => {
+  await connectDB();
   try {
     const {
       bookingDate,

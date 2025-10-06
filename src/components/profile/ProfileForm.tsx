@@ -9,7 +9,8 @@ import { IUserDB } from "@/types";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 import { FaUserEdit } from "react-icons/fa";
 import ChangePassword from "../auth/ChangePassword";
 import Field from "../common/Field";
@@ -31,6 +32,8 @@ const ProfileForm = ({ user }: { user: IUserDB }) => {
   const isGoogleSingIN =
     session?.data?.user &&
     Object.keys(session.data.user).includes("emailVerified");
+
+  const router = useRouter();
 
   const {
     firstName,
@@ -74,7 +77,6 @@ const ProfileForm = ({ user }: { user: IUserDB }) => {
     errors,
     touched,
     resetForm,
-    setValues,
   } = useForm({
     initialValues,
     validate: (values) => validateRegistrationForm(values, "PROFILE"),
@@ -98,13 +100,13 @@ const ProfileForm = ({ user }: { user: IUserDB }) => {
         const response = await doUpdateProfile(formData);
         if (response.success && response.updatedUser) {
           setUserData(response.updatedUser);
-          console.log(userData);
           showToast(
             "Profile details have been updated successfully!",
             "SUCCESS"
           );
           resetForm();
           setIsEditable(false);
+          router.refresh();
         } else {
           showToast("Failed to update profile details!", "ERROR");
         }
@@ -121,22 +123,6 @@ const ProfileForm = ({ user }: { user: IUserDB }) => {
     formValues.avatar && isEditable && Array.isArray(formValues.avatar)
       ? URL?.createObjectURL(formValues.avatar[0])
       : image;
-
-  useEffect(() => {
-    if (userData) {
-      setValues({
-        ...userData,
-        avatar: null,
-        bio: userData.bio ?? "",
-        farmName: userData.farmName ?? "",
-        specialization: userData.specialization ?? "",
-        farmSize: userData.farmSize ?? "",
-        farmSizeUnit: userData.farmSizeUnit ?? "",
-        farmDistrict: userData.farmDistrict ?? "",
-        farmAddress: userData.farmAddress ?? "",
-      });
-    }
-  }, [userData]);
 
   return (
     <div className="relative space-y-4">
@@ -528,6 +514,7 @@ const ProfileForm = ({ user }: { user: IUserDB }) => {
               label="Update Profile"
               loading={loading}
               loadingText="Updating..."
+              hasSpinner={true}
             />
           )}
         </div>

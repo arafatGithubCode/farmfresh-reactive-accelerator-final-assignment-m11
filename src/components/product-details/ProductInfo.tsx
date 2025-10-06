@@ -166,7 +166,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
       >
         <div className="flex items-center space-x-3">
           <Image
-            src={product.farmer.image}
+            src={product.farmer.image!}
             alt={product.farmer.firstName}
             width={48}
             height={48}
@@ -177,7 +177,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
               {product.farmer.firstName} {product.farmer.lastName}
             </h4>
             <p className="text-sm text-gray-600 dark:text-gray-400">
-              Farmer since {new Date(product.farmer.updatedAt).getFullYear()}
+              Farmer since {new Date(product.farmer.updatedAt!).getFullYear()}
             </p>
           </div>
         </div>

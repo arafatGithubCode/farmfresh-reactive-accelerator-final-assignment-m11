@@ -3,14 +3,17 @@
 import { signIn, signOut } from "@/auth";
 import { connectDB } from "@/libs/connectDB";
 import { User } from "@/models/userModel";
-import { createUser, getUserByEmail } from "@/queries/user";
+import { createUser } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
 import { IUserDB, IUserRegistrationForm } from "@/types";
 import { catchErr } from "@/utils/catchErr";
+import { getUserSession } from "@/utils/getUserSession";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
+import { validateChangePassword } from "@/validations/validateChangePassword";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import bcrypt from "bcryptjs";
 import { Types } from "mongoose";
+import { getUserByEmail } from "./../../queries/user/index";
 
 // Perform registration
 export const doRegistration = async (formData: FormData) => {
@@ -141,6 +144,7 @@ export const doSignIn = async () => {
 
 // Perform update profile
 export const doUpdateProfile = async (formData: FormData) => {
+  await connectDB();
   try {
     const email = formData.get("email");
     if (typeof email !== "string") {
@@ -190,5 +194,68 @@ export const doUpdateProfile = async (formData: FormData) => {
   } catch (error) {
     const errMsg = catchErr(error);
     return { success: false, err: errMsg };
+  }
+};
+
+// Perform change password
+export const doChangePassword = async (
+  formData: FormData
+): Promise<{ success: boolean; message: string }> => {
+  await connectDB();
+  try {
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+    const newConfirmPassword = formData.get("newConfirmPassword") as string;
+
+    const user = await getUserSession();
+
+    if (!user || !user?.email) {
+      throw new Error("Session expired. Please login again.");
+    }
+
+    const validationErr = validateChangePassword({
+      currentPassword,
+      newPassword,
+      newConfirmPassword,
+    });
+
+    for (const value of Object.values(validationErr)) {
+      if (value) {
+        throw new Error("Please fill up the all required fields.");
+      }
+    }
+
+    const existingUser = await getUserByEmail(user.email);
+
+    if (!existingUser) {
+      throw new Error("Bad Credentials");
+    }
+
+    if (newPassword !== newConfirmPassword) {
+      throw new Error(
+        "Please match the new password with new confirm password."
+      );
+    }
+
+    const isMatch = await bcrypt.compare(
+      currentPassword,
+      existingUser.password
+    );
+
+    if (!isMatch) {
+      throw new Error("Password does not match to current password.");
+    }
+
+    const hashedPassword = await bcrypt.hash(newConfirmPassword, 10);
+
+    await User.findOneAndUpdate(
+      { email: existingUser.email },
+      { password: hashedPassword }
+    );
+
+    return { success: true, message: "Password updated successfully." };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, message: errMsg.error };
   }
 };

@@ -1,9 +1,9 @@
 "use client";
 
 import { CartContext } from "@/context";
-import { useCatchErr } from "@/hooks/useCatchErr";
 import { cartReducer, initialCartState } from "@/reducers/cartReducer";
 import { IProductFrontend } from "@/types";
+import { catchErr } from "@/utils/catchErr";
 import { fetchData } from "@/utils/fetchData";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -13,7 +13,7 @@ import { showToast } from "./ToastProvider";
 const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, initialCartState);
   const [loading, setLoading] = useState<Record<string, boolean>>({});
-  const { catchErr, err } = useCatchErr();
+  const [err, setErr] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -30,7 +30,8 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
         const data = await fetchData(`/api/cart?customerId=${customerId}`);
         dispatch({ type: "SET_CART", payload: data?.cart });
       } catch (error) {
-        catchErr(error);
+        const errMsg = catchErr(error);
+        setErr(errMsg.error);
       }
     };
     fetchCart();
@@ -74,7 +75,8 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         const data = await fetchData(`/api/cart?customerId=${customerId}`);
         dispatch({ type: "SET_CART", payload: data?.cart });
-        catchErr(error);
+        const errMsg = catchErr(error);
+        setErr(errMsg.error);
       } finally {
         setLoading((prev) => ({ ...prev, [product.id]: false }));
       }
@@ -95,7 +97,8 @@ const CartProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         const data = await fetchData(`/api/cart?customerId=${customerId}`);
         dispatch({ type: "SET_CART", payload: data?.cart });
-        catchErr(error);
+        const errMsg = catchErr(error);
+        setErr(errMsg.error);
       } finally {
         setLoading((prev) => ({ ...prev, productId: false }));
       }

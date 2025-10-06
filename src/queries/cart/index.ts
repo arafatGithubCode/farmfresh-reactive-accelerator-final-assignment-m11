@@ -1,3 +1,4 @@
+import { connectDB } from "@/libs/connectDB";
 import { Cart } from "@/models/CartModel";
 import { ICartFrontend } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
@@ -6,6 +7,7 @@ import { transformMongoDoc } from "@/utils/transformMongoDoc";
 export const getCartByCustomerId = async (
   customerId: string
 ): Promise<ICartFrontend | null> => {
+  await connectDB();
   const cart = await Cart.findOne({ customer: customerId })
     .populate("customer")
     .populate({

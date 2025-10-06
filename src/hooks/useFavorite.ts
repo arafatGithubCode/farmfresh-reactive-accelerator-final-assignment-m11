@@ -1,17 +1,16 @@
 "use client";
 
 import { showToast } from "@/providers/ToastProvider";
+import { catchErr } from "@/utils/catchErr";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useCatchErr } from "./useCatchErr";
 
 export const useFavorite = (productName: string) => {
   const [favoriteList, setFavoriteList] = useState<string[]>([]);
   const session = useSession();
   const customerId = session?.data?.user?.id;
 
-  const { err, catchErr } = useCatchErr();
   const router = useRouter();
 
   const updateFavorite = async (productId: string) => {
@@ -76,9 +75,8 @@ export const useFavorite = (productName: string) => {
           const data = await response.json();
           setFavoriteList(data?.favoriteList?.items || []);
         } catch (error) {
-          console.log(error, "product-cart");
-          catchErr(error);
-          showToast(err!, "ERROR");
+          const errMsg = catchErr(error);
+          showToast(errMsg.error, "ERROR");
         }
       };
       fetchFavorite();

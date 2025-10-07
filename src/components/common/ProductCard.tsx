@@ -158,7 +158,12 @@ const ProductCard = ({
             )}
           </div>
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            Stock: {`${(remainingStock ?? 0).toFixed(0)}${product?.unit}`}
+            Stock:{" "}
+            {`${
+              isInCart
+                ? remainingStock.toFixed(0)
+                : (remainingStock + 1).toFixed()
+            } ${product?.unit}`}
           </span>
         </div>
         {isManageListingPage ? (

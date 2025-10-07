@@ -1,64 +1,64 @@
-import { TPaymentData } from "@/types";
-import { maxLength, minLength, required } from ".";
+import { TPaymentField, TPaymentFieldErr } from "@/types";
+import { maxLength, minLength, phoneValidate, required } from ".";
 
-export const validatePaymentForm = (paymentData: TPaymentData) => {
+export const validatePaymentForm = (
+  fields: TPaymentField
+): TPaymentFieldErr => {
   const {
+    method,
+    cardDetails: { cardNumber, cvv, expiry, nameOnCard },
+    mobileDetails: { number },
     deliveryAddress,
-    paymentMethod: { cardDetails, method, mobileDetails },
-  } = paymentData;
+  } = fields;
 
-  // validate delivery address
   const deliveryAddressError =
     required(deliveryAddress) ??
     minLength(deliveryAddress, 10) ??
-    maxLength(deliveryAddress, 100);
+    maxLength(deliveryAddress, 50);
 
-  // validate card method
-  const cardErrors =
-    method === "card"
-      ? {
-          nameOnCard:
-            required(cardDetails.nameOnCard) ??
-            minLength(cardDetails.nameOnCard, 3) ??
-            maxLength(cardDetails.nameOnCard, 50),
+  const validateCard = () => ({
+    nameOnCard:
+      required(nameOnCard) ??
+      minLength(nameOnCard, 2) ??
+      maxLength(nameOnCard, 30),
 
-          cardNumber:
-            required(cardDetails.cardNumber) ??
-            (/^\d{16}$/.test(cardDetails.cardNumber)
-              ? null
-              : "Card number must be 16 digits"),
+    cardNumber:
+      required(cardNumber) ??
+      (/^\d{16}$/.test(cardNumber) ? null : "Card number must be 16 digits"),
 
-          cvv:
-            required(cardDetails.cvv) ??
-            (/^\d{3,4}$/.test(cardDetails.cvv)
-              ? null
-              : "CVV must be 3 or 4 digits"),
+    cvv:
+      required(cvv) ??
+      (/^\d{3,4}$/.test(cvv) ? null : "CVV must be 3 or 4 digits"),
 
-          expiry:
-            required(cardDetails.expiry) ??
-            (/^(0[1-9]|1[0-2])\/\d{2}$/.test(cardDetails.expiry)
-              ? null
-              : "Expiry must be in MM/YY format"),
-        }
-      : null;
+    expiry:
+      required(expiry) ??
+      (/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)
+        ? null
+        : "Expiry must be in MM/YY format"),
+  });
 
-  // validate bkash/nagad method
-  const mobileErrors =
-    method === "bkash" || method === "nagad"
-      ? {
-          number:
-            required(mobileDetails.number) ??
-            (/^01[3-9]\d{8}$/.test(mobileDetails.number)
-              ? null
-              : "Invalid mobile number format"),
-        }
-      : null;
+  // Mobile wallet validation
+  const validateMobile = () => ({
+    number: phoneValidate(number),
+  });
 
-  return {
-    deliveryAddress: deliveryAddressError,
-    paymentMethod: {
-      method,
-      ...(method === "card" ? cardErrors : mobileErrors),
-    },
-  };
+  switch (method) {
+    case "card":
+      return {
+        deliveryAddress: deliveryAddressError,
+        ...validateCard(),
+      };
+
+    case "bkash":
+    case "nagad":
+      return {
+        deliveryAddress: deliveryAddressError,
+        ...validateMobile(),
+      };
+
+    default:
+      return {
+        deliveryAddress: deliveryAddressError,
+      };
+  }
 };

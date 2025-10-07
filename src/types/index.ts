@@ -264,6 +264,18 @@ export interface TPaymentMethod {
   };
 }
 
+export interface TPaymentField extends TPaymentMethod {
+  deliveryAddress: string;
+}
+
+export interface TPaymentFieldErr {
+  deliveryAddress?: string | null;
+  nameOnCard?: string | null;
+  cvv?: string | null;
+  expiry?: string | null;
+  cardNumber?: string | null;
+  number?: string | null;
+}
 export interface TPaymentData {
   bookingDate: Date;
   sameDayDeliveryDate?: Date | boolean;

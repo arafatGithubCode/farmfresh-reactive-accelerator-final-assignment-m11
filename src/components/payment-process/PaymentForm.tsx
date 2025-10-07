@@ -5,7 +5,13 @@ import { useBalance } from "@/hooks/useBalance";
 import { useCart } from "@/hooks/useCart";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { showToast } from "@/providers/ToastProvider";
-import { ICartItemFronted, TPaymentData, TPaymentMethod } from "@/types";
+import {
+  ICartItemFronted,
+  TPaymentData,
+  TPaymentField,
+  TPaymentFieldErr,
+  TPaymentMethod,
+} from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
 import { validatePaymentForm } from "@/validations/validatePaymentForm";
 import Image from "next/image";
@@ -74,9 +80,9 @@ const PaymentForm = ({
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [validationErrors, setValidationErrors] = useState<
-    Partial<Record<string, string>>
-  >({});
+  const [validationErrors, setValidationErrors] = useState<TPaymentFieldErr>(
+    {}
+  );
 
   const { cart } = useCart();
   const selectedItems = cart?.items?.filter(
@@ -151,28 +157,19 @@ const PaymentForm = ({
         selectedItems,
       };
 
-      const validationErr = validatePaymentForm(paymentData);
-      const flattenedErrors: Record<string, string> = {};
+      const paymentFields: TPaymentField = {
+        ...paymentMethod,
+        deliveryAddress,
+      };
 
-      // handle top level errors
-      if (validationErr.deliveryAddress) {
-        flattenedErrors["deliveryAddress"] = validationErr.deliveryAddress;
-        return;
-      }
+      const validationResult = validatePaymentForm(paymentFields);
+      const hasErrors = Object.values(validationResult).some(
+        (value) => value !== null || value !== undefined || !value
+      );
 
-      // handle nested payment method errors
-      const methodErrors = validationErr.paymentMethod;
-      if (methodErrors && typeof methodErrors === "object") {
-        for (const [key, value] of Object.entries(methodErrors)) {
-          if (key !== "method" && value) {
-            flattenedErrors[`paymentMethod.${key}`] = value as string;
-          }
-        }
-      }
-      setValidationErrors(flattenedErrors);
-
-      if (Object.keys(validationErrors).length > 0) {
-        showToast("Please fill up the form details carefully.", "WARNING");
+      if (hasErrors) {
+        setValidationErrors(validationResult);
+        console.log(validationErrors);
         setLoading(false);
         return;
       }
@@ -262,10 +259,8 @@ const PaymentForm = ({
               placeholder="Enter product's delivery address..."
               className="font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 placeholder:font-normal placeholder:text-sm px-2 py-1 border border-primary-500"
             />
-            {validationErrors["deliveryAddress"] && (
-              <p className="text-red-400 text-sm">
-                {validationErrors["deliveryAddress"]}
-              </p>
+            {validationErrors.deliveryAddress && (
+              <p className="text-red-400">{validationErrors.deliveryAddress}</p>
             )}
           </div>
         </div>
@@ -390,9 +385,9 @@ const PaymentForm = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="John Doe"
                 />
-                {validationErrors["paymentMethod.nameOnCard"] && (
+                {validationErrors.nameOnCard && (
                   <p className="text-red-400 text-sm">
-                    {validationErrors["paymentMethod.nameOnCard"]}
+                    {validationErrors.nameOnCard}
                   </p>
                 )}
               </div>
@@ -413,9 +408,9 @@ const PaymentForm = ({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="1234 5678 9012 3456"
                 />
-                {validationErrors["paymentMethod.cardNumber"] && (
+                {validationErrors.cardNumber && (
                   <p className="text-red-400 text-sm">
-                    {validationErrors["paymentMethod.cardNumber"]}
+                    {validationErrors.cardNumber}
                   </p>
                 )}
               </div>
@@ -437,9 +432,9 @@ const PaymentForm = ({
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder="MM/YY"
                   />
-                  {validationErrors["paymentMethod.expiry"] && (
+                  {validationErrors.expiry && (
                     <p className="text-red-400 text-sm">
-                      {validationErrors["paymentMethod.expiry"]}
+                      {validationErrors.expiry}
                     </p>
                   )}
                 </div>
@@ -460,9 +455,9 @@ const PaymentForm = ({
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                     placeholder="123"
                   />
-                  {validationErrors["paymentMethod.cvv"] && (
+                  {validationErrors.cvv && (
                     <p className="text-red-400 text-sm">
-                      {validationErrors["paymentMethod.cvv"]}
+                      {validationErrors.cvv}
                     </p>
                   )}
                 </div>
@@ -486,10 +481,14 @@ const PaymentForm = ({
                   name="mobileNumber"
                   value={paymentMethod.mobileDetails.number}
                   onChange={handleMobileDetails}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="+880 1234 567890"
                 />
+                {validationErrors.number && (
+                  <p className="text-red-400 text-sm">
+                    {validationErrors.number}
+                  </p>
+                )}
               </div>
             </div>
           )}

@@ -1,22 +1,59 @@
 "use client";
 
+import { showToast } from "@/providers/ToastProvider";
 import { IOrderFronted } from "@/types";
+import { catchErr } from "@/utils/catchErr";
+import { FormEvent, useState } from "react";
 import { FaDownload } from "react-icons/fa";
+import Button from "../ui/Button";
 
 const DownloadReceipt = ({ order }: { order: IOrderFronted }) => {
-  console.log(order);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleDownloadPDF = async (e: FormEvent) => {
+    e.preventDefault();
+
+    setLoading(true);
+    try {
+      const response = await fetch(`http://localhost:3000/api/order/email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ order }),
+      });
+
+      if (!response.ok) {
+        setLoading(false);
+        throw new Error("Failed to download the receipt.");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `receipt-${order.id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      setLoading(false);
+    } catch (error) {
+      const errMsg = catchErr(error);
+      showToast(errMsg.error, "ERROR");
+      setLoading(false);
+    }
+  };
   return (
-    <>
-      <button
-        onClick={() => {
-          // TODO:
-        }}
-        className="flex items-center justify-center px-8 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition"
-      >
-        <FaDownload className="mr-2" />
-        Download Receipt (PDF)
-      </button>
-    </>
+    <form onSubmit={handleDownloadPDF} className="w-full max-w-xs">
+      <Button
+        label="Download Receipt (PDF)"
+        loading={loading}
+        hasSpinner={true}
+        icon={<FaDownload className="mr-2" />}
+        loadingText="Downloading..."
+      />
+    </form>
   );
 };
 

@@ -12,6 +12,7 @@ export const POST = async (req: NextRequest) => {
     const order: IOrderFronted = body.order;
 
     const pdfBuffer = await renderToBuffer(<InvoicePDF order={order} />);
+    const uint8Array = new Uint8Array(pdfBuffer);
 
     const subject = `Your order #${order.id} receipt.`;
     const html = `
@@ -43,7 +44,13 @@ FarmFresh`;
       ],
     });
 
-    return NextResponse.json({ ok: true });
+    return new NextResponse(uint8Array, {
+      status: 200,
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Description": `attachment; filename=receipt-${order.id}.pdf`,
+      },
+    });
   } catch (err) {
     console.error("Email send failed:", err);
     return NextResponse.json(

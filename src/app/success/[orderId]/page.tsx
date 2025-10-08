@@ -1,5 +1,6 @@
+import DownloadReceipt from "@/components/common/DownloadReceipt";
 import DeliveryInfo from "@/components/success/DeliveryInfo";
-import DownloadReceipt from "@/components/success/DownloadReceipt";
+
 import PaymentSummary from "@/components/success/PaymentSummary";
 import { getOrderById } from "@/queries/order";
 import Image from "next/image";

@@ -292,6 +292,7 @@ export interface IOrderItem {
 }
 export interface IOrder {
   customer: string | TBaseUser;
+  farmer: string | TBaseUser;
   items: IOrderItem[];
   status: "PLACED" | "CONFIRMED" | "SHIPPED" | "DELIVERED";
   bookingDate: Date;
@@ -312,7 +313,7 @@ export interface IOrderFronted {
     quantity: number;
     id?: string;
   }[];
-  status: "PLACED" | "CONFIRMED" | "SHIPPED" | "DELIVERED";
+  status: "PLACED" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELED";
   bookingDate: Date | string;
   sameDayDeliveryDate?: Date | boolean | string;
   regularDeliveryDate?: Date | boolean | string;

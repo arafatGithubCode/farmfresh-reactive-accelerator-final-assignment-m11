@@ -54,15 +54,27 @@ const DeliveryInfo = ({
             {regularDelivery && getFormattedDate(regularDelivery)}
           </span>
         </div>
-        <div className="flex justify-between">
-          <span className="text-gray-600 dark:text-gray-400">
-            Delivery Time:
-          </span>
-          <span className="text-gray-900 dark:text-white">
-            {sameDayDelivery && getTimeRange(sameDayDelivery)}
-            {regularDelivery && getTimeRange(regularDelivery)}
-          </span>
-        </div>
+
+        {sameDayDelivery && (
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">
+              Same Day Delivery Time:
+            </span>
+            <span className="text-gray-900 dark:text-white">
+              {sameDayDelivery && getTimeRange(sameDayDelivery)}
+            </span>
+          </div>
+        )}
+        {regularDelivery && (
+          <div className="flex justify-between">
+            <span className="text-gray-600 dark:text-gray-400">
+              Regular Delivery Time:
+            </span>
+            <span className="text-gray-900 dark:text-white">
+              {regularDelivery && getTimeRange(regularDelivery)}
+            </span>
+          </div>
+        )}
         <div className="flex justify-between">
           <span className="text-gray-600 dark:text-gray-400">Address:</span>
           <span className="text-gray-900 dark:text-white text-right">

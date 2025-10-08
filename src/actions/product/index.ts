@@ -456,8 +456,6 @@ export const doPayment = async (
 
     const order = await getOrderById(created._id.toString());
 
-    console.log(order);
-
     await fetch(`http://localhost:3000/api/order/email`, {
       method: "POST",
       headers: {

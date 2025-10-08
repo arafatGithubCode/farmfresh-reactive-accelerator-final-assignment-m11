@@ -21,3 +21,39 @@ export const getOrderById = async (orderId: string) => {
 
   return order ? transformMongoDoc(order) : null;
 };
+
+// Get orders by customer id
+export const getOrdersByCustomerId = async (customerId: string) => {
+  await connectDB();
+
+  const orders = await Order.find({
+    customer: customerId,
+  })
+    .populate("customer")
+    .populate({
+      path: "items.product",
+      model: "Product",
+      populate: {
+        path: "farmer",
+        model: "User",
+      },
+    })
+    .lean<IOrderFronted[]>();
+
+  return orders ? transformMongoDoc(orders) : null;
+};
+
+// Get orders by farmer id
+export const getOrdersByFarmerId = async (farmerId: string) => {
+  await connectDB();
+
+  const orders = await Order.find()
+    .populate({
+      path: "items.product",
+      model: "Product",
+      match: { farmer: farmerId },
+    })
+    .lean<IOrderFronted[]>();
+
+  return orders ? transformMongoDoc(orders) : null;
+};

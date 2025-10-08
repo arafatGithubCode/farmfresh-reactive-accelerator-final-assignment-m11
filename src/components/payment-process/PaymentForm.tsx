@@ -4,6 +4,7 @@ import { doPayment } from "@/actions/product";
 import { useBalance } from "@/hooks/useBalance";
 import { useCart } from "@/hooks/useCart";
 import { useCatchErr } from "@/hooks/useCatchErr";
+import { useDeliveryInfo } from "@/hooks/useDeliveryInfo";
 import { showToast } from "@/providers/ToastProvider";
 import {
   ICartItemFronted,
@@ -64,7 +65,6 @@ const PaymentForm = ({
   selectedItemProductIds: string[];
 }) => {
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
-
   const [paymentMethod, setPaymentMethod] = useState<TPaymentMethod>({
     method: "card",
     cardDetails: {
@@ -88,35 +88,13 @@ const PaymentForm = ({
   const selectedItems = cart?.items?.filter(
     (item, index) => item.product.id === selectedItemProductIds[index]
   );
-
   const { subtotal, total, totalDeliveryFee, totalDiscountAmount, serviceFee } =
     useBalance(selectedItems);
-
-  const sameDayDeliveryItems = selectedItems?.filter(
-    (item) => item.product.deliveryMethod === "same_day_delivery"
-  );
-  const regularDeliveryItems = selectedItems?.filter(
-    (item) => item.product.deliveryMethod === "regular_delivery"
-  );
-
   const { err, catchErr } = useCatchErr();
+  const { bookingDate, regularDeliveryDate, sameDayDeliveryDate } =
+    useDeliveryInfo(selectedItems);
 
   const router = useRouter();
-
-  //   Delivery Date
-  const bookingDate = new Date();
-
-  const sameDayDeliveryDate =
-    sameDayDeliveryItems.length > 0 && new Date(bookingDate);
-  if (typeof sameDayDeliveryDate === "object") {
-    sameDayDeliveryDate.setDate(sameDayDeliveryDate.getDate() + 1);
-  }
-
-  const regularDeliveryDate =
-    regularDeliveryItems?.length > 0 && new Date(bookingDate);
-  if (typeof regularDeliveryDate === "object") {
-    regularDeliveryDate.setDate(regularDeliveryDate.getDate() + 3);
-  }
 
   const handlePaymentMethodChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPaymentMethod((prev) => ({
@@ -163,19 +141,18 @@ const PaymentForm = ({
       };
 
       const validationResult = validatePaymentForm(paymentFields);
+
       const hasErrors = Object.values(validationResult).some(
-        (value) => value !== null || value !== undefined || !value
+        (value) => typeof value === "string"
       );
 
       if (hasErrors) {
         setValidationErrors(validationResult);
-        console.log(validationErrors);
         setLoading(false);
         return;
       }
 
       const response = await doPayment(paymentData);
-      console.log(response, "res");
 
       if (!response.success) {
         showToast("Failed to place the order.", "ERROR");
@@ -184,7 +161,7 @@ const PaymentForm = ({
       }
       showToast(response.message, "SUCCESS");
       setLoading(false);
-      router.push(`/order/${response.orderId}`);
+      router.push(`/success/${response.orderId}`);
     } catch (error) {
       console.log(error);
       catchErr(error);

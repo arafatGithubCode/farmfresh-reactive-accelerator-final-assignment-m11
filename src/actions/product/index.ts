@@ -4,6 +4,7 @@ import { connectDB } from "@/libs/connectDB";
 import { deleteCloudinaryImage } from "@/libs/deleteCloudinaryImage";
 import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
+import { getOrderById } from "@/queries/order";
 import { createProduct, getProduct } from "@/queries/product";
 import { getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
@@ -404,6 +405,7 @@ export const doPayment = async (
   paymentData: TPaymentData
 ): Promise<{ success: boolean; message: string; orderId?: string }> => {
   await connectDB();
+
   try {
     const {
       bookingDate,
@@ -441,21 +443,33 @@ export const doPayment = async (
       quantity: item.quantity,
     }));
 
-    const order = await Order.create({
+    const created = await Order.create({
       customer: new Types.ObjectId(customerId),
       items: itemWithProductIdsAndQuantity,
       status: "PLACED",
       bookingDate,
       deliveryAddress,
       paymentMethod,
-      regularDeliveryDate,
-      sameDayDeliveryDate,
+      regularDeliveryDate: regularDeliveryDate ?? false,
+      sameDayDeliveryDate: sameDayDeliveryDate ?? false,
+    });
+
+    const order = await getOrderById(created._id.toString());
+
+    console.log(order);
+
+    await fetch(`http://localhost:3000/api/order/email`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ order }),
     });
 
     return {
       success: true,
       message: "Order placed successfully.",
-      orderId: order._id.toString(),
+      orderId: created._id.toString(),
     };
   } catch (error) {
     const errMsg = catchErr(error);

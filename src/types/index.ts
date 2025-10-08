@@ -301,4 +301,24 @@ export interface IOrder {
   paymentMethod: TPaymentMethod;
 }
 
-// Order Types End
+// DB Order Types End
+
+// Fronted Order Type Start
+export interface IOrderFronted {
+  id: string;
+  customer: TBaseUser;
+  items: {
+    product: IProductFrontend;
+    quantity: number;
+    id?: string;
+  }[];
+  status: "PLACED" | "CONFIRMED" | "SHIPPED" | "DELIVERED";
+  bookingDate: Date | string;
+  sameDayDeliveryDate?: Date | boolean | string;
+  regularDeliveryDate?: Date | boolean | string;
+  deliveryAddress: string;
+  paymentMethod: TPaymentMethod;
+  createdAt: Date | string;
+  updatedAt: Date | string;
+}
+// Fronted Order Type End

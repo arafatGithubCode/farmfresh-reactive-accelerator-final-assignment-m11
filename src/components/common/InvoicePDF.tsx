@@ -1,14 +1,8 @@
 import { useBalance } from "@/hooks/useBalance";
 import { IOrderFronted } from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
-import {
-  Document,
-  Image,
-  Page,
-  StyleSheet,
-  Text,
-  View,
-} from "@react-pdf/renderer";
+import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import Image from "next/image";
 
 const styles = StyleSheet.create({
   page: {
@@ -165,7 +159,10 @@ const InvoicePDF = ({ order }: { order: IOrderFronted }) => {
                 <View style={[styles.tableCell, { flex: 0.7 }]}>
                   <Image
                     src={product.imagesUrl?.[0]?.url}
-                    style={styles.productImage}
+                    alt="product-image"
+                    className="w-16 h-16 rounded-lg object-fill"
+                    width={64}
+                    height={64}
                   />
                 </View>
                 <Text style={[styles.tableCell, { flex: 2 }]}>

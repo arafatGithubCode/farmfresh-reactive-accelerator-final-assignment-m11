@@ -282,7 +282,7 @@ export interface TPaymentData {
   regularDeliveryDate?: Date | boolean;
   deliveryAddress: string;
   paymentMethod: TPaymentMethod;
-  selectedItems: ICartItemFronted[];
+  items: ICartItemFronted[];
 }
 
 // DB Order Types Start

@@ -2,12 +2,12 @@
 
 import { doPayment } from "@/actions/product";
 import { useBalance } from "@/hooks/useBalance";
-import { useCart } from "@/hooks/useCart";
 import { useCatchErr } from "@/hooks/useCatchErr";
 import { useDeliveryInfo } from "@/hooks/useDeliveryInfo";
 import { showToast } from "@/providers/ToastProvider";
 import {
   ICartItemFronted,
+  IProductFrontend,
   TPaymentData,
   TPaymentField,
   TPaymentFieldErr,
@@ -60,9 +60,13 @@ const Item = ({ cartItem }: { cartItem: ICartItemFronted }) => (
 );
 
 const PaymentForm = ({
-  selectedItemProductIds,
+  items,
 }: {
-  selectedItemProductIds: string[];
+  items: {
+    product: IProductFrontend;
+    quantity: number;
+    id?: string;
+  }[];
 }) => {
   const [deliveryAddress, setDeliveryAddress] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<TPaymentMethod>({
@@ -79,20 +83,15 @@ const PaymentForm = ({
   });
 
   const [loading, setLoading] = useState<boolean>(false);
-
   const [validationErrors, setValidationErrors] = useState<TPaymentFieldErr>(
     {}
   );
 
-  const { cart } = useCart();
-  const selectedItems = cart?.items?.filter(
-    (item, index) => item.product.id === selectedItemProductIds[index]
-  );
   const { subtotal, total, totalDeliveryFee, totalDiscountAmount, serviceFee } =
-    useBalance(selectedItems);
+    useBalance(items);
   const { err, catchErr } = useCatchErr();
   const { bookingDate, regularDeliveryDate, sameDayDeliveryDate } =
-    useDeliveryInfo(selectedItems);
+    useDeliveryInfo(items);
 
   const router = useRouter();
 
@@ -132,7 +131,7 @@ const PaymentForm = ({
         regularDeliveryDate,
         deliveryAddress,
         paymentMethod,
-        selectedItems,
+        items,
       };
 
       const paymentFields: TPaymentField = {
@@ -163,7 +162,6 @@ const PaymentForm = ({
       setLoading(false);
       router.push(`/success/${response.orderId}`);
     } catch (error) {
-      console.log(error);
       catchErr(error);
       if (err) {
         showToast(err, "ERROR");
@@ -186,9 +184,9 @@ const PaymentForm = ({
           Order Summary
         </h2>
 
-        {selectedItems?.length > 0 && (
+        {items?.length > 0 && (
           <>
-            {selectedItems.map((item) => (
+            {items.map((item) => (
               <Item key={item.product.id} cartItem={item} />
             ))}
           </>

@@ -10,6 +10,7 @@ import { useState } from "react";
 import {
   FaBolt,
   FaHeart,
+  FaMapMarkerAlt,
   FaMinus,
   FaPlus,
   FaShoppingCart,
@@ -18,7 +19,7 @@ import {
 import Tags from "../ui/Tags";
 
 const ProductInfo = ({ product }: { product: IProductFrontend }) => {
-  const [quantity, setQuantity] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
   const [stock, setStock] = useState<number>(product.stock);
 
   const { updateCart, loading } = useCart();
@@ -96,7 +97,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
           </div>
         </div>
         <div className="flex items-center text-gray-600 dark:text-gray-400 mb-4">
-          <i className="fas fa-map-marker-alt mr-2"></i>
+          <FaMapMarkerAlt className="mr-2" />
           <span>{product.farmer.farmDistrict}, Bangladesh</span>
         </div>
       </div>
@@ -131,7 +132,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
 
       <div className="space-y-3">
         <Link
-          href={`/payment-process/${product.id}?q=${quantity}`}
+          href={`/payment-process?productId=${product.id}&quantity=${quantity}`}
           className="w-full flex items-center justify-center gap-1 bg-primary-600 hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-800 text-white py-3 px-6 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg"
         >
           <FaBolt className="mr-2" />
@@ -161,7 +162,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
         </button>
       </div>
       <Link
-        href="/will-do"
+        href="/navigate-to-farmer-"
         className="block bg-primary-50 dark:bg-primary-900 rounded-xl p-4 group"
       >
         <div className="flex items-center space-x-3">

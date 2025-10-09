@@ -411,7 +411,7 @@ export const doPayment = async (
       bookingDate,
       deliveryAddress,
       paymentMethod,
-      selectedItems,
+      items,
       regularDeliveryDate,
       sameDayDeliveryDate,
     } = paymentData;
@@ -428,8 +428,9 @@ export const doPayment = async (
       throw new Error("Please login to place an order.");
     }
 
+    // decrease the stock
     await Promise.all(
-      selectedItems?.map((item) =>
+      items?.map((item) =>
         Product.findByIdAndUpdate(
           { _id: new Types.ObjectId(item.product.id) },
           { stock: item.product.stock - item.quantity },
@@ -438,7 +439,7 @@ export const doPayment = async (
       )
     );
 
-    const itemWithProductIdsAndQuantity = selectedItems?.map((item) => ({
+    const itemWithProductIdsAndQuantity = items?.map((item) => ({
       product: item.product.id,
       quantity: item.quantity,
     }));

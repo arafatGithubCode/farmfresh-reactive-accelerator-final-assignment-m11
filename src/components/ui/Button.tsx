@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React, { ButtonHTMLAttributes, ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import MiniSpinner from "./MiniSpinner";
 
@@ -14,7 +14,9 @@ type ButtonProps = {
   variant?: ButtonVariant;
   icon?: ReactNode;
   fullWidth?: boolean;
-};
+  type?: "submit" | "button";
+  handleClick?: () => void;
+} & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button = ({
   label,
@@ -24,6 +26,8 @@ const Button = ({
   variant = "primary",
   icon,
   fullWidth = true,
+  type = "submit",
+  onClick,
 }: ButtonProps) => {
   const { pending } = useFormStatus();
   const isLoading = pending || loading;
@@ -40,7 +44,8 @@ const Button = ({
 
   return (
     <button
-      type="submit"
+      type={type}
+      onClick={onClick}
       disabled={isLoading}
       aria-busy={isLoading}
       aria-disabled={isLoading}

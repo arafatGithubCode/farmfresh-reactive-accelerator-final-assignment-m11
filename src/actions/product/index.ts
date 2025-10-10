@@ -491,98 +491,61 @@ export const doUpdateOrderStatus = async (
       throw new Error("This order does not exist.");
     }
 
-    // canceled the order
-    if (role === "Customer" && currentStatus === "PLACED") {
-      const updatedOrder = await Order.findByIdAndUpdate(
-        { _id: new Types.ObjectId(orderId) },
-        { status: "CANCELED" },
-        { new: true }
-      )
-        .populate("customer")
-        .lean();
+    let newStatus: TOrderStatus | null = null;
+    let successMessage: string = "";
 
-      const order = transformMongoDoc(updatedOrder);
-
-      await fetch(`http://localhost:3000/api/send-email/order-status-update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ order }),
-      });
-
-      return {
-        success: true,
-        message: "This order has been cancelled successfully.",
-      };
+    // customer actions
+    if (role === "Customer") {
+      if (currentStatus === "PLACED") {
+        newStatus = "CANCELED";
+        successMessage = "Your order has been canceled successfully.";
+      } else if (currentStatus === "CANCELED") {
+        newStatus = "PLACED";
+        successMessage = "Your order has been placed again successfully.";
+      }
     }
 
-    // placed the cancel order again
-    if (role === "Customer" && currentStatus === "CANCELED") {
-      const updatedOrder = await Order.findByIdAndUpdate(
-        { _id: new Types.ObjectId(orderId) },
-        { status: "PLACED" },
-        { new: true }
-      )
-        .populate("customer")
-        .lean();
-
-      const order = transformMongoDoc(updatedOrder);
-
-      await fetch(`http://localhost:3000/api/send-email/order-status-update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ order }),
-      });
-
-      return {
-        success: true,
-        message: "This order has been placed successfully.",
-      };
-    }
-
-    // update the forward order status by farmer
+    // farmer actions
     if (role === "Farmer" && currentStatus !== "DELIVERED") {
-      const forwardStatus = {
+      const forwardStatus: Record<TOrderStatus, TOrderStatus> = {
         PLACED: "CONFIRMED",
         CONFIRMED: "SHIPPED",
         SHIPPED: "DELIVERED",
+        CANCELED: "CANCELED",
+        DELIVERED: "DELIVERED",
       };
 
-      const updatedOrder = await Order.findByIdAndUpdate(
-        { _id: new Types.ObjectId(orderId) },
-        { status: forwardStatus[currentStatus as keyof typeof forwardStatus] },
-        { new: true }
-      );
-
-      const order = transformMongoDoc(updatedOrder);
-
-      await fetch(`http://localhost:3000/api/send-email/order-status-update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ order }),
-      });
-
-      return {
-        success: true,
-        message: `Order status updated to ${
-          forwardStatus[currentStatus as keyof typeof forwardStatus]
-        }`,
-      };
+      newStatus = forwardStatus[currentStatus];
+      successMessage = `Order status updated to ${newStatus}`;
     }
-    return {
-      success: true,
-      message: "updated",
-    };
+
+    if (!newStatus || currentStatus === newStatus) {
+      return { success: true, message: "No status change performed." };
+    }
+
+    // update the order
+    const updatedOrder = await Order.findByIdAndUpdate(
+      { _id: new Types.ObjectId(order.id) },
+      { status: newStatus },
+      { new: true }
+    )
+      .populate("customer")
+      .lean();
+
+    const transformOrder = transformMongoDoc(updatedOrder);
+
+    // notify by the email
+    await fetch(`${process.env.BASE_URL}/api/send-email/order-status-update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ transformOrder }),
+    });
+
+    return { success: true, message: successMessage };
   } catch (error) {
-    console.log(error, "status err");
-    return {
-      success: false,
-      message: "updated failed",
-    };
+    console.error("Order status update error:", error);
+    return { success: false, message: "Order status update failed." };
   }
 };

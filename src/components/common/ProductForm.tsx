@@ -12,7 +12,7 @@ import { useState } from "react";
 import { FaCloud, FaTrash } from "react-icons/fa";
 import DeleteImage from "../edit-product/DeleteImage";
 import Button from "../ui/Button";
-import WarningPopup from "../ui/WarningPopup";
+import ConfirmPopup from "../ui/ConfirmPopup";
 import Field from "./Field";
 
 type ProductFormProps<
@@ -541,14 +541,14 @@ const ProductForm = <
         />
       </form>
       {showWarning && (
-        <WarningPopup>
+        <ConfirmPopup>
           <DeleteImage
             deletedImage={deletedImage}
             onClose={() => setShowWarning(false)}
             public_id={publicId}
             productId={editProductId!}
           />
-        </WarningPopup>
+        </ConfirmPopup>
       )}
     </>
   );

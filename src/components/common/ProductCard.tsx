@@ -19,8 +19,8 @@ import {
   FaTrash,
 } from "react-icons/fa6";
 import DeleteProduct from "../manage-products/DeleteProduct";
+import ConfirmPopup from "../ui/ConfirmPopup";
 import ProductImageCarousel from "../ui/ProductImageCarousel";
-import WarningPopup from "../ui/WarningPopup";
 
 const ProductCard = ({
   isManageListingPage = false,
@@ -193,14 +193,14 @@ const ProductCard = ({
               <FaTrash />
             </button>
             {showWarning && (
-              <WarningPopup>
+              <ConfirmPopup>
                 <DeleteProduct
                   productId={product.id}
                   productName={product.name}
                   productImage={product.imagesUrl}
                   onClose={() => setShowWarning(false)}
                 />
-              </WarningPopup>
+              </ConfirmPopup>
             )}
           </div>
         ) : isInCart ? (

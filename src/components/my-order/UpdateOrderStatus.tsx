@@ -6,28 +6,33 @@ import { TOrderStatus } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { getForwardOrderStatus } from "@/utils/getForwardOrderStatus";
 import { useRouter } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import Button from "../ui/Button";
+import ConfirmPopup from "../ui/ConfirmPopup";
+import ConfirmedCancelOrder from "./ConfirmedCancelOrder";
 
-type Props = {
+interface UpdateOrderStatusProps {
   orderId: string;
   currentStatus: TOrderStatus;
   role: "Customer" | "Farmer";
-};
+}
 
-const UpdateOrderStatus = ({ orderId, currentStatus, role }: Props) => {
-  const [loading, setLoading] = useState<boolean>(false);
-
+const UpdateOrderStatus = ({
+  orderId,
+  currentStatus,
+  role,
+}: UpdateOrderStatusProps) => {
+  const [loading, setLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const router = useRouter();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // ===== Submit Handler =====
+  const handleSubmit = async () => {
     setLoading(true);
 
     try {
       const response = await doUpdateOrderStatus(orderId, currentStatus, role);
-      console.log(response, "res");
       if (!response.success) {
         showToast(response.message, "ERROR");
       } else {
@@ -35,53 +40,88 @@ const UpdateOrderStatus = ({ orderId, currentStatus, role }: Props) => {
         router.refresh();
       }
     } catch (error) {
-      console.log(error, "status-client-err");
       const errMsg = catchErr(error);
       showToast(errMsg.error, "ERROR");
     } finally {
       setLoading(false);
     }
   };
+
+  // ===== Render Button Based on Role and Status =====
+  const renderButton = () => {
+    // Customer: Cancel order
+    if (role === "Customer" && currentStatus === "PLACED") {
+      return (
+        <Button
+          type="button"
+          label="Cancel Order"
+          icon={<FaTimes className="mr-2" />}
+          loading={loading}
+          hasSpinner
+          loadingText="Canceling..."
+          variant="danger"
+          fullWidth={false}
+          onClick={() => setShowConfirm(true)}
+        />
+      );
+    }
+
+    // Customer: Re-place canceled order
+    if (role === "Customer" && currentStatus === "CANCELED") {
+      return (
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          label="Place this order again"
+          loading={loading}
+          hasSpinner
+          variant="warning"
+          fullWidth={false}
+        />
+      );
+    }
+
+    // Farmer: Forward status (PLACED → CONFIRMED → SHIPPED → DELIVERED)
+    if (
+      role === "Farmer" &&
+      !["DELIVERED", "CANCELED"].includes(currentStatus)
+    ) {
+      const nextLabel = getForwardOrderStatus(currentStatus);
+      return (
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          label={nextLabel ?? "Update Status"}
+          loading={loading}
+          hasSpinner
+          loadingText="Updating..."
+          fullWidth={false}
+        />
+      );
+    }
+
+    return null;
+  };
+
+  // ===== Render =====
   return (
-    <>
-      <form onSubmit={handleSubmit}>
-        {role === "Customer" && currentStatus === "PLACED" && (
-          <div className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3">
-            <Button
-              label="Cancel Order"
-              loading={loading}
-              hasSpinner={true}
-              icon={<FaTimes className="mr-2" />}
-              loadingText="Canceling..."
-              variant="danger"
-              fullWidth={false}
-            />
-          </div>
-        )}
-        {role === "Customer" && currentStatus === "CANCELED" && (
-          <div className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3">
-            <Button
-              label="Place this order again"
-              loading={loading}
-              hasSpinner={true}
-              variant="warning"
-              fullWidth={false}
-            />
-          </div>
-        )}
-        {role === "Farmer" &&
-          currentStatus !== "DELIVERED" &&
-          currentStatus !== "CANCELED" && (
-            <Button
-              label={getForwardOrderStatus(currentStatus)!}
-              loading={loading}
-              hasSpinner={true}
-              loadingText="Status Updating..."
-              fullWidth={false}
-            />
-          )}
-      </form>
-    </>
+    <div
+      onSubmit={handleSubmit}
+      className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3"
+    >
+      {renderButton()}
+      {showConfirm && (
+        <ConfirmPopup>
+          <ConfirmedCancelOrder
+            loading={loading}
+            message="Are you sure you want to cancel this order?"
+            title="Cancel Order?"
+            onCancel={() => setShowConfirm(false)}
+            onConfirm={handleSubmit}
+          />
+        </ConfirmPopup>
+      )}
+    </div>
   );
 };
 

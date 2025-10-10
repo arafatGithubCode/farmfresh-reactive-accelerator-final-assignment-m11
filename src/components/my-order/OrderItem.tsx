@@ -3,20 +3,20 @@
 import { useBalance } from "@/hooks/useBalance";
 import { IOrderFronted } from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
-import { getOrderStatus } from "@/utils/getOrderStatus";
 import Image from "next/image";
 import { useState } from "react";
 import {
   FaCheckCircle,
   FaRedo,
   FaRegClock,
+  FaSadTear,
   FaStar,
-  FaTimes,
 } from "react-icons/fa";
 import DownloadReceipt from "../common/DownloadReceipt";
 import WarningPopup from "../ui/WarningPopup";
 import OrderStatus from "./OrderStatus";
 import OrderSummary from "./OrderSummary";
+import UpdateOrderStatus from "./UpdateOrderStatus";
 
 const OrderItem = ({ order, role }: { order: IOrderFronted; role: string }) => {
   const { total } = useBalance(order?.items);
@@ -52,15 +52,23 @@ const OrderItem = ({ order, role }: { order: IOrderFronted; role: string }) => {
                 className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                   order?.status === "DELIVERED"
                     ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                    : order.status === "CANCELED"
+                    ? "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
                     : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
                 }`}
               >
                 {order.status === "DELIVERED" ? (
                   <FaCheckCircle className="mr-1" />
+                ) : order.status === "CANCELED" ? (
+                  <FaSadTear className="mr-1" />
                 ) : (
                   <FaRegClock className="mr-1" />
                 )}
-                {getOrderStatus(order.status)}
+                {order.status === "DELIVERED"
+                  ? "Delivered"
+                  : order.status === "CANCELED"
+                  ? "Canceled"
+                  : "Pending"}
               </span>
               <span className="text-lg font-bold text-gray-900 dark:text-white">
                 ৳{total}
@@ -115,18 +123,23 @@ const OrderItem = ({ order, role }: { order: IOrderFronted; role: string }) => {
           </div>
 
           <div className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3">
-            {role === "Customer" && order?.status !== "PLACED" && (
-              <>
-                <DownloadReceipt order={order} />
-                <button className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition">
-                  <FaStar className="mr-2" />
-                  Write Review
-                </button>
-                <button className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition">
-                  <FaRedo className="mr-2" />
-                  Reorder
-                </button>
-              </>
+            {role === "Customer" &&
+              order?.status !== "PLACED" &&
+              order?.status !== "CANCELED" && (
+                <>
+                  <DownloadReceipt order={order} />
+
+                  <button className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition">
+                    <FaRedo className="mr-2" />
+                    Reorder
+                  </button>
+                </>
+              )}
+            {role === "Customer" && order.status === "DELIVERED" && (
+              <button className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition">
+                <FaStar className="mr-2" />
+                Write Review
+              </button>
             )}
             {role === "Customer" && order?.status === "PLACED" && (
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
@@ -135,23 +148,31 @@ const OrderItem = ({ order, role }: { order: IOrderFronted; role: string }) => {
             )}
           </div>
           {role === "Customer" && order?.status === "PLACED" && (
-            <div className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3">
-              <button className="flex items-center px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900 rounded-lg font-medium transition">
-                <FaTimes className="mr-2" />
-                Cancel Order
-              </button>
-            </div>
+            <UpdateOrderStatus
+              orderId={order.id}
+              currentStatus={order.status}
+              role="Customer"
+            />
           )}
-          {role === "Farmer" && (
-            <div className="pt-4 flex flex-wrap gap-3">
-              <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                <option value="">Update Status</option>
-                <option value="PLACED">Placed</option>
-                <option value="CONFIRMED">Confirmed</option>
-                <option value="SHIPPED">Shipped</option>
-                <option value="DELIVERED">Delivered</option>
-              </select>
-            </div>
+          {role === "Customer" && order?.status === "CANCELED" && (
+            <UpdateOrderStatus
+              orderId={order.id}
+              currentStatus={order.status}
+              role="Customer"
+            />
+          )}
+          {role === "Farmer" && order.status !== "CANCELED" && (
+            <UpdateOrderStatus
+              orderId={order.id}
+              currentStatus={order.status}
+              role="Farmer"
+            />
+          )}
+          {role === "Farmer" && order.status === "CANCELED" && (
+            <p>
+              This order has been canceled by customer(
+              {`${order?.customer?.firstName} ${order?.customer?.lastName}`})
+            </p>
           )}
         </div>
       </div>

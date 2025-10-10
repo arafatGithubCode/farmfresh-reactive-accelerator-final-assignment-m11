@@ -1,8 +1,15 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { useBalance } from "@/hooks/useBalance";
 import { IOrderFronted } from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
-import { Document, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-import Image from "next/image";
+import {
+  Document,
+  Image,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+} from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
   page: {
@@ -58,8 +65,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   productImage: {
-    width: 40,
-    height: 40,
+    width: 60,
+    height: 60,
     objectFit: "cover",
     borderRadius: 3,
     marginHorizontal: "auto",
@@ -158,11 +165,8 @@ const InvoicePDF = ({ order }: { order: IOrderFronted }) => {
               <View style={styles.tableRow} key={item.id}>
                 <View style={[styles.tableCell, { flex: 0.7 }]}>
                   <Image
-                    src={product.imagesUrl?.[0]?.url}
-                    alt="product-image"
-                    className="w-16 h-16 rounded-lg object-fill"
-                    width={64}
-                    height={64}
+                    src={product.imagesUrl?.[0]?.url || ""}
+                    style={styles.productImage}
                   />
                 </View>
                 <Text style={[styles.tableCell, { flex: 2 }]}>

@@ -290,11 +290,18 @@ export interface IOrderItem {
   product: Types.ObjectId;
   quantity: number;
 }
+
+export type TOrderStatus =
+  | "PLACED"
+  | "CONFIRMED"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELED";
 export interface IOrder {
   customer: string | TBaseUser;
   farmer: string | TBaseUser;
   items: IOrderItem[];
-  status: "PLACED" | "CONFIRMED" | "SHIPPED" | "DELIVERED";
+  status: TOrderStatus;
   bookingDate: Date;
   sameDayDeliveryDate?: Date | boolean;
   regularDeliveryDate?: Date | boolean;
@@ -313,7 +320,7 @@ export interface IOrderFronted {
     quantity: number;
     id?: string;
   }[];
-  status: "PLACED" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELED";
+  status: TOrderStatus;
   bookingDate: Date | string;
   sameDayDeliveryDate?: Date | boolean | string;
   regularDeliveryDate?: Date | boolean | string;

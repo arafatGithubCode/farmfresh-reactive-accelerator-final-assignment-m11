@@ -13,6 +13,7 @@ import {
   IProductForm,
   IProductFrontend,
   TActionResponse,
+  TOrderStatus,
   TPaymentData,
 } from "@/types";
 import { catchErr } from "@/utils/catchErr";
@@ -457,7 +458,7 @@ export const doPayment = async (
 
     const order = await getOrderById(created._id.toString());
 
-    await fetch(`http://localhost:3000/api/order/email`, {
+    await fetch(`http://localhost:3000/api/send-email/order-invoice`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -473,5 +474,115 @@ export const doPayment = async (
   } catch (error) {
     const errMsg = catchErr(error);
     return { success: false, message: errMsg.error };
+  }
+};
+
+// ===== Update Order Status ===== //
+export const doUpdateOrderStatus = async (
+  orderId: string,
+  currentStatus: TOrderStatus,
+  role: "Customer" | "Farmer"
+): Promise<{ success: boolean; message: string }> => {
+  await connectDB();
+  try {
+    const order = await getOrderById(orderId);
+
+    if (!order) {
+      throw new Error("This order does not exist.");
+    }
+
+    // canceled the order
+    if (role === "Customer" && currentStatus === "PLACED") {
+      const updatedOrder = await Order.findByIdAndUpdate(
+        { _id: new Types.ObjectId(orderId) },
+        { status: "CANCELED" },
+        { new: true }
+      )
+        .populate("customer")
+        .lean();
+
+      const order = transformMongoDoc(updatedOrder);
+
+      await fetch(`http://localhost:3000/api/send-email/order-status-update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ order }),
+      });
+
+      return {
+        success: true,
+        message: "This order has been cancelled successfully.",
+      };
+    }
+
+    // placed the cancel order again
+    if (role === "Customer" && currentStatus === "CANCELED") {
+      const updatedOrder = await Order.findByIdAndUpdate(
+        { _id: new Types.ObjectId(orderId) },
+        { status: "PLACED" },
+        { new: true }
+      )
+        .populate("customer")
+        .lean();
+
+      const order = transformMongoDoc(updatedOrder);
+
+      await fetch(`http://localhost:3000/api/send-email/order-status-update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ order }),
+      });
+
+      return {
+        success: true,
+        message: "This order has been placed successfully.",
+      };
+    }
+
+    // update the forward order status by farmer
+    if (role === "Farmer" && currentStatus !== "DELIVERED") {
+      const forwardStatus = {
+        PLACED: "CONFIRMED",
+        CONFIRMED: "SHIPPED",
+        SHIPPED: "DELIVERED",
+      };
+
+      const updatedOrder = await Order.findByIdAndUpdate(
+        { _id: new Types.ObjectId(orderId) },
+        { status: forwardStatus[currentStatus as keyof typeof forwardStatus] },
+        { new: true }
+      );
+
+      const order = transformMongoDoc(updatedOrder);
+
+      await fetch(`http://localhost:3000/api/send-email/order-status-update`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ order }),
+      });
+
+      return {
+        success: true,
+        message: `Order status updated to ${
+          forwardStatus[currentStatus as keyof typeof forwardStatus]
+        }`,
+      };
+    }
+    return {
+      success: true,
+      message: "updated",
+    };
+  } catch (error) {
+    console.log(error, "status err");
+    return {
+      success: false,
+      message: "updated failed",
+    };
   }
 };

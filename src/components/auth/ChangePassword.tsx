@@ -161,9 +161,7 @@ const ChangePassword = () => {
           </button>
         </div>
       </Field>
-      <div className="max-w-xl mx-auto my-5">
-        <Button label="Change Password" loading={loading} />
-      </div>
+      <Button label="Change Password" loading={loading} fullWidth={false} />
     </form>
   );
 };

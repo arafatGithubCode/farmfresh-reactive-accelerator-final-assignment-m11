@@ -72,15 +72,15 @@ const DeleteImage = ({
         >
           Close
         </button>
-        <div className="w-full max-w-[200px]">
-          <Button
-            label="Yes, delete it."
-            loading={loading}
-            hasSpinner={true}
-            loadingText="Deleting..."
-            isDanger={true}
-          />
-        </div>
+
+        <Button
+          label="Yes, delete it."
+          loading={loading}
+          hasSpinner={true}
+          loadingText="Deleting..."
+          variant="danger"
+          fullWidth={false}
+        />
       </div>
     </form>
   );

@@ -9,15 +9,15 @@ import Image from "next/image";
 import { Fragment, useState } from "react";
 import { FaRedo, FaStar } from "react-icons/fa";
 import DownloadReceipt from "../common/DownloadReceipt";
-import ConfirmPopup from "../ui/ConfirmPopup";
 import { getStatusIcon } from "../ui/getStatusIcon";
+import Popup from "../ui/Popup";
 import OrderStatus from "./OrderStatus";
 import OrderSummary from "./OrderSummary";
 import UpdateOrderStatus from "./UpdateOrderStatus";
 
 interface OrderItemProps {
   order: IOrderFronted;
-  role: "Customer" | "Farmer";
+  role: string | "Customer" | "Farmer";
 }
 
 const OrderItem = ({ order, role }: OrderItemProps) => {
@@ -138,53 +138,60 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
           </div>
 
           {/* Order Items */}
-          {order.items.map((item) => {
-            const { product, quantity } = item;
-            const finalPrice = (
-              product.price *
-              quantity *
-              (1 - (product.discountRate ?? 0) / 100)
-            ).toFixed(2);
+          {order?.items?.length > 0 &&
+            order.items.map((item) => {
+              const { product, quantity } = item;
+              const finalPrice = (
+                product?.price *
+                quantity *
+                (1 - (product?.discountRate ?? 0) / 100)
+              ).toFixed(2);
 
-            return (
-              <div
-                key={product.id}
-                className="border-t border-gray-200 dark:border-gray-600 pt-4"
-              >
-                <div className="flex items-center space-x-4 mb-4">
-                  <Image
-                    src={product.imagesUrl?.[0]?.url || "/placeholder.jpg"}
-                    alt={product.name}
-                    className="w-16 h-16 rounded-lg object-cover"
-                    width={64}
-                    height={64}
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 dark:text-white">
-                      {product.name}
-                    </h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      By {product.farmer?.firstName}&apos;s Farm
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      Quantity: {quantity} {product.unit} • ৳{product.price}/
-                      {product.unit}
+              return (
+                <div
+                  key={product?.id}
+                  className="border-t border-gray-200 dark:border-gray-600 pt-4"
+                >
+                  <div className="flex items-center space-x-4 mb-4">
+                    <Image
+                      src={product?.imagesUrl?.[0]?.url || "/placeholder.jpg"}
+                      alt={product?.name}
+                      className="w-16 h-16 rounded-lg object-cover"
+                      width={64}
+                      height={64}
+                    />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900 dark:text-white">
+                        {product?.name}
+                      </h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        By {product?.farmer?.firstName}&apos;s Farm
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Quantity: {quantity} {product?.unit} • ৳{product?.price}
+                        /{product?.unit}
+                      </p>
+                    </div>
+                    <p className="font-medium text-gray-900 dark:text-white text-right">
+                      ৳{finalPrice}
                     </p>
                   </div>
-                  <p className="font-medium text-gray-900 dark:text-white text-right">
-                    ৳{finalPrice}
-                  </p>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
 
           {/* Status Section */}
-          <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
+          <div
+            className={`${
+              order?.items?.length > 1
+                ? "border-t border-gray-200 dark:border-gray-600 pt-4"
+                : ""
+            }`}
+          >
             <h4 className="font-medium text-gray-900 dark:text-white mb-3">
               Order Status
             </h4>
-            <OrderStatus status={order.status} />
+            <OrderStatus status={order?.status} />
           </div>
 
           {/* Actions */}
@@ -195,13 +202,13 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
 
       {/* Order Summary Modal */}
       {showSummary && (
-        <ConfirmPopup>
+        <Popup>
           <OrderSummary
-            items={order.items}
-            id={order.id}
+            items={order?.items}
+            id={order?.id}
             onClose={() => setShowSummary(false)}
           />
-        </ConfirmPopup>
+        </Popup>
       )}
     </>
   );

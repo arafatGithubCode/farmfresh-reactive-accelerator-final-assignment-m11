@@ -1,10 +1,10 @@
 import { IProductBase } from "@/types";
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const productSchema = new mongoose.Schema<IProductBase>(
   {
     farmer: {
-      type: mongoose.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "User",
     },
     name: {
@@ -71,9 +71,12 @@ const productSchema = new mongoose.Schema<IProductBase>(
       type: Number,
       required: [true, "service fee is required"],
     },
-    review: {
-      type: [{}],
-    },
+    review: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,

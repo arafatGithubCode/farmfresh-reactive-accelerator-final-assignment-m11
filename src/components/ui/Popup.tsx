@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import ReactDOM from "react-dom";
 
-const ConfirmPopup = ({ children }: { children: ReactNode }) => {
+const Popup = ({ children }: { children: ReactNode }) => {
   return ReactDOM.createPortal(
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
       <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg p-4 shadow-xl animate-zoom-in">
@@ -12,4 +12,4 @@ const ConfirmPopup = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export default ConfirmPopup;
+export default Popup;

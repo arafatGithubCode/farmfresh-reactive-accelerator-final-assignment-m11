@@ -1,5 +1,6 @@
 import { connectDB } from "@/libs/connectDB";
 import { Order } from "@/models/orderModel";
+import { Product } from "@/models/productModel";
 import { IOrderFronted } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
@@ -47,13 +48,24 @@ export const getOrdersByCustomerId = async (customerId: string) => {
 export const getOrdersByFarmerId = async (farmerId: string) => {
   await connectDB();
 
-  const orders = await Order.find()
+  // Get all products of this farmer
+  const products = await Product.find({ farmer: farmerId }).select("_id");
+  const productIds = products.map((p) => p._id);
+
+  if (productIds.length === 0) return null;
+
+  // Get only the orders that include those orders
+  const orders = await Order.find({ "items.product": { $in: productIds } })
+    .populate("customer")
     .populate({
       path: "items.product",
       model: "Product",
-      match: { farmer: farmerId },
+      populate: {
+        path: "farmer",
+        model: "User",
+      },
     })
-    .lean<IOrderFronted[]>();
+    .lean();
 
   return orders ? transformMongoDoc(orders) : null;
 };

@@ -1,4 +1,4 @@
-import { AnyObject, Types } from "mongoose";
+import { AnyObject, Schema } from "mongoose";
 
 //===== User Types Start =====//
 export type TUserRole = "Farmer" | "Customer";
@@ -42,7 +42,7 @@ export type TUserValidationErrors = Partial<Record<keyof UserInput, string>>;
 
 export interface TBaseUser {
   id: string;
-  role: TUserRole;
+  role: TUserRole | string;
   firstName: string;
   email: string;
   address: string;
@@ -96,12 +96,29 @@ export interface IUserLoginForm {
 //===== User Types End =====//
 
 //===== Review Types Start =====//
-export interface IReview {
+export interface IReplyDB {
+  reply: string;
+}
+export interface IReplyFronted {
+  id: string;
+  reply: string;
+  updatedAt: string;
+  createdAt: string;
+}
+export interface IReviewDB {
+  customer: Schema.Types.ObjectId;
+  product: Schema.Types.ObjectId;
+  rating: number;
+  comment: string;
+  reply?: IReplyDB[];
+}
+export interface IReviewFronted {
   id: string;
   customer: string;
   product: IProductFrontend;
   rating: number;
   comment: string;
+  reply: IReplyFronted[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -110,7 +127,7 @@ export interface IReview {
 //===== Product Types Start =====//
 export interface IProductBase {
   id: string;
-  farmer?: Types.ObjectId;
+  farmer?: Schema.Types.ObjectId;
   name: string;
   category: string;
   description: string;
@@ -126,7 +143,7 @@ export interface IProductBase {
   perUnitDeliveryFee: number;
   serviceFee: number;
   isActive: boolean;
-  review?: IReview[];
+  review?: Schema.Types.ObjectId[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -156,7 +173,7 @@ export type TAddProductValidationError<
 
 //===== Cart Types Start =====//
 export interface ICartItem {
-  product: Types.ObjectId;
+  product: Schema.Types.ObjectId;
   quantity: number;
 }
 
@@ -166,7 +183,7 @@ export interface ICartItemFronted {
   id?: string;
 }
 export interface ICart {
-  customer: Types.ObjectId;
+  customer: Schema.Types.ObjectId;
   items: ICartItem[];
 }
 
@@ -287,7 +304,7 @@ export interface TPaymentData {
 
 // DB Order Types Start
 export interface IOrderItem {
-  product: Types.ObjectId;
+  product: Schema.Types.ObjectId;
   quantity: number;
 }
 
@@ -327,6 +344,6 @@ export interface IOrderFronted {
   deliveryAddress: string;
   paymentMethod: TPaymentMethod;
   createdAt: Date | string;
-  updatedAt: Date | string;
+  updatedAt?: Date | string;
 }
 // Fronted Order Type End

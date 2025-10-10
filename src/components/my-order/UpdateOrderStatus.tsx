@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import Button from "../ui/Button";
-import ConfirmPopup from "../ui/ConfirmPopup";
+import Popup from "../ui/Popup";
 import ConfirmedCancelOrder from "./ConfirmedCancelOrder";
 
 interface UpdateOrderStatusProps {
@@ -107,11 +107,15 @@ const UpdateOrderStatus = ({
   return (
     <div
       onSubmit={handleSubmit}
-      className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3"
+      className={`${
+        currentStatus === "CANCELED" && role === "Customer"
+          ? ""
+          : "border-t border-gray-200 dark:border-gray-600"
+      } pt-4 flex flex-wrap gap-3`}
     >
       {renderButton()}
       {showConfirm && (
-        <ConfirmPopup>
+        <Popup>
           <ConfirmedCancelOrder
             loading={loading}
             message="Are you sure you want to cancel this order?"
@@ -119,7 +123,7 @@ const UpdateOrderStatus = ({
             onCancel={() => setShowConfirm(false)}
             onConfirm={handleSubmit}
           />
-        </ConfirmPopup>
+        </Popup>
       )}
     </div>
   );

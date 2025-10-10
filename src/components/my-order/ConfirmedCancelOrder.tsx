@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "../ui/Button";
+import CloseBtn from "../ui/CloseBtn";
 
 type Props = {
   title: string;
@@ -27,12 +28,7 @@ const ConfirmedCancelOrder = ({
       </p>
 
       <div className="flex justify-between items-center gap-3">
-        <button
-          onClick={onCancel}
-          className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-        >
-          No, Keep It
-        </button>
+        <CloseBtn level="No, Keep It" onClose={onCancel} />
         <Button
           label="Yest, Cancel Order"
           loading={loading}

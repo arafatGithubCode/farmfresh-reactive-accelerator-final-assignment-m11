@@ -44,7 +44,7 @@ const ProductForm = <
   const { err, setErr, catchErr } = useCatchErr();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [showConfirmPopup, setShowConfirmPopup] = useState<boolean>(false);
   const [deletedImage, setDeletedImage] = useState<string>("");
   const [publicId, setPublicId] = useState<string>("");
 
@@ -122,7 +122,7 @@ const ProductForm = <
 
     if (typeof image === "object" && "url" in image) {
       setPublicId(image.public_id);
-      setShowWarning(true);
+      setShowConfirmPopup(true);
       setDeletedImage(image.url);
     }
   };
@@ -540,13 +540,13 @@ const ProductForm = <
           loadingText={mode === "ADD" ? "Adding..." : "Updating..."}
         />
       </form>
-      {showWarning && (
-        <Popup>
+      {showConfirmPopup && (
+        <Popup onClose={() => setShowConfirmPopup(false)}>
           <DeleteImage
             deletedImage={deletedImage}
-            onClose={() => setShowWarning(false)}
             public_id={publicId}
             productId={editProductId!}
+            onCancel={() => setShowConfirmPopup(false)}
           />
         </Popup>
       )}

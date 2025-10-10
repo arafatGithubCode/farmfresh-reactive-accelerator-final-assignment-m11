@@ -32,7 +32,7 @@ const ProductCard = ({
   const { cart, updateCart, loading } = useCart();
   const { favoriteList, updateFavorite } = useFavorite(product.name);
   const [activeProgress, setActiveProgress] = useState<boolean>(false);
-  const [showWarning, setShowWarning] = useState<boolean>(false);
+  const [showConfirmPopup, setShowConfirmPopup] = useState<boolean>(false);
 
   const cartItem = cart?.items?.find(
     (item) => item?.product?.id === product.id
@@ -80,7 +80,7 @@ const ProductCard = ({
 
   const handleDeleteProduct = async (productId: string) => {
     if (productId) {
-      setShowWarning(true);
+      setShowConfirmPopup(true);
     }
   };
 
@@ -192,13 +192,13 @@ const ProductCard = ({
             >
               <FaTrash />
             </button>
-            {showWarning && (
-              <Popup>
+            {showConfirmPopup && (
+              <Popup onClose={() => setShowConfirmPopup(false)}>
                 <DeleteProduct
                   productId={product.id}
                   productName={product.name}
                   productImage={product.imagesUrl}
-                  onClose={() => setShowWarning(false)}
+                  onCancel={() => setShowConfirmPopup(false)}
                 />
               </Popup>
             )}

@@ -8,17 +8,18 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { PiWarningCircleFill } from "react-icons/pi";
 import Button from "../ui/Button";
+import CloseBtn from "../ui/CloseBtn";
 
 const DeleteProduct = ({
   productId,
   productName,
   productImage,
-  onClose,
+  onCancel,
 }: {
   productId: string;
   productName: string;
   productImage: { url: string; public_id: string; id?: string }[];
-  onClose: () => void;
+  onCancel: () => void;
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { catchErr, err } = useCatchErr();
@@ -72,18 +73,14 @@ const DeleteProduct = ({
       />
       <p className="font-semibold mb-3 text-primary-500">{productName}</p>
       <div className="w-full flex items-center justify-between">
-        <button
-          onClick={onClose}
-          className="text-white py-3 bg-primary-600 hover:bg-primary-700 hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center"
-        >
-          Close
-        </button>
+        <CloseBtn level="No, Keep It" onClose={onCancel} />
         <Button
           label="Yes, delete it."
           loading={loading}
           hasSpinner={true}
           loadingText="Deleting..."
           fullWidth={false}
+          variant="danger"
         />
       </div>
     </form>

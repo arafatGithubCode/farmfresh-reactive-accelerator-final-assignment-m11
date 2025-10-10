@@ -115,13 +115,13 @@ const UpdateOrderStatus = ({
     >
       {renderButton()}
       {showConfirm && (
-        <Popup>
+        <Popup onClose={() => setShowConfirm(false)}>
           <ConfirmedCancelOrder
             loading={loading}
             message="Are you sure you want to cancel this order?"
             title="Cancel Order?"
-            onCancel={() => setShowConfirm(false)}
             onConfirm={handleSubmit}
+            onCancel={() => setShowConfirm(false)}
           />
         </Popup>
       )}

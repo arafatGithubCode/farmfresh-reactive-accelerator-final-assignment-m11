@@ -1,14 +1,8 @@
 "use client";
 
 import { TBaseUser } from "@/types";
-import Image from "next/image";
 import { useState } from "react";
-import {
-  FaEnvelope,
-  FaMapMarkerAlt,
-  FaPhoneAlt,
-  FaTractor,
-} from "react-icons/fa";
+import UserInfo from "../common/UserInfo";
 
 const ProductDescription = ({
   description,
@@ -92,78 +86,7 @@ const ProductDescription = ({
 
       {tab.isReview && <h3>The number of reviews here</h3>}
 
-      {tab.isFarmer && (
-        <div className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-4">
-          {/* Header */}
-          <div className="flex items-center gap-4">
-            <Image
-              src={farmer.image!}
-              alt={farmer.firstName}
-              className="w-20 h-20 rounded-full border-4 border-primary-500 object-cover"
-              width={80}
-              height={80}
-            />
-            <div>
-              <h2 className="text-xl font-semibold">
-                {farmer.firstName} {farmer.lastName}
-              </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                {farmer.role}
-              </p>
-            </div>
-          </div>
-
-          {/* Contact Info */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-            <p className="flex items-center gap-2">
-              <FaEnvelope className="text-primary-500" /> {farmer.email}
-            </p>
-            <p className="flex items-center gap-2">
-              <FaPhoneAlt className="text-primary-500" /> {farmer.phone}
-            </p>
-            <p className="flex items-center gap-2">
-              <FaMapMarkerAlt className="text-primary-500" /> {farmer.address}
-            </p>
-          </div>
-
-          {/* Bio */}
-          <div>
-            <h3 className="text-lg font-semibold mb-1">About</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
-              {farmer.bio}
-            </p>
-          </div>
-
-          {/* Farm Info */}
-          <div className="border-t border-gray-300 dark:border-gray-700 pt-3">
-            <h3 className="text-lg font-semibold mb-2 flex items-center gap-2">
-              <FaTractor className="text-primary-500" /> Farm Information
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-              <p>
-                <span className="font-semibold">Farm Name:</span>{" "}
-                {farmer.farmName}
-              </p>
-              <p>
-                <span className="font-semibold">Size:</span> {farmer.farmSize}{" "}
-                {farmer.farmSizeUnit}
-              </p>
-              <p>
-                <span className="font-semibold">Specialization:</span>{" "}
-                {farmer.specialization}
-              </p>
-              <p>
-                <span className="font-semibold">District:</span>{" "}
-                {farmer.farmDistrict}
-              </p>
-              <p className="sm:col-span-2">
-                <span className="font-semibold">Address:</span>{" "}
-                {farmer.farmAddress}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
+      {tab.isFarmer && <UserInfo user={farmer} />}
     </div>
   );
 };

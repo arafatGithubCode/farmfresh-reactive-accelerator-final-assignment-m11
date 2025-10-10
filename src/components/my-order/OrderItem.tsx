@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Fragment, useState } from "react";
 import { FaRedo, FaStar } from "react-icons/fa";
 import DownloadReceipt from "../common/DownloadReceipt";
+import UserInfo from "../common/UserInfo";
 import { getStatusIcon } from "../ui/getStatusIcon";
 import Popup from "../ui/Popup";
 import OrderStatus from "./OrderStatus";
@@ -21,8 +22,10 @@ interface OrderItemProps {
 }
 
 const OrderItem = ({ order, role }: OrderItemProps) => {
+  const [showFarmer, setShowFarmer] = useState<boolean>(false);
+  const [showSummery, setShowSummary] = useState<boolean>(false);
+
   const { total } = useBalance(order?.items);
-  const [showSummary, setShowSummary] = useState(false);
 
   const orderIdColor =
     order.status === "DELIVERED"
@@ -164,9 +167,20 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
                       <h4 className="font-medium text-gray-900 dark:text-white">
                         {product?.name}
                       </h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p
+                        onClick={() => setShowFarmer(true)}
+                        className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 hover:underline duration-150 hover:cursor-pointer"
+                      >
                         By {product?.farmer?.firstName}&apos;s Farm
                       </p>
+                      {showFarmer && (
+                        <Popup
+                          hasUserInfo={true}
+                          onClose={() => setShowFarmer(false)}
+                        >
+                          <UserInfo user={item.product.farmer} />
+                        </Popup>
+                      )}
                       <p className="text-sm text-gray-600 dark:text-gray-400">
                         Quantity: {quantity} {product?.unit} • ৳{product?.price}
                         /{product?.unit}
@@ -201,13 +215,9 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
       </div>
 
       {/* Order Summary Modal */}
-      {showSummary && (
-        <Popup>
-          <OrderSummary
-            items={order?.items}
-            id={order?.id}
-            onClose={() => setShowSummary(false)}
-          />
+      {showSummery && (
+        <Popup onClose={() => setShowSummary(false)}>
+          <OrderSummary items={order?.items} id={order?.id} />
         </Popup>
       )}
     </>

@@ -8,15 +8,16 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { PiWarningCircleFill } from "react-icons/pi";
 import Button from "../ui/Button";
+import CloseBtn from "../ui/CloseBtn";
 
 const DeleteImage = ({
   deletedImage,
-  onClose,
+  onCancel,
   public_id,
   productId,
 }: {
   deletedImage: string;
-  onClose: () => void;
+  onCancel: () => void;
   public_id: string;
   productId: string;
 }) => {
@@ -66,12 +67,7 @@ const DeleteImage = ({
         className="my-5"
       />
       <div className="w-full flex items-center justify-between">
-        <button
-          onClick={onClose}
-          className="text-white py-3 bg-primary-600 hover:bg-primary-700 hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center"
-        >
-          Close
-        </button>
+        <CloseBtn level="No, Keep It" onClose={onCancel} />
 
         <Button
           label="Yes, delete it."

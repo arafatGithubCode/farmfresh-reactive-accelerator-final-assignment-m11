@@ -152,13 +152,14 @@ const ProfileForm = ({ user }: { user: IUserDB }) => {
             }}
             className="relative group"
           >
-            <Image
-              src={avatar!}
-              alt="profile"
-              width={200}
-              height={200}
-              className="rounded-full border-2 border-primary-500"
-            />
+            <div className="w-48 h-48 rounded-full relative">
+              <Image
+                src={avatar!}
+                alt="profile"
+                fill={true}
+                className="rounded-full border-2 border-primary-500"
+              />
+            </div>
             {isEditable && (
               <div className="absolute inset-0 hidden bg-primary-500 bg-opacity-50 group-hover:block rounded-full duration-200">
                 <div className="w-full h-full flex items-center justify-center text-xl text-white">

@@ -12,7 +12,6 @@ import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import { validateChangePassword } from "@/validations/validateChangePassword";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
 import bcrypt from "bcryptjs";
-import { Types } from "mongoose";
 import { getUserByEmail } from "./../../queries/user/index";
 
 // Perform registration
@@ -181,7 +180,7 @@ export const doUpdateProfile = async (formData: FormData) => {
     delete userDataForUpdate["email"];
 
     const updatedUserWithMetaData = await User.findByIdAndUpdate(
-      { _id: new Types.ObjectId(existingUser?.id) },
+      { _id: existingUser.id },
       userDataForUpdate,
       { new: true }
     ).lean();

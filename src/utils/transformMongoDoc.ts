@@ -1,6 +1,6 @@
-import { Types } from "mongoose";
+import mongoose from "mongoose";
 
-type TransformMongoDoc<T> = T extends Types.ObjectId
+type TransformMongoDoc<T> = T extends mongoose.Types.ObjectId
   ? string
   : T extends Date
   ? string
@@ -20,9 +20,9 @@ export const transformMongoDoc = <T>(doc: T): TransformMongoDoc<T> => {
     const result: any = {};
 
     for (const [key, value] of Object.entries(doc)) {
-      if (key === "_id" && value instanceof Types.ObjectId) {
+      if (key === "_id" && value instanceof mongoose.Types.ObjectId) {
         result["id"] = value.toString();
-      } else if (value instanceof Types.ObjectId) {
+      } else if (value instanceof mongoose.Types.ObjectId) {
         result[key] = value.toString();
       } else if (value instanceof Date) {
         result[key] = value.toISOString();

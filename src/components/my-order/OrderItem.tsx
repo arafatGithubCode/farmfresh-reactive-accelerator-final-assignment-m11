@@ -6,12 +6,11 @@ import { getFormattedDate } from "@/utils/getFormattedDate";
 import { getStatusLabel } from "@/utils/getStatusLavel";
 import { getStatusStyles } from "@/utils/getStatusStyles";
 import Image from "next/image";
-import { Fragment, useState } from "react";
-import { FaRedo, FaStar } from "react-icons/fa";
-import DownloadReceipt from "../common/DownloadReceipt";
+import { useState } from "react";
 import UserInfo from "../common/UserInfo";
 import { getStatusIcon } from "../ui/getStatusIcon";
 import Popup from "../ui/Popup";
+import CustomerActionOnOrder from "./CustomerActionOnOrder";
 import OrderStatus from "./OrderStatus";
 import OrderSummary from "./OrderSummary";
 import UpdateOrderStatus from "./UpdateOrderStatus";
@@ -24,6 +23,7 @@ interface OrderItemProps {
 const OrderItem = ({ order, role }: OrderItemProps) => {
   const [showFarmer, setShowFarmer] = useState<boolean>(false);
   const [showSummery, setShowSummary] = useState<boolean>(false);
+  const [showCustomer, setShowCustomer] = useState<boolean>(false);
 
   const { total } = useBalance(order?.items);
 
@@ -34,40 +34,9 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
       ? "text-red-500"
       : "text-yellow-500";
 
-  // ===== Customer Buttons =====
-  const renderCustomerActions = () => (
-    <div className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3">
-      {/* Delivered / Shipped / Confirmed */}
-      {["CONFIRMED", "SHIPPED", "DELIVERED"].includes(order.status) && (
-        <Fragment>
-          <DownloadReceipt order={order} />
-          <button className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition">
-            <FaRedo className="mr-2" />
-            Reorder
-          </button>
-        </Fragment>
-      )}
-
-      {/* Delivered → Write Review */}
-      {order.status === "DELIVERED" && (
-        <button className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition">
-          <FaStar className="mr-2" />
-          Write Review
-        </button>
-      )}
-
-      {/* Placed (waiting for farmer) */}
-      {order.status === "PLACED" && (
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-          Waiting for farmer confirmation
-        </p>
-      )}
-    </div>
-  );
-
   // ===== Update Status Buttons =====
   const renderUpdateButtons = () => {
-    if (role === "Customer" && ["PLACED", "CANCELED"].includes(order.status)) {
+    if (role !== "Farmer" && ["PLACED", "CANCELED"].includes(order.status)) {
       return (
         <UpdateOrderStatus
           orderId={order.id}
@@ -92,7 +61,8 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
         <p className="text-sm text-red-500 mt-2">
           This order was canceled by{" "}
           <strong>
-            {order.customer.firstName} {order.customer.lastName}
+            {order.customer.firstName ?? order.customer.name}{" "}
+            {order.customer.lastName ?? ""}
           </strong>
           .
         </p>
@@ -109,19 +79,42 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
         <div className="p-6 group relative">
           {/* Header */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4">
-            <div
-              className="flex items-center space-x-4 mb-4 lg:mb-0 cursor-pointer"
-              onClick={() => setShowSummary(true)}
-            >
+            <div className="flex items-center space-x-4 mb-4 lg:mb-0">
               <div>
                 <h3
-                  className={`text-lg font-semibold group-hover:underline ${orderIdColor}`}
+                  onClick={() => setShowSummary(true)}
+                  className={`text-lg font-semibold group-hover:underline hover:cursor-pointer ${orderIdColor}`}
                 >
                   Order #{order.id}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Placed on {getFormattedDate(new Date(order.createdAt))}
+                  Placed on {getFormattedDate(new Date(order.createdAt))} by
                 </p>
+                {role === "Farmer" && (
+                  <div className="flex items-center gap-1">
+                    <Image
+                      src={order.customer.image!}
+                      alt="Customer-Image"
+                      width={24}
+                      height={24}
+                      className="w-6 h-6 rounded-full object-fill"
+                    />
+                    <p
+                      onClick={() => setShowCustomer(true)}
+                      className="text-sm font-semibold hover:underline hover:cursor-pointer"
+                    >{`${order.customer.firstName ?? order.customer.name} ${
+                      order.customer.lastName ?? ""
+                    }`}</p>
+                    {showCustomer && (
+                      <Popup
+                        hasUserInfo={true}
+                        onClose={() => setShowCustomer(false)}
+                      >
+                        <UserInfo user={order.customer} />
+                      </Popup>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -156,13 +149,15 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
                   className="border-t border-gray-200 dark:border-gray-600 pt-4"
                 >
                   <div className="flex items-center space-x-4 mb-4">
-                    <Image
-                      src={product?.imagesUrl?.[0]?.url || "/placeholder.jpg"}
-                      alt={product?.name}
-                      className="w-16 h-16 rounded-lg object-cover"
-                      width={64}
-                      height={64}
-                    />
+                    <div className="w-16 h-16 rounded-lg relative">
+                      <Image
+                        src={product?.imagesUrl?.[0]?.url || "/placeholder.jpg"}
+                        alt={product?.name}
+                        className="w-16 h-16 rounded-lg object-cover"
+                        fill={true}
+                        objectFit="contain"
+                      />
+                    </div>
                     <div className="flex-1">
                       <h4 className="font-medium text-gray-900 dark:text-white">
                         {product?.name}
@@ -171,7 +166,7 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
                         onClick={() => setShowFarmer(true)}
                         className="text-sm text-gray-600 dark:text-gray-400 hover:text-primary-500 hover:underline duration-150 hover:cursor-pointer"
                       >
-                        By {product?.farmer?.firstName}&apos;s Farm
+                        By {product?.farmer?.farmName}&apos;s Farm
                       </p>
                       {showFarmer && (
                         <Popup
@@ -209,7 +204,7 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
           </div>
 
           {/* Actions */}
-          {role === "Customer" && renderCustomerActions()}
+          {role === "Customer" && <CustomerActionOnOrder order={order} />}
           {renderUpdateButtons()}
         </div>
       </div>

@@ -4,7 +4,7 @@ import { connectDB } from "@/libs/connectDB";
 import { deleteCloudinaryImage } from "@/libs/deleteCloudinaryImage";
 import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
-import { getOrderById } from "@/queries/order";
+import { getOrderById, getOrdersByProductId } from "@/queries/order";
 import { createProduct, getProduct } from "@/queries/product";
 import { getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
@@ -12,6 +12,7 @@ import {
   IProductBase,
   IProductForm,
   IProductFrontend,
+  IReviewDB,
   TActionResponse,
   TOrderStatus,
   TPaymentData,
@@ -20,7 +21,7 @@ import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import { validateAddProductForm } from "@/validations/validateAddProductForm";
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 
 // ===== Add Product ===== //
 export const doAddingProduct = async (
@@ -280,7 +281,7 @@ export const doEditingProduct = async (
     }
 
     const updatedProductWithMetaData = await Product.findByIdAndUpdate(
-      { _id: new Types.ObjectId(editProductId) },
+      { _id: new mongoose.Types.ObjectId(editProductId) },
       productDataForUpdate,
       { new: true }
     ).lean<IProductBase>();
@@ -323,7 +324,7 @@ export const doDeletingProductImage = async (
       throw new Error("This image does not exist");
     }
     const updatedProduct = await Product.findByIdAndUpdate(
-      { _id: new Types.ObjectId(productId) },
+      { _id: new mongoose.Types.ObjectId(productId) },
       {
         imagesUrl: product.imagesUrl.filter((id) => id.public_id !== public_id),
       },
@@ -359,7 +360,7 @@ export const doToggleProductActive = async (
     const currentStatus = existingProduct.isActive;
 
     const updatedProduct = await Product.findByIdAndUpdate(
-      { _id: new Types.ObjectId(productId) },
+      { _id: new mongoose.Types.ObjectId(productId) },
       { isActive: !currentStatus }
     ).lean<IProductFrontend>();
 
@@ -433,7 +434,7 @@ export const doPayment = async (
     await Promise.all(
       items?.map((item) =>
         Product.findByIdAndUpdate(
-          { _id: new Types.ObjectId(item.product.id) },
+          { _id: new mongoose.Types.ObjectId(item.product.id) },
           { stock: item.product.stock - item.quantity },
           { new: true }
         )
@@ -446,7 +447,7 @@ export const doPayment = async (
     }));
 
     const created = await Order.create({
-      customer: new Types.ObjectId(customerId),
+      customer: new mongoose.Types.ObjectId(customerId!),
       items: itemWithProductIdsAndQuantity,
       status: "PLACED",
       bookingDate,
@@ -525,7 +526,7 @@ export const doUpdateOrderStatus = async (
 
     // update the order
     const updatedOrder = await Order.findByIdAndUpdate(
-      { _id: new Types.ObjectId(order.id) },
+      { _id: new mongoose.Types.ObjectId(order.id) },
       { status: newStatus },
       { new: true }
     )
@@ -547,5 +548,25 @@ export const doUpdateOrderStatus = async (
   } catch (error) {
     console.error("Order status update error:", error);
     return { success: false, message: "Order status update failed." };
+  }
+};
+
+// ===== Make review ===== //
+export const doReview = async (review: IReviewDB) => {
+  try {
+    const {
+      customer: customerId,
+      product: productId,
+      comment,
+      rating,
+      reply,
+    } = review;
+
+    console.log(customerId, comment, rating, reply);
+
+    const orders = await getOrdersByProductId(productId as string);
+    console.log(orders, "from action");
+  } catch (error) {
+    console.log(error);
   }
 };

@@ -3,6 +3,7 @@ import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
 import { IOrderFronted } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
+import mongoose from "mongoose";
 
 // Get order by id
 export const getOrderById = async (orderId: string) => {
@@ -68,4 +69,18 @@ export const getOrdersByFarmerId = async (farmerId: string) => {
     .lean();
 
   return orders ? transformMongoDoc(orders) : null;
+};
+
+// Get orders by product id
+export const getOrdersByProductId = async (productId: string) => {
+  await connectDB();
+
+  const orders = await Order.find({
+    "items.product": new mongoose.Types.ObjectId(productId),
+  })
+    .populate("customer")
+    .populate("items.product")
+    .lean<IOrderFronted[]>();
+
+  return transformMongoDoc(orders);
 };

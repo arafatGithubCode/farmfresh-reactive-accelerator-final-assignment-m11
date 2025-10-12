@@ -1,4 +1,4 @@
-import { AnyObject, Schema } from "mongoose";
+import mongoose, { AnyObject } from "mongoose";
 
 //===== User Types Start =====//
 export type TUserRole = "Farmer" | "Customer";
@@ -13,13 +13,13 @@ export interface IUserSession {
   name?: string;
   email?: string;
   image?: string;
-  role?: string;
+  role?: string | TUserRole;
 }
 
 export type UserFormMode = "register" | "login" | "profile";
 
 export interface UserInput {
-  role?: string;
+  role?: string | TUserRole;
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -44,6 +44,7 @@ export interface TBaseUser {
   id: string;
   role: TUserRole | string;
   firstName: string;
+  name?: string;
   email: string;
   address: string;
   password: string;
@@ -106,15 +107,15 @@ export interface IReplyFronted {
   createdAt: string;
 }
 export interface IReviewDB {
-  customer: Schema.Types.ObjectId;
-  product: Schema.Types.ObjectId;
+  customer: mongoose.Types.ObjectId | string;
+  product: mongoose.Types.ObjectId | string;
   rating: number;
   comment: string;
   reply?: IReplyDB[];
 }
 export interface IReviewFronted {
   id: string;
-  customer: string;
+  customer: TBaseUser;
   product: IProductFrontend;
   rating: number;
   comment: string;
@@ -127,7 +128,7 @@ export interface IReviewFronted {
 //===== Product Types Start =====//
 export interface IProductBase {
   id: string;
-  farmer?: Schema.Types.ObjectId;
+  farmer?: mongoose.Types.ObjectId;
   name: string;
   category: string;
   description: string;
@@ -143,7 +144,7 @@ export interface IProductBase {
   perUnitDeliveryFee: number;
   serviceFee: number;
   isActive: boolean;
-  review?: Schema.Types.ObjectId[];
+  review?: string[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -173,7 +174,7 @@ export type TAddProductValidationError<
 
 //===== Cart Types Start =====//
 export interface ICartItem {
-  product: Schema.Types.ObjectId;
+  product: mongoose.Types.ObjectId;
   quantity: number;
 }
 
@@ -183,13 +184,13 @@ export interface ICartItemFronted {
   id?: string;
 }
 export interface ICart {
-  customer: Schema.Types.ObjectId;
+  customer: mongoose.Types.ObjectId;
   items: ICartItem[];
 }
 
 export interface ICartFrontend {
   id: string | null;
-  customer: string | TBaseUser | null;
+  customer: TBaseUser | string | null;
   items: {
     product: IProductFrontend;
     quantity: number;
@@ -304,7 +305,7 @@ export interface TPaymentData {
 
 // DB Order Types Start
 export interface IOrderItem {
-  product: Schema.Types.ObjectId;
+  product: mongoose.Types.ObjectId;
   quantity: number;
 }
 

@@ -2,13 +2,16 @@ import { connectDB } from "@/libs/connectDB";
 import { Cart } from "@/models/CartModel";
 import { ICartFrontend } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
+import mongoose from "mongoose";
 
 // ====== Get Cart By Customer ID ====== //
 export const getCartByCustomerId = async (
   customerId: string
 ): Promise<ICartFrontend | null> => {
   await connectDB();
-  const cart = await Cart.findOne({ customer: customerId })
+  const cart = await Cart.findOne({
+    customer: new mongoose.Types.ObjectId(customerId),
+  })
     .populate("customer")
     .populate({
       path: "items.product",

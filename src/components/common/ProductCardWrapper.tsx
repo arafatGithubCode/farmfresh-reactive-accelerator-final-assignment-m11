@@ -12,7 +12,7 @@ const ProductCardWrapper = ({
     <>
       {products && products.length === 0 ? (
         <p className="text-xs font-semibold text-gray-400">
-          No products listed yet
+          No products listed yet.
         </p>
       ) : (
         products.map((product) => (

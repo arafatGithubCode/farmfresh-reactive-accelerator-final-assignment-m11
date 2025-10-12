@@ -71,10 +71,10 @@ const productSchema = new mongoose.Schema<IProductBase>(
       type: Number,
       required: [true, "service fee is required"],
     },
-    review: [
+    reviews: [
       {
         type: Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "Review",
       },
     ],
     isActive: {

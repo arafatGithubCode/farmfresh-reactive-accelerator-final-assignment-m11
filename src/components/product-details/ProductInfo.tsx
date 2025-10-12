@@ -14,13 +14,13 @@ import {
   FaMinus,
   FaPlus,
   FaShoppingCart,
-  FaStar,
 } from "react-icons/fa";
+import Rating from "../common/Rating";
 import Tags from "../ui/Tags";
 
 const ProductInfo = ({ product }: { product: IProductFrontend }) => {
   const [quantity, setQuantity] = useState<number>(1);
-  const [stock, setStock] = useState<number>(product.stock);
+  const [stock, setStock] = useState<number>(product.stock - 1);
 
   const { updateCart, loading } = useCart();
   const pending = loading[product.id] || false;
@@ -62,17 +62,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
         </p>
       </div>
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-1">
-          <div className="flex text-yellow-400">
-            {[...Array(5)].map((_, i) => (
-              <FaStar key={i} />
-            ))}
-          </div>
-          <span className="text-lg font-semibold text-gray-900 dark:text-white">
-            4.8
-          </span>
-        </div>
-        <span className="text-gray-500 dark:text-gray-400">(127 reviews)</span>
+        <Rating reviews={product.reviews} />
         <button className="text-primary-600 dark:text-primary-400 hover:underline">
           Write a review
         </button>

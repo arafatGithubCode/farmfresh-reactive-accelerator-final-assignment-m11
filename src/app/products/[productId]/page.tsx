@@ -34,6 +34,7 @@ const ProductDetailsPage = async ({
         <ProductDescription
           description={product.description}
           farmer={product.farmer}
+          reviews={product.reviews}
         />
       </div>
     </>

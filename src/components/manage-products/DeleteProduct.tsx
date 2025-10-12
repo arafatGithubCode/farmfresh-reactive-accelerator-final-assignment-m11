@@ -60,17 +60,21 @@ const DeleteProduct = ({
       onSubmit={handleSubmit}
       className="flex flex-col items-center justify-center gap-2"
     >
-      <PiWarningCircleFill className="text-xl text-orange-400 my-2" />
+      <PiWarningCircleFill className="text-2xl text-orange-400 my-2" />
       <p className="font-semibold">Are you sure to delete this product?</p>
-      <Image
-        src={productImage[0].url}
-        alt="delete-image"
-        width={200}
-        height={200}
-        placeholder="blur"
-        blurDataURL={productImage[0].url}
-        className="my-5"
-      />
+      <p className="text-sm text-gray-400">
+        Deleted products can not be restored.
+      </p>
+      <div className="w-16 h-16 rounded relative">
+        <Image
+          src={productImage[0].url}
+          alt="delete-image"
+          fill={true}
+          placeholder="blur"
+          blurDataURL={productImage[0].url}
+          className="my-2 w-16 h-16 rounded object-contain"
+        />
+      </div>
       <p className="font-semibold mb-3 text-primary-500">{productName}</p>
       <div className="w-full flex items-center justify-between">
         <CloseBtn level="No, Keep It" onClose={onCancel} />

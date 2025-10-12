@@ -42,6 +42,7 @@ const CustomerActionOnOrder = ({ order }: { order: IOrderFronted }) => {
               <WriteReview
                 customerId={order.customer.id}
                 productId={order.items[0].product.id}
+                onClose={() => setShowReviewPopup(false)}
               />
             </Popup>
           )}

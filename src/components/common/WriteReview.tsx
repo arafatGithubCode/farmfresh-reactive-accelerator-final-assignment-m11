@@ -1,8 +1,10 @@
 "use client";
 
-import { doReview } from "@/actions/product";
+import { doReview } from "@/actions/review";
 import { showToast } from "@/providers/ToastProvider";
 import { IReviewDB } from "@/types";
+import { catchErr } from "@/utils/catchErr";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, Fragment, useState } from "react";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import Button from "../ui/Button";
@@ -10,9 +12,11 @@ import Button from "../ui/Button";
 const WriteReview = ({
   customerId,
   productId,
+  onClose,
 }: {
   customerId: string;
   productId: string;
+  onClose: () => void;
 }) => {
   const [review, setReview] = useState<IReviewDB>({
     customer: customerId,
@@ -23,6 +27,7 @@ const WriteReview = ({
   const [hoverRating, setHoverRating] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -31,11 +36,21 @@ const WriteReview = ({
       if (review.rating === 0) {
         showToast("Rating must be greater then 0.", "ERROR");
         return;
+      } else if (review.comment.length > 500) {
+        showToast("Maximum length of comment is 500 characters.");
+        return;
       }
       const response = await doReview(review);
-      console.log(response);
+      if (!response.success) {
+        showToast(response.message, "ERROR");
+      } else {
+        showToast(response.message);
+        onClose();
+        router.refresh();
+      }
     } catch (error) {
-      console.log(error);
+      const errMsg = catchErr(error);
+      showToast(errMsg.error, "ERROR");
     } finally {
       setLoading(false);
     }

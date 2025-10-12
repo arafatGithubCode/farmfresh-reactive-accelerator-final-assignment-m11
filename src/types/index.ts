@@ -98,7 +98,12 @@ export interface IUserLoginForm {
 
 //===== Review Types Start =====//
 export interface IReplyDB {
+  farmer: mongoose.Types.ObjectId | string;
   reply: string;
+}
+export interface ILikesDB {
+  customer: mongoose.Types.ObjectId | string;
+  isLike: boolean;
 }
 export interface IReplyFronted {
   id: string;
@@ -112,6 +117,7 @@ export interface IReviewDB {
   rating: number;
   comment: string;
   reply?: IReplyDB[];
+  likes?: ILikesDB[];
 }
 export interface IReviewFronted {
   id: string;
@@ -144,24 +150,22 @@ export interface IProductBase {
   perUnitDeliveryFee: number;
   serviceFee: number;
   isActive: boolean;
-  review?: string[];
+  reviews?: mongoose.Types.ObjectId[] | IReviewFronted[];
   createdAt?: string;
   updatedAt?: string;
 }
 
-export type IProductWithFarmer = Omit<IProductBase, "farmer"> & {
+export interface IProductFrontend
+  extends Omit<IProductBase, "farmer" | "reviews"> {
   farmer: TBaseUser;
-};
-
-export interface IProductFrontend extends Omit<IProductWithFarmer, "farmer"> {
-  farmer: TBaseUser;
+  reviews: IReviewFronted[];
 }
 
 export interface IProductForm<
   T extends { url: string; public_id: string; id?: string }[] | File[]
 > extends Omit<
     IProductBase,
-    "imagesUrl" | "farmer" | "id" | "createdAt" | "updatedAt" | "review"
+    "imagesUrl" | "farmer" | "id" | "createdAt" | "updatedAt" | "reviews"
   > {
   images: T;
 }

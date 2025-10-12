@@ -1,6 +1,8 @@
+import "@/models/reviewModel";
+
 import { connectDB } from "@/libs/connectDB";
 import { Product } from "@/models/productModel";
-import { IProductBase, IProductFrontend, IProductWithFarmer } from "@/types";
+import { IProductBase, IProductFrontend } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // Create a product
@@ -15,8 +17,9 @@ export const getProducts = async () => {
   await connectDB();
 
   const products = await Product.find()
-    .populate("farmer", "firstName farmDistrict farmName")
-    .lean<IProductWithFarmer[]>();
+    .populate("farmer")
+    .populate("reviews")
+    .lean<IProductFrontend[]>();
 
   return transformMongoDoc(products);
 };
@@ -27,7 +30,8 @@ export const getProductsByFarmerId = async (farmerId: string) => {
 
   const products = await Product.find({ farmer: farmerId })
     .populate("farmer")
-    .lean<IProductWithFarmer[]>();
+    .populate("reviews")
+    .lean<IProductFrontend[]>();
 
   return transformMongoDoc(products);
 };
@@ -38,6 +42,14 @@ export const getProduct = async (productId: string) => {
 
   const product = await Product.findById(productId)
     .populate("farmer")
+    .populate({
+      path: "reviews",
+      model: "Review",
+      populate: {
+        path: "customer",
+        model: "User",
+      },
+    })
     .lean<IProductFrontend>();
   return transformMongoDoc(product);
 };

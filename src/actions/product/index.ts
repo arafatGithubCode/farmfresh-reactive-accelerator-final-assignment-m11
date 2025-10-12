@@ -4,7 +4,7 @@ import { connectDB } from "@/libs/connectDB";
 import { deleteCloudinaryImage } from "@/libs/deleteCloudinaryImage";
 import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
-import { getOrderById, getOrdersByProductId } from "@/queries/order";
+import { getOrderById } from "@/queries/order";
 import { createProduct, getProduct } from "@/queries/product";
 import { getUserByEmail } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
@@ -12,7 +12,6 @@ import {
   IProductBase,
   IProductForm,
   IProductFrontend,
-  IReviewDB,
   TActionResponse,
   TOrderStatus,
   TPaymentData,
@@ -548,25 +547,5 @@ export const doUpdateOrderStatus = async (
   } catch (error) {
     console.error("Order status update error:", error);
     return { success: false, message: "Order status update failed." };
-  }
-};
-
-// ===== Make review ===== //
-export const doReview = async (review: IReviewDB) => {
-  try {
-    const {
-      customer: customerId,
-      product: productId,
-      comment,
-      rating,
-      reply,
-    } = review;
-
-    console.log(customerId, comment, rating, reply);
-
-    const orders = await getOrdersByProductId(productId as string);
-    console.log(orders, "from action");
-  } catch (error) {
-    console.log(error);
   }
 };

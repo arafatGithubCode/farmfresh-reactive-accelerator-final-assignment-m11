@@ -1,13 +1,31 @@
-import { IReplyDB, IReviewDB } from "@/types";
+import { ILikesDB, IReplyDB, IReviewDB } from "@/types";
 import mongoose, { Model, Schema } from "mongoose";
 
 const replaySchema = new Schema<IReplyDB>(
   {
+    farmer: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
     reply: {
       type: String,
     },
   },
   { timestamps: true }
+);
+
+const likesSchema = new Schema<ILikesDB>(
+  {
+    customer: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+    },
+    isLike: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: false }
 );
 
 const reviewSchema = new Schema<IReviewDB>(
@@ -29,6 +47,7 @@ const reviewSchema = new Schema<IReviewDB>(
       required: [true, "Rating is required."],
     },
     reply: [replaySchema],
+    likes: [likesSchema],
   },
   { timestamps: true }
 );

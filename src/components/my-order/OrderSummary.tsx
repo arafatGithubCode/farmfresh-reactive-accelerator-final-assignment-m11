@@ -22,13 +22,17 @@ const OrderSummary = ({
         <span className="text-gray-700 dark:text-gray-300">Subtotal</span>
         <Amount amount={subtotal} />
       </div>
-      <Divider isDotted={true} />
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-gray-700 dark:text-gray-300">
-          Total Discount Applied
-        </span>
-        <Amount amount={totalDiscountAmount} />
-      </div>
+      {totalDiscountAmount > 0 && (
+        <>
+          <Divider isDotted={true} />
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-gray-700 dark:text-gray-300">
+              Total Discount Applied
+            </span>
+            <Amount amount={totalDiscountAmount} />
+          </div>
+        </>
+      )}
       <Divider isDotted={true} />
       <div className="flex items-center justify-between gap-2">
         <span className="text-gray-700 dark:text-gray-300">Delivery Fee</span>

@@ -1,46 +1,44 @@
 "use client";
 
-import { doReview } from "@/actions/review";
+import { doCreateReview, doUpdateReview } from "@/actions/review";
 import { showToast } from "@/providers/ToastProvider";
-import { IReviewDB } from "@/types";
+import { IReview } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, Fragment, useState } from "react";
 import { FaStar, FaStarHalfAlt } from "react-icons/fa";
 import Button from "../ui/Button";
 
-const WriteReview = ({
-  customerId,
-  productId,
-  onClose,
-}: {
-  customerId: string;
-  productId: string;
+type Props = {
+  review: IReview;
+  mood: "CREATE" | "EDIT";
   onClose: () => void;
-}) => {
-  const [review, setReview] = useState<IReviewDB>({
-    customer: customerId,
-    product: productId,
-    rating: 0,
-    comment: "",
-  });
+};
+
+const WriteReview = ({ review, mood, onClose }: Props) => {
+  const [reviewState, setReviewState] = useState<IReview>(review);
   const [hoverRating, setHoverRating] = useState<number>(0);
 
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
+  const isEditMood = reviewState.id && mood === "EDIT";
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      if (review.rating === 0) {
+      if (reviewState.rating === 0) {
         showToast("Rating must be greater then 0.", "ERROR");
         return;
-      } else if (review.comment.length > 500) {
+      } else if (reviewState.comment.length > 500) {
         showToast("Maximum length of comment is 500 characters.");
         return;
       }
-      const response = await doReview(review);
+      const response = isEditMood
+        ? await doUpdateReview(reviewState)
+        : await doCreateReview(reviewState);
+
       if (!response.success) {
         showToast(response.message, "ERROR");
       } else {
@@ -58,7 +56,7 @@ const WriteReview = ({
 
   const renderStar = (index: number) => {
     const currentValue = index + 1;
-    const activeValue = hoverRating || review.rating;
+    const activeValue = hoverRating || reviewState.rating;
 
     if (activeValue >= currentValue) {
       return <FaStar className="text-yellow-500" />;
@@ -87,7 +85,9 @@ const WriteReview = ({
   };
   return (
     <>
-      <h2 className="text-2xl font-semibold mb-4">Write a Review</h2>
+      <h2 className="text-2xl font-semibold mb-4">
+        {isEditMood ? "Update this review" : "Write a Review"}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4" id="reviewForm">
         <div>
           <label
@@ -113,7 +113,7 @@ const WriteReview = ({
                     const x = e.clientX - left;
                     const isHalf = x < width / 2;
                     const value = isHalf ? index + 0.5 : index + 1;
-                    setReview((prev) => ({ ...prev, rating: value }));
+                    setReviewState((prev) => ({ ...prev, rating: value }));
                   }}
                   onMouseMove={(e) => {
                     // fractional star
@@ -154,9 +154,9 @@ const WriteReview = ({
             required
             minLength={2}
             maxLength={500}
-            value={review.comment}
+            value={reviewState.comment}
             onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              setReview((prev) => ({ ...prev, comment: e.target.value }))
+              setReviewState((prev) => ({ ...prev, comment: e.target.value }))
             }
           ></textarea>
           <p className="text-red-500 text-xs italic hidden" id="commentError">
@@ -164,9 +164,9 @@ const WriteReview = ({
           </p>
         </div>
         <Button
-          label="Submit Review"
+          label={isEditMood ? "Update Review" : "Submit Review"}
           loading={loading}
-          loadingText="Submitting..."
+          loadingText={isEditMood ? "Updating..." : "Submitting..."}
           hasSpinner={true}
         />
       </form>

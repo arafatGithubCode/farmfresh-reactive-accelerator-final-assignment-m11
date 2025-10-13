@@ -97,6 +97,13 @@ export interface IUserLoginForm {
 //===== User Types End =====//
 
 //===== Review Types Start =====//
+export interface IReview {
+  id?: string;
+  customerId: string;
+  product: string;
+  comment: string;
+  rating: number;
+}
 export interface IReplyDB {
   farmer: mongoose.Types.ObjectId | string;
   reply: string;
@@ -122,7 +129,7 @@ export interface IReviewDB {
 export interface IReviewFronted {
   id: string;
   customer: TBaseUser;
-  product: IProductFrontend;
+  product: string;
   rating: number;
   comment: string;
   reply: IReplyFronted[];

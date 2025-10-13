@@ -1,6 +1,6 @@
 "use client";
 
-import { IReviewFronted } from "@/types";
+import { IReview, IReviewFronted } from "@/types";
 import { getDateDiff } from "@/utils/getDateDiff";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -15,10 +15,12 @@ import {
 } from "react-icons/fa";
 import Popup from "../ui/Popup";
 import UserInfo from "./UserInfo";
+import WriteReview from "./WriteReview";
 
 const ReviewItem = ({ review }: { review: IReviewFronted }) => {
   const [showCustomerInfo, setShowCustomerInfo] = useState<boolean>(false);
   const [showReviewAction, setShowReviewAction] = useState<boolean>(false);
+  const [showUpdateReview, setShowUpdateReview] = useState<boolean>(false);
 
   const reviewActionRef = useRef<HTMLDivElement>(null);
 
@@ -28,7 +30,15 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
   const session = useSession();
   const loggedInUserId = session?.data?.user?.id;
 
-  const isReviewOwner = review.customer.id === loggedInUserId;
+  const isReviewOwner = review?.customer?.id === loggedInUserId;
+
+  const existingReview: IReview = {
+    id: review.id,
+    customerId: review.customer.id,
+    product: review.product,
+    comment: review.comment,
+    rating: review.rating,
+  };
 
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
@@ -97,7 +107,10 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
               </button>
               {showReviewAction && (
                 <div className="absolute top-5 right-4 p-4 space-y-4 bg-gray-100 dark:bg-gray-900 rounded-lg shadow animate-fade-up">
-                  <div className="flex items-center gap-1 hover:text-primary-500 hover:cursor-pointer text-sm">
+                  <div
+                    onClick={() => setShowUpdateReview(true)}
+                    className="flex items-center gap-1 hover:text-primary-500 hover:cursor-pointer text-sm"
+                  >
                     <FaEdit />
                     <span>Edit</span>
                   </div>
@@ -110,6 +123,15 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
             </div>
           )}
         </div>
+        {showUpdateReview && (
+          <Popup onClose={() => setShowUpdateReview(false)}>
+            <WriteReview
+              mood="EDIT"
+              review={existingReview}
+              onClose={() => setShowUpdateReview(false)}
+            />
+          </Popup>
+        )}
         <p className="text-gray-700 dark:text-gray-300 mb-3">
           {review.comment}
         </p>

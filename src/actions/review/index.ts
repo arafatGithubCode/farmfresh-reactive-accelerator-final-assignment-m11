@@ -5,18 +5,18 @@ import { Product } from "@/models/productModel";
 import { Review } from "@/models/reviewModel";
 import { getSingleOrderByProductId } from "@/queries/order";
 import { getProduct } from "@/queries/product";
-import { IReviewDB } from "@/types";
+import { IReview } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 
 // ===== Make a review ===== //
-export const doReview = async (
-  review: IReviewDB
+export const doCreateReview = async (
+  reviewData: IReview
 ): Promise<{ success: boolean; message: string }> => {
   await connectDB();
   try {
-    const { customer: customerId, product: productId } = review;
+    const { customerId, comment, rating } = reviewData;
 
-    const order = await getSingleOrderByProductId(productId as string);
+    const order = await getSingleOrderByProductId(reviewData.product as string);
 
     if (!order) {
       throw new Error("Please place an order to make a review.");
@@ -26,7 +26,7 @@ export const doReview = async (
       throw new Error("You can make review for DELIVERED order.");
     }
 
-    const product = await getProduct(productId as string);
+    const product = await getProduct(reviewData.product as string);
 
     if (!product) {
       throw new Error("This product does not exist.");
@@ -40,12 +40,37 @@ export const doReview = async (
       throw new Error("You can only make one review for a product.");
     }
 
-    const newReview = await Review.create(review);
-    await Product.findByIdAndUpdate(productId, {
+    const newReview = await Review.create({
+      customer: customerId,
+      product: reviewData.product,
+      comment,
+      rating,
+    });
+    await Product.findByIdAndUpdate(reviewData.product, {
       $push: { reviews: newReview._id },
     });
 
     return { success: true, message: "Review placed successfully." };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, message: errMsg.error };
+  }
+};
+
+// ===== Update a review ===== //
+export const doUpdateReview = async (
+  reviewData: IReview
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const { id, comment, rating } = reviewData;
+
+    if (!id) {
+      throw new Error("This review does not exist.");
+    }
+
+    await Review.findByIdAndUpdate({ _id: id }, { rating, comment });
+
+    return { success: true, message: "Review updated successfully." };
   } catch (error) {
     const errMsg = catchErr(error);
     return { success: false, message: errMsg.error };

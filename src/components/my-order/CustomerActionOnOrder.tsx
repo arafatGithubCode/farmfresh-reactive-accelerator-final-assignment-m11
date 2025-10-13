@@ -1,6 +1,6 @@
 "use client";
 
-import { IOrderFronted } from "@/types";
+import { IOrderFronted, IReview } from "@/types";
 import { Fragment, useState } from "react";
 import { FaRedo, FaStar } from "react-icons/fa";
 import DownloadReceipt from "../common/DownloadReceipt";
@@ -9,6 +9,13 @@ import Popup from "../ui/Popup";
 
 const CustomerActionOnOrder = ({ order }: { order: IOrderFronted }) => {
   const [showReviewPopup, setShowReviewPopup] = useState<boolean>(false);
+
+  const newReview: IReview = {
+    customerId: order.customer.id,
+    productId: order.items[0].product.id,
+    comment: "",
+    rating: 0,
+  };
 
   return (
     <div className="border-t border-gray-200 dark:border-gray-600 pt-4 flex flex-wrap gap-3">
@@ -40,8 +47,8 @@ const CustomerActionOnOrder = ({ order }: { order: IOrderFronted }) => {
           {showReviewPopup && order.items.length === 1 && (
             <Popup onClose={() => setShowReviewPopup(false)}>
               <WriteReview
-                customerId={order.customer.id}
-                productId={order.items[0].product.id}
+                mood="CREATE"
+                review={newReview}
                 onClose={() => setShowReviewPopup(false)}
               />
             </Popup>

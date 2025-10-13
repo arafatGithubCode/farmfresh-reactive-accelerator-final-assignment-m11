@@ -33,10 +33,12 @@ const reviewSchema = new Schema<IReviewDB>(
     customer: {
       type: Schema.Types.ObjectId,
       ref: "User",
+      required: [true, "Customer ID is required."],
     },
     product: {
       type: Schema.Types.ObjectId,
       ref: "Product",
+      required: [true, "Product ID is required."],
     },
     comment: {
       type: String,
@@ -52,5 +54,5 @@ const reviewSchema = new Schema<IReviewDB>(
   { timestamps: true }
 );
 
-export const Review: Model<IReplyDB> =
+export const Review: Model<IReviewDB> =
   mongoose.models.Review ?? mongoose.model("Review", reviewSchema);

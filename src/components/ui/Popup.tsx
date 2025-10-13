@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode } from "react";
 import ReactDOM from "react-dom";
 import { IoClose } from "react-icons/io5";
 
@@ -13,27 +13,15 @@ const Popup = ({
   onClose: () => void;
   hasUserInfo?: boolean;
 }) => {
-  const wrapperEl = useRef<HTMLDivElement | null>(null);
-
   const width = hasUserInfo ? "w-full max-w-3xl" : "w-full max-w-md";
 
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (wrapperEl.current && !wrapperEl.current.contains(e.target as Node)) {
-        onClose();
-      }
-    };
-
-    document.addEventListener("click", handleOutsideClick);
-    return () => {
-      document.removeEventListener("click", handleOutsideClick);
-    };
-  }, [onClose]);
-
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/50 flex items-center justify-center"
+    >
       <div
-        ref={wrapperEl}
+        onClick={(e) => e.stopPropagation()}
         className={`${width} bg-white dark:bg-gray-800 rounded-lg p-4 shadow-xl animate-zoom-in relative`}
       >
         {children}

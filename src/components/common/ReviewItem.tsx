@@ -58,7 +58,7 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
   }, []);
 
   return (
-    <div className="flex items-start space-x-4">
+    <div className="flex items-start space-x-4 dark:bg-gray-800 bg-white p-4 rounded-lg">
       <div className="w-12 h-12 rounded-full relative">
         <Image
           src={review.customer.image!}

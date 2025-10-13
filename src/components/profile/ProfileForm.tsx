@@ -157,6 +157,8 @@ const ProfileForm = ({ user }: { user: IUserDB }) => {
                 src={avatar!}
                 alt="profile"
                 fill={true}
+                placeholder="blur"
+                blurDataURL={avatar!}
                 className="rounded-full border-2 border-primary-500"
               />
             </div>

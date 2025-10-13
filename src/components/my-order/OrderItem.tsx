@@ -1,13 +1,14 @@
 "use client";
 
 import { useBalance } from "@/hooks/useBalance";
-import { IOrderFronted } from "@/types";
+import { IOrderFronted, IReview } from "@/types";
 import { getFormattedDate } from "@/utils/getFormattedDate";
 import { getStatusLabel } from "@/utils/getStatusLavel";
 import { getStatusStyles } from "@/utils/getStatusStyles";
 import Image from "next/image";
 import { useState } from "react";
 import UserInfo from "../common/UserInfo";
+import WriteReview from "../common/WriteReview";
 import { getStatusIcon } from "../ui/getStatusIcon";
 import Popup from "../ui/Popup";
 import CustomerActionOnOrder from "./CustomerActionOnOrder";
@@ -24,6 +25,17 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
   const [showFarmer, setShowFarmer] = useState<boolean>(false);
   const [showSummery, setShowSummary] = useState<boolean>(false);
   const [showCustomer, setShowCustomer] = useState<boolean>(false);
+  const [writeReview, setWriteReview] = useState<{
+    showPopup: boolean;
+    productId: string;
+  }>({ showPopup: false, productId: "" });
+
+  const addNewReview: IReview = {
+    customerId: order.customer.id,
+    product: writeReview.productId,
+    comment: "",
+    rating: 0,
+  };
 
   const { total } = useBalance(order?.items);
 
@@ -135,7 +147,7 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
 
           {/* Order Items */}
           {order?.items?.length > 0 &&
-            order.items.map((item) => {
+            order.items.map((item, index) => {
               const { product, quantity } = item;
               const finalPrice = (
                 product?.price *
@@ -185,6 +197,37 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
                       ৳{finalPrice}
                     </p>
                   </div>
+                  {order?.items?.length > 1 && (
+                    <>
+                      <button
+                        onClick={() =>
+                          setWriteReview({
+                            productId: order.items[index].product.id,
+                            showPopup: true,
+                          })
+                        }
+                        className="text-primary-600 dark:text-primary-400 hover:underline"
+                      >
+                        Write a review
+                      </button>
+                      {writeReview.showPopup && (
+                        <Popup
+                          onClose={() =>
+                            setWriteReview((prev) => ({
+                              ...prev,
+                              showPopup: false,
+                            }))
+                          }
+                        >
+                          <WriteReview
+                            onClose={() => setShowCustomer(false)}
+                            review={addNewReview}
+                            mood="CREATE"
+                          />
+                        </Popup>
+                      )}
+                    </>
+                  )}
                 </div>
               );
             })}

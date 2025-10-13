@@ -81,10 +81,7 @@ export const getSingleOrderByProductIdAndCustomerId = async (
   const orders = await Order.findOne({
     customer: customerId,
     "items.product": new mongoose.Types.ObjectId(productId),
-  })
-    .populate("customer")
-    .populate("items.product")
-    .lean<IOrderFronted>();
+  }).lean<IOrderFronted>();
 
   return transformMongoDoc(orders);
 };

@@ -1,9 +1,11 @@
 "use server";
 
 import { connectDB } from "@/libs/connectDB";
-import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
 import { Review } from "@/models/reviewModel";
+import { getSingleOrderByProductIdAndCustomerId } from "@/queries/order";
+import { getProduct } from "@/queries/product";
+import { getSingleReviewByProductIdAndCustomerId } from "@/queries/review";
 import { IReview } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 
@@ -16,10 +18,10 @@ export const doCreateReview = async (
     const { customerId, product, comment, rating } = reviewData;
 
     // Verify the customer actually ordered and received this product
-    const order = await Order.findOne({
-      customer: customerId,
-      "items.product": product,
-    });
+    const order = await getSingleOrderByProductIdAndCustomerId(
+      customerId,
+      product
+    );
 
     if (!order) {
       throw new Error("Please place an order to make a review.");
@@ -30,15 +32,18 @@ export const doCreateReview = async (
     }
 
     // Check if the product exists
-    const productExists = await Product.findById(product);
+    const productExists = await getProduct(product);
     if (!productExists) {
       throw new Error("This product does not exist.");
     }
 
     // Check if this user already reviewed the product
-    const hasReview = await Review.findOne({ customer: customerId, product });
+    const hasReview = await getSingleReviewByProductIdAndCustomerId(
+      customerId,
+      product
+    );
     if (hasReview) {
-      throw new Error("You can only make one review for this product.");
+      throw new Error("You already made a review for this product.");
     }
 
     // Create review

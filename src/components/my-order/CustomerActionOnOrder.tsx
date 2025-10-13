@@ -34,7 +34,7 @@ const CustomerActionOnOrder = ({ order }: { order: IOrderFronted }) => {
       )}
 
       {/* Delivered → Write Review */}
-      {order.status === "DELIVERED" && (
+      {order.status === "DELIVERED" && order.items?.length === 1 && (
         <>
           <button
             type="button"

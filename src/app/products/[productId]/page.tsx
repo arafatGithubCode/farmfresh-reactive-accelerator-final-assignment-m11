@@ -1,9 +1,11 @@
 import ProductDescription from "@/components/product-details/ProductDescription";
 import ProductImageGallery from "@/components/product-details/ProductImageGallery";
 import ProductInfo from "@/components/product-details/ProductInfo";
+import ReviewSection from "@/components/product-details/ReviewSection";
 import BreadCrumb from "@/components/ui/BreadCrumb";
 import { showToast } from "@/providers/ToastProvider";
 import { getProduct } from "@/queries/product";
+import { getReviewsByProductId } from "@/queries/review";
 import { redirect } from "next/navigation";
 
 const ProductDetailsPage = async ({
@@ -23,6 +25,8 @@ const ProductDetailsPage = async ({
     redirect("/products");
   }
 
+  const reviews = await getReviewsByProductId(params.productId);
+
   return (
     <>
       <BreadCrumb productName={product.name} />
@@ -36,6 +40,11 @@ const ProductDetailsPage = async ({
           farmer={product.farmer}
           reviews={product.reviews}
         />
+        {reviews && reviews.length === 0 ? (
+          <p>No reviews added yet.</p>
+        ) : (
+          <ReviewSection reviews={reviews} productId={params.productId} />
+        )}
       </div>
     </>
   );

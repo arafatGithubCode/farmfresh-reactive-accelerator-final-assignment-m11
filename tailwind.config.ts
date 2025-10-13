@@ -55,7 +55,7 @@ const config: Config = {
       animation: {
         "bounce-skew": "bounce-skew 1s ease-in-out",
         spin: "spin 1s linear infinite",
-        "fade-up": "fade-up 500ms ease-in",
+        "fade-up": "fade-up 300ms ease-in",
         "fade-left": "fade-left 500ms ease-in",
         "fade-right": "fade-right 500ms ease-in",
         "fade-horizontal": "fade-horizontal 2.5s linear infinite",

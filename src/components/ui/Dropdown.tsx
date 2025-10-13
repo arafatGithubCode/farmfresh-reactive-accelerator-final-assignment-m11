@@ -47,6 +47,12 @@ const Dropdown = ({ image, name }: { image: string; name: string }) => {
           className="w-8 h-8 rounded-full border border-primary-500"
           width={50}
           height={50}
+          placeholder="blur"
+          blurDataURL={
+            image
+              ? image
+              : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face"
+          }
         />
         <span className="hidden sm:block">{name}</span>
         <FaAngleDown />

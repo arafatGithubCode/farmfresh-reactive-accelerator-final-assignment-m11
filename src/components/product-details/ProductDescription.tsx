@@ -89,13 +89,13 @@ const ProductDescription = ({
       )}
 
       {tab.isReview && (
-        <div className="px-4 py-8 w-full max-w-3xl rounded-lg rounded-t-none dark:bg-gray-800 bg-white shadow">
+        <div className="py-4 w-full max-w-3xl rounded-lg rounded-t-none dark:bg-gray-800 bg-white shadow">
           {reviews?.length === 0 ? (
-            <p>No Reviews.</p>
+            <p className="text-sm text-gray-400 p-4">No Reviews.</p>
           ) : (
             reviews?.map((review, index) => (
               <>
-                <ReviewItem key={review.id} review={review} />
+                <ReviewItem key={review.updatedAt} review={review} />
                 {index < reviews?.length - 1 && <Divider />}
               </>
             ))

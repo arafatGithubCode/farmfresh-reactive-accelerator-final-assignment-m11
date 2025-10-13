@@ -1,10 +1,9 @@
 "use server";
 
 import { connectDB } from "@/libs/connectDB";
+import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
 import { Review } from "@/models/reviewModel";
-import { getSingleOrderByProductId } from "@/queries/order";
-import { getProduct } from "@/queries/product";
 import { IReview } from "@/types";
 import { catchErr } from "@/utils/catchErr";
 
@@ -14,39 +13,44 @@ export const doCreateReview = async (
 ): Promise<{ success: boolean; message: string }> => {
   await connectDB();
   try {
-    const { customerId, comment, rating } = reviewData;
+    const { customerId, product, comment, rating } = reviewData;
 
-    const order = await getSingleOrderByProductId(reviewData.product as string);
+    // Verify the customer actually ordered and received this product
+    const order = await Order.findOne({
+      customer: customerId,
+      "items.product": product,
+    });
 
     if (!order) {
       throw new Error("Please place an order to make a review.");
     }
 
     if (order.status !== "DELIVERED") {
-      throw new Error("You can make review for DELIVERED order.");
+      throw new Error("You can only make a review for a delivered order.");
     }
 
-    const product = await getProduct(reviewData.product as string);
-
-    if (!product) {
+    // Check if the product exists
+    const productExists = await Product.findById(product);
+    if (!productExists) {
       throw new Error("This product does not exist.");
     }
 
-    const hasReview = product.reviews.some(
-      (review) => review.customer.id === customerId
-    );
-
+    // Check if this user already reviewed the product
+    const hasReview = await Review.findOne({ customer: customerId, product });
     if (hasReview) {
-      throw new Error("You can only make one review for a product.");
+      throw new Error("You can only make one review for this product.");
     }
 
+    // Create review
     const newReview = await Review.create({
       customer: customerId,
-      product: reviewData.product,
+      product,
       comment,
       rating,
     });
-    await Product.findByIdAndUpdate(reviewData.product, {
+
+    // Add to product's review list
+    await Product.findByIdAndUpdate(product, {
       $push: { reviews: newReview._id },
     });
 

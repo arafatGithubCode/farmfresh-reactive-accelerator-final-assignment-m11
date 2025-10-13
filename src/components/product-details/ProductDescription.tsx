@@ -4,6 +4,7 @@ import { IReviewFronted, TBaseUser } from "@/types";
 import { useState } from "react";
 import ReviewItem from "../common/ReviewItem";
 import UserInfo from "../common/UserInfo";
+import Divider from "../ui/Divider";
 
 const ProductDescription = ({
   description,
@@ -92,8 +93,11 @@ const ProductDescription = ({
           {reviews?.length === 0 ? (
             <p>No Reviews.</p>
           ) : (
-            reviews?.map((review) => (
-              <ReviewItem key={review.id} review={review} />
+            reviews?.map((review, index) => (
+              <>
+                <ReviewItem key={review.id} review={review} />
+                {index < reviews?.length - 1 && <Divider />}
+              </>
             ))
           )}
         </div>

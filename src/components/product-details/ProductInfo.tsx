@@ -3,7 +3,8 @@
 import { useCart } from "@/hooks/useCart";
 import { useFavorite } from "@/hooks/useFavorite";
 import { showToast } from "@/providers/ToastProvider";
-import { IProductFrontend } from "@/types";
+import { IProductFrontend, IReview } from "@/types";
+import { useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
@@ -16,11 +17,24 @@ import {
   FaShoppingCart,
 } from "react-icons/fa";
 import Rating from "../common/Rating";
+import WriteReview from "../common/WriteReview";
+import Popup from "../ui/Popup";
 import Tags from "../ui/Tags";
 
 const ProductInfo = ({ product }: { product: IProductFrontend }) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [stock, setStock] = useState<number>(product.stock - 1);
+  const [showWriteReview, setShowWriteReview] = useState<boolean>(false);
+
+  const session = useSession();
+  const customerId = session?.data?.user?.id;
+
+  const newReview: IReview = {
+    customerId: customerId!,
+    product: product.id,
+    comment: "",
+    rating: 0,
+  };
 
   const { updateCart, loading } = useCart();
   const pending = loading[product.id] || false;
@@ -63,7 +77,19 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
       </div>
       <div className="flex items-center space-x-4">
         <Rating reviews={product.reviews} />
-        <button className="text-primary-600 dark:text-primary-400 hover:underline">
+        {showWriteReview && (
+          <Popup onClose={() => setShowWriteReview(false)}>
+            <WriteReview
+              mood="CREATE"
+              review={newReview}
+              onClose={() => setShowWriteReview(false)}
+            />
+          </Popup>
+        )}
+        <button
+          onClick={() => setShowWriteReview(true)}
+          className="text-primary-600 dark:text-primary-400 hover:underline"
+        >
           Write a review
         </button>
       </div>

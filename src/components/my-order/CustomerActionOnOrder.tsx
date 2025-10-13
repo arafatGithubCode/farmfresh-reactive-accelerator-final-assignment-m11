@@ -11,8 +11,8 @@ const CustomerActionOnOrder = ({ order }: { order: IOrderFronted }) => {
   const [showReviewPopup, setShowReviewPopup] = useState<boolean>(false);
 
   const newReview: IReview = {
-    customerId: order.customer.id,
-    productId: order.items[0].product.id,
+    customerId: order?.customer?.id,
+    product: order?.items[0]?.product?.id,
     comment: "",
     rating: 0,
   };

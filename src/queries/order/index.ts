@@ -72,10 +72,14 @@ export const getOrdersByFarmerId = async (farmerId: string) => {
 };
 
 // Get orders by product id
-export const getSingleOrderByProductId = async (productId: string) => {
+export const getSingleOrderByProductIdAndCustomerId = async (
+  customerId: string,
+  productId: string
+) => {
   await connectDB();
 
   const orders = await Order.findOne({
+    customer: customerId,
     "items.product": new mongoose.Types.ObjectId(productId),
   })
     .populate("customer")

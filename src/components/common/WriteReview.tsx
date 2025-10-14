@@ -19,8 +19,6 @@ const WriteReview = ({ review, mood, onClose }: Props) => {
   const [reviewState, setReviewState] = useState<IReview>(review);
   const [hoverRating, setHoverRating] = useState<number>(0);
 
-  console.log(reviewState, "state");
-
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 

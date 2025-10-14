@@ -1,18 +1,5 @@
-import { ILikesDB, IReplyDB, IReviewDB } from "@/types";
+import { ILikesDB, IReviewDB } from "@/types";
 import mongoose, { Model, Schema } from "mongoose";
-
-const replaySchema = new Schema<IReplyDB>(
-  {
-    farmer: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-    },
-    reply: {
-      type: String,
-    },
-  },
-  { timestamps: true }
-);
 
 const likesSchema = new Schema<ILikesDB>(
   {
@@ -48,7 +35,6 @@ const reviewSchema = new Schema<IReviewDB>(
       type: Number,
       required: [true, "Rating is required."],
     },
-    reply: [replaySchema],
     likes: [likesSchema],
   },
   { timestamps: true }

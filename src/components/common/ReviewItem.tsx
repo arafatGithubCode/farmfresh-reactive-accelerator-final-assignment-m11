@@ -1,9 +1,13 @@
 "use client";
 
+import { doDeleteReviewById, doLike } from "@/actions/review";
+import { showToast } from "@/providers/ToastProvider";
 import { IReview, IReviewFronted } from "@/types";
+import { catchErr } from "@/utils/catchErr";
 import { getDateDiff } from "@/utils/getDateDiff";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import {
   FaEdit,
@@ -22,13 +26,21 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
   const [showReviewAction, setShowReviewAction] = useState<boolean>(false);
   const [showUpdateReview, setShowUpdateReview] = useState<boolean>(false);
 
+  const session = useSession();
+  const loggedInUserId = session?.data?.user?.id;
+
+  const [loading, setLoading] = useState<boolean>(false);
+  const router = useRouter();
+
+  const numberOfLikes = review.likes.filter((like) => like.isLike);
+  const userHasLiked = numberOfLikes.some(
+    (like) => like.customer.toString() === loggedInUserId
+  );
+
   const reviewActionRef = useRef<HTMLDivElement>(null);
 
   const fullStars = Math.trunc(review.rating);
   const halfStar = review.rating % 1 >= 0.5;
-
-  const session = useSession();
-  const loggedInUserId = session?.data?.user?.id;
 
   const isReviewOwner = review?.customer?.id === loggedInUserId;
 
@@ -38,6 +50,39 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
     product: review.product,
     comment: review.comment,
     rating: review.rating,
+  };
+
+  const handleLikeToggle = async () => {
+    setLoading(true);
+    try {
+      const response = await doLike(review.id, loggedInUserId!);
+      if (!response.success) {
+        showToast(response.message);
+      } else {
+        router.refresh();
+      }
+    } catch (error) {
+      const errMsg = catchErr(error);
+      showToast(errMsg.error, "ERROR");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    setLoading(true);
+    try {
+      const response = await doDeleteReviewById(review.id);
+      if (!response.success) {
+        showToast(response.message, "ERROR");
+      }
+      router.refresh();
+    } catch (error) {
+      const errMsg = catchErr(error);
+      showToast(errMsg.error, "ERROR");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -114,9 +159,12 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
                     <FaEdit />
                     <span>Edit</span>
                   </div>
-                  <div className="flex items-center gap-1 hover:text-red-500 hover:cursor-pointer text-sm">
+                  <div
+                    onClick={handleDeleteReview}
+                    className="flex items-center gap-1 hover:text-red-500 hover:cursor-pointer text-sm"
+                  >
                     <FaTrash />
-                    <span>Delete</span>
+                    <span>{loading ? "Deleting..." : "Delete"}</span>
                   </div>
                 </div>
               )}
@@ -136,11 +184,17 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
           {review.comment}
         </p>
         <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-          <button className="hover:text-primary-600 dark:hover:text-primary-400 flex">
-            <FaThumbsUp className="mr-1" /> Helpful (12)
-          </button>
-          <button className="hover:text-primary-600 dark:hover:text-primary-400">
-            Reply
+          <button
+            onClick={handleLikeToggle}
+            type="button"
+            disabled={loading}
+            className={`flex items-center disabled:cursor-not-allowed ${
+              userHasLiked
+                ? "text-primary-500"
+                : "text-gray-500 dark:text-gray-400"
+            } hover:text-primary-600 dark:hover:text-primary-400`}
+          >
+            <FaThumbsUp className="mr-1" /> Helpful ({numberOfLikes.length})
           </button>
         </div>
       </div>

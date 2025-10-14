@@ -46,7 +46,9 @@ const ReviewSection = ({
     (review) => review.customer.id === userId
   );
 
-  const otherReviews = reviews.filter((review) => review.product === productId);
+  const otherReviews = reviews.filter(
+    (review) => review.product === productId && review.customer.id !== userId
+  );
 
   const addNewReview: IReview = {
     customerId: userId!,
@@ -128,14 +130,12 @@ const ReviewSection = ({
 
       {/* <!-- Individual Reviews --> */}
       <div className="space-y-6">
-        {loggedInUserReviews.length > 0 &&
-          loggedInUserReviews.map((review) => (
-            <ReviewItem key={review.id} review={review} />
-          ))}
-        {otherReviews.length > 1 &&
-          otherReviews.map((review) => (
-            <ReviewItem key={review.id} review={review} />
-          ))}
+        {loggedInUserReviews.map((review) => (
+          <ReviewItem key={review.id} review={review} />
+        ))}
+        {otherReviews.map((review) => (
+          <ReviewItem key={review.id} review={review} />
+        ))}
       </div>
 
       <div className="text-center mt-8">

@@ -204,9 +204,9 @@ const ProductCard = ({
             )}
           </div>
         ) : isInCart ? (
-          <div className="bg-white rounded-lg border border-primary-500 flex flex-col">
-            <div className="flex items-center justify-between">
-              <div className="font-semibold py-1 px-2 rounded-lg rounded-r-none border-r border-primary-500 text-black">
+          <div className="bg-white rounded-lg flex flex-col">
+            <div className="flex items-center justify-between bg-white dark:bg-gray-800 border border-primary-500">
+              <div className="font-semibold py-1 px-2 rounded-lg rounded-r-none border-r border-primary-500">
                 {cartItem?.quantity ?? 1} {product.unit}
               </div>
               <div className="flex items-center justify-center gap-4 flex-grow">
@@ -222,7 +222,7 @@ const ProductCard = ({
                   }}
                   className="disabled:cursor-wait"
                 >
-                  <FaPlus className="text-xl text-black hover:text-primary-500 duration-200 cursor-pointer" />
+                  <FaPlus className="text-xl hover:text-primary-500 duration-200 cursor-pointer" />
                 </button>
                 <button
                   disabled={pending}
@@ -236,14 +236,14 @@ const ProductCard = ({
                   }}
                   className="disabled:cursor-wait"
                 >
-                  <FaMinus className="text-xl text-black hover:text-primary-500 duration-200 cursor-pointer" />
+                  <FaMinus className="text-xl hover:text-primary-500 duration-200 cursor-pointer" />
                 </button>
               </div>
               <button
                 disabled={pending}
                 type="button"
                 onClick={() => updateCart("REMOVE_ITEM", product.id)}
-                className="text-black bg-red-50 py-1 px-2 rounded-lg rounded-l-none border-l border-primary-500"
+                className="py-1 px-2 border-l border-primary-500"
               >
                 Remove
               </button>

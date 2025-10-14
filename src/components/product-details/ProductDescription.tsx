@@ -1,6 +1,7 @@
 "use client";
 
 import { IReviewFronted, TBaseUser } from "@/types";
+import { useSession } from "next-auth/react";
 import { useState } from "react";
 import ReviewItem from "../common/ReviewItem";
 import UserInfo from "../common/UserInfo";
@@ -10,16 +11,29 @@ const ProductDescription = ({
   description,
   farmer,
   reviews,
+  productId,
 }: {
   description: string;
   farmer: TBaseUser;
   reviews: IReviewFronted[];
+  productId: string;
 }) => {
   const [tab, setTab] = useState({
     isDescription: true,
     isReview: false,
     isFarmer: false,
   });
+
+  const session = useSession();
+  const userId = session?.data?.user?.id;
+
+  const loggedInUserReviews = reviews.filter(
+    (review) => review.customer.id === userId
+  );
+
+  const otherReviews = reviews.filter(
+    (review) => review.product === productId && review.customer.id !== userId
+  );
 
   return (
     <div className="mt-16">
@@ -93,12 +107,20 @@ const ProductDescription = ({
           {reviews?.length === 0 ? (
             <p className="text-sm text-gray-400 p-4">No Reviews.</p>
           ) : (
-            reviews?.map((review, index) => (
-              <>
-                <ReviewItem key={review.updatedAt} review={review} />
-                {index < reviews?.length - 1 && <Divider />}
-              </>
-            ))
+            <>
+              {loggedInUserReviews.map((review, index) => (
+                <>
+                  <ReviewItem key={review.id} review={review} />
+                  {index < reviews?.length - 1 && <Divider />}
+                </>
+              ))}
+              {otherReviews.map((review, index) => (
+                <>
+                  <ReviewItem key={review.id} review={review} />
+                  {index < otherReviews?.length - 1 && <Divider />}
+                </>
+              ))}
+            </>
           )}
         </div>
       )}

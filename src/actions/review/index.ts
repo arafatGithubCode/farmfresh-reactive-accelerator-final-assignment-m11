@@ -1,4 +1,5 @@
 "use server";
+import "@/models/reviewModel";
 
 import { connectDB } from "@/libs/connectDB";
 import { Product } from "@/models/productModel";
@@ -80,6 +81,66 @@ export const doUpdateReview = async (
     await Review.findByIdAndUpdate({ _id: id }, { rating, comment });
 
     return { success: true, message: "Review updated successfully." };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, message: errMsg.error };
+  }
+};
+
+// ===== Like toggling ===== //
+export const doLike = async (
+  reviewId: string,
+  customerId: string
+): Promise<{ success: boolean; message: string }> => {
+  await connectDB();
+  try {
+    const existingReview = await Review.findById(reviewId);
+
+    if (!existingReview) {
+      throw new Error("This review does not exist.");
+    }
+
+    // Ensure likes is initialized
+    if (!existingReview.likes) {
+      existingReview.likes = [];
+    }
+
+    const likeIndex = existingReview.likes.findIndex(
+      (like) => like.customer.toString() === customerId
+    );
+
+    let message = "";
+
+    if (likeIndex === -1) {
+      // New like
+      existingReview.likes.push({ customer: customerId, isLike: true });
+      message = "You liked this review.";
+    } else {
+      // Toggle existing like
+      const currentLike = existingReview.likes[likeIndex];
+      existingReview.likes[likeIndex].isLike = !currentLike.isLike;
+
+      message = currentLike.isLike
+        ? "You unliked this review."
+        : "You liked this review.";
+    }
+
+    await existingReview.save();
+
+    return { success: true, message };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, message: errMsg.error };
+  }
+};
+
+// ===== Delete a review ===== //
+export const doDeleteReviewById = async (
+  reviewId: string
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    await Review.findByIdAndDelete(reviewId);
+    return { success: true, message: "This review deleted successfully." };
   } catch (error) {
     const errMsg = catchErr(error);
     return { success: false, message: errMsg.error };

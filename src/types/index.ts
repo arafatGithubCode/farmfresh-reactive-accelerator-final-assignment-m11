@@ -123,7 +123,6 @@ export interface IReviewDB {
   product: mongoose.Types.ObjectId | string;
   rating: number;
   comment: string;
-  reply?: IReplyDB[];
   likes?: ILikesDB[];
 }
 export interface IReviewFronted {
@@ -132,7 +131,7 @@ export interface IReviewFronted {
   product: string;
   rating: number;
   comment: string;
-  reply: IReplyFronted[];
+  likes: ILikesDB[];
   createdAt?: string;
   updatedAt?: string;
 }

@@ -39,6 +39,7 @@ const ProductDetailsPage = async ({
           description={product.description}
           farmer={product.farmer}
           reviews={product.reviews}
+          productId={params.productId}
         />
         {reviews && reviews.length === 0 ? (
           <p>No reviews added yet.</p>

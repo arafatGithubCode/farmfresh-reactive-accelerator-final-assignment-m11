@@ -1,6 +1,6 @@
 import { connectDB } from "@/libs/connectDB";
 import { Review } from "@/models/reviewModel";
-import { IReviewFronted } from "@/types";
+import { IReviewDB, IReviewFronted } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // Get reviews
@@ -25,6 +25,13 @@ export const getSingleReviewByProductIdAndCustomerId = async (
     customer: customerId,
     product: productId,
   }).lean<IReviewFronted>();
+
+  return transformMongoDoc(review);
+};
+
+// Get Review by id
+export const getReviewById = async (reviewId: string) => {
+  const review = await Review.findById(reviewId).lean<IReviewDB>();
 
   return transformMongoDoc(review);
 };

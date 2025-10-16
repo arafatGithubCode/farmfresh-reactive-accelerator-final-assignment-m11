@@ -4,9 +4,11 @@ import ProductCard from "./ProductCard";
 const ProductCardWrapper = ({
   products,
   isManageListingPage = false,
+  viewType,
 }: {
   products: IProductFrontend[];
   isManageListingPage?: boolean;
+  viewType?: "GRID" | "LIST";
 }) => {
   return (
     <>
@@ -20,6 +22,7 @@ const ProductCardWrapper = ({
             key={product.id}
             product={product}
             isManageListingPage={isManageListingPage}
+            viewType={viewType}
           />
         ))
       )}

@@ -1,7 +1,7 @@
 import { getUserSession } from "@/utils/getUserSession";
-import { FaSearch } from "react-icons/fa";
 import { FaBars } from "react-icons/fa6";
 import Logo from "../common/Logo";
+import SearchByTerm from "../products/filter/SearchByTerm";
 import CartBadge from "./CartBadge";
 import NavItem from "./NavItem";
 import ThemeToggler from "./ThemeToggler";
@@ -50,14 +50,8 @@ const Navbar = async () => {
 
           {/* <!-- User Actions --> */}
           <div className="flex items-center space-x-4">
-            {/* <!-- Search --> */}
-            <div className="hidden sm:block relative">
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="w-64 pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              />
-              <FaSearch className="absolute left-3 top-3 text-gray-400" />
+            <div className="hidden sm:block">
+              <SearchByTerm />
             </div>
 
             {!user || (user?.role?.toLowerCase() !== "farmer" && <CartBadge />)}

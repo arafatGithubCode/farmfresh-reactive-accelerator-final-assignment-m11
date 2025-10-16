@@ -25,14 +25,21 @@ import ProductImageCarousel from "../ui/ProductImageCarousel";
 const ProductCard = ({
   isManageListingPage = false,
   product,
+  viewType,
 }: {
   isManageListingPage?: boolean;
   product: IProductFrontend;
+  viewType?: "GRID" | "LIST";
 }) => {
   const { cart, updateCart, loading } = useCart();
   const { favoriteList, updateFavorite } = useFavorite(product.name);
   const [activeProgress, setActiveProgress] = useState<boolean>(false);
   const [showConfirmPopup, setShowConfirmPopup] = useState<boolean>(false);
+
+  const averageRating =
+    product.reviews.length > 0 &&
+    product.reviews.reduce((acc, cur) => acc + cur.rating, 0) /
+      product.reviews.length;
 
   const cartItem = cart?.items?.find(
     (item) => item?.product?.id === product.id
@@ -85,36 +92,59 @@ const ProductCard = ({
   };
 
   return (
-    <form className="bg-white dark:bg-gray-800 group rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 relative">
-      <div className="relative">
+    <form
+      className={`bg-white dark:bg-gray-800 group rounded-2xl shadow-lg overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative 
+      ${
+        viewType === "LIST"
+          ? "flex flex-col sm:flex-row items-center gap-4 p-4"
+          : ""
+      }`}
+    >
+      {/* === IMAGE SECTION === */}
+      <div
+        className={`relative overflow-hidden ${
+          viewType === "LIST" ? "w-full sm:w-1/3 h-52" : "w-full"
+        }`}
+      >
         {product?.imagesUrl?.length > 0 && (
           <ProductImageCarousel
             images={product.imagesUrl}
             productId={product.id}
           />
         )}
-        <div className="absolute top-3 left-3">
-          {product?.features?.length > 0 && (
-            <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-              {product.features[0]}
-            </span>
-          )}
-        </div>
-        <div className="absolute top-3 right-3">
-          <button
-            onClick={() => updateFavorite(product.id)}
-            type="button"
-            className="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition"
-          >
-            <FaHeart
-              className={`text-xl ${
-                isFavorite ? "text-red-500" : "text-gray-600 dark:text-gray-400"
-              }`}
-            />
-          </button>
-        </div>
+
+        <>
+          <div className="absolute top-3 left-3">
+            {product?.features?.length > 0 && (
+              <span className="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                {product.features[0]}
+              </span>
+            )}
+          </div>
+          <div className="absolute top-3 right-3">
+            <button
+              onClick={() => updateFavorite(product.id)}
+              type="button"
+              className="bg-white dark:bg-gray-800 p-2 rounded-full shadow-md hover:bg-gray-100 dark:hover:bg-gray-700 transition"
+            >
+              <FaHeart
+                className={`text-xl ${
+                  isFavorite
+                    ? "text-red-500"
+                    : "text-gray-600 dark:text-gray-400"
+                }`}
+              />
+            </button>
+          </div>
+        </>
       </div>
-      <div className="p-6">
+
+      {/* === DETAILS SECTION === */}
+      <div
+        className={`p-6 w-full ${
+          viewType === "LIST" ? "sm:w-2/3 flex flex-col justify-between" : ""
+        }`}
+      >
         <div className="flex items-center justify-between mb-2">
           <Link href={`/products/${product.id}`}>
             <h3
@@ -125,17 +155,21 @@ const ProductCard = ({
               {product?.name}
             </h3>
           </Link>
-          <div className="flex items-center text-yellow-400">
-            <FaStar className="text-sm" />
-            <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
-              4.8
-            </span>
-          </div>
+          {averageRating && averageRating > 0 && (
+            <div className="flex items-center text-yellow-400">
+              <FaStar className="text-sm" />
+              <span className="text-sm text-gray-600 dark:text-gray-400 ml-1">
+                {averageRating > 0 && averageRating.toFixed(1)}
+              </span>
+            </div>
+          )}
         </div>
+
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
           By {product?.farmer?.firstName}&apos;s Farm •{" "}
           {product?.farmer?.farmDistrict}
         </p>
+
         <div className="flex items-center justify-between mb-4">
           <div>
             <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
@@ -148,15 +182,15 @@ const ProductCard = ({
               /{product?.unit}
             </span>
             <br />
-            {product.discountRate > 0 && (
+            {product.discountRate > 0 ? (
               <span className="text-red-400 line-through ml-1">
                 ৳{Math.round(product?.price).toLocaleString()}
               </span>
-            )}
-            {Number(product.discountRate) === 0 && (
-              <span className="ml-1 text-transparent">no discount</span>
+            ) : (
+              <span className="text-transparent select-none">no discount</span>
             )}
           </div>
+
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Stock:{" "}
             {`${
@@ -166,6 +200,8 @@ const ProductCard = ({
             } ${product?.unit}`}
           </span>
         </div>
+
+        {/* === BUTTON SECTION === */}
         {isManageListingPage ? (
           <div className="flex space-x-2">
             <Link
@@ -266,12 +302,16 @@ const ProductCard = ({
                 showToast("This product is out of stock.", "WARNING");
               }
             }}
-            className="w-full text-white py-3 bg-primary-600 hover:bg-primary-700 hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center disabled:cursor-wait"
+            className={`w-full text-white py-3 bg-primary-600 hover:bg-primary-700 hover:scale-105 px-4 rounded-lg font-medium transition duration-200 flex items-center justify-center disabled:cursor-wait ${
+              viewType === "LIST" ? "sm:w-1/2 mt-auto" : ""
+            }`}
           >
             {pending ? "Adding.." : "Add to cart"}
           </button>
         )}
       </div>
+
+      {/* Overlay for inactive products */}
       {!isManageListingPage && !product.isActive && (
         <div className="w-full h-full absolute inset-0 bg-gray-500 bg-opacity-60">
           <div className="w-full h-full flex items-center justify-center">

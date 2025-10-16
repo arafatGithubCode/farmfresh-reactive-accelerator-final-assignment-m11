@@ -1,12 +1,26 @@
-import CategoryFilter from "@/components/products/CategoryFilter";
-import LocationFilter from "@/components/products/LocationFilter";
-import OrganicFilter from "@/components/products/OrganicFilter";
-import PriceFilter from "@/components/products/PriceFilter";
+import Pagination from "@/components/common/Pagination";
+import CategoryFilter from "@/components/products/filter/CategoryFilter";
+import LocationFilter from "@/components/products/filter/LocationFilter";
+import OrganicFilter from "@/components/products/filter/OrganicFilter";
+import PriceFilter from "@/components/products/filter/PriceFilter";
+import SearchByTerm from "@/components/products/filter/SearchByTerm";
 import ProductsGrid from "@/components/products/ProductsGrid";
 import { getProducts } from "@/queries/product";
 
-const ProductsPage = async () => {
-  const products = await getProducts();
+const ProductsPage = async ({
+  searchParams,
+}: {
+  searchParams: {
+    term: string;
+    category: string;
+    priceRange: string;
+    location: string;
+    organic: string;
+    sort: string;
+  };
+}) => {
+  const { products, pagination } = await getProducts(searchParams);
+
   return (
     <>
       <div className="bg-primary-600 text-white py-12">
@@ -25,13 +39,22 @@ const ProductsPage = async () => {
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
                 Filters
               </h3>
+              <div className="mb-4">
+                <h4 className="font-medium text-gray-900 dark:text-white mb-3">
+                  Search Term
+                </h4>
+                <SearchByTerm width="w-52" />
+              </div>
               <CategoryFilter />
               <PriceFilter />
               <LocationFilter />
               <OrganicFilter />
             </div>
           </div>
-          <ProductsGrid products={products} />
+          <div className="lg:col-span-3">
+            <ProductsGrid products={products} pagination={pagination} />
+            <Pagination pagination={pagination} />
+          </div>
         </div>
       </div>
     </>

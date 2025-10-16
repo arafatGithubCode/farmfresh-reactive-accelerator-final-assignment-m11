@@ -21,6 +21,7 @@ export const getProducts = async (searchParams: {
   location?: string;
   organic?: string;
   sort?: string;
+  status?: string;
   page?: string;
   limit?: string;
 }) => {

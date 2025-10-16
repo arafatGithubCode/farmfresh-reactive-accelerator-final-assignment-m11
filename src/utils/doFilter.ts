@@ -4,6 +4,7 @@ export const doFilter = (searchParams: {
   priceRange?: string;
   organic?: string;
   sort?: string;
+  status?: string;
   page?: string;
   limit?: string;
 }) => {
@@ -13,12 +14,22 @@ export const doFilter = (searchParams: {
     priceRange,
     organic,
     sort,
+    status,
     page = "1",
     limit = "6",
   } = searchParams;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const filter: any = { isActive: true };
+  const filter: any = {};
+
+  // filter based on status
+  if (status === "active") {
+    filter.isActive = true;
+  } else if (status === "inactive") {
+    filter.isActive = false;
+  } else {
+    filter.isActive = true;
+  }
 
   // search term based on name or description
   if (term) {

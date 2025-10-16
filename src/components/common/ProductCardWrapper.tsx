@@ -12,7 +12,7 @@ const ProductCardWrapper = ({
 }) => {
   return (
     <>
-      {products && products.length === 0 ? (
+      {products && products?.length === 0 ? (
         <p className="text-xs font-semibold text-gray-400">
           No products listed yet.
         </p>

@@ -7,10 +7,24 @@ import { showToast } from "@/providers/ToastProvider";
 import { getProductsByFarmerId } from "@/queries/product";
 import { getUserSession } from "@/utils/getUserSession";
 
-const ManageProductPage = async () => {
+const ManageProductPage = async ({
+  searchParams,
+}: {
+  searchParams: {
+    term: string;
+    category: string;
+    priceRange: string;
+    location: string;
+    organic: string;
+    sort: string;
+  };
+}) => {
   const userSession = await getUserSession();
   const farmerId = userSession?.id;
-  const products = await getProductsByFarmerId(farmerId!);
+  const { products, pagination } = await getProductsByFarmerId(
+    searchParams,
+    farmerId!
+  );
 
   if (userSession?.role !== "Farmer")
     showToast("Only farmer can access manage product page.", "WARNING");
@@ -22,7 +36,7 @@ const ManageProductPage = async () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <ProductCardWrapper products={products} isManageListingPage={true} />
       </div>
-      <Pagination />
+      <Pagination pagination={pagination} />
     </div>
   ) : (
     <AccessDenied allowedRole="Farmer" path="Manage-Product page" />

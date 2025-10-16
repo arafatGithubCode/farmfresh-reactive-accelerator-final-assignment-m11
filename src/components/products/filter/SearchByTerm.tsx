@@ -44,6 +44,7 @@ const SearchByTerm = ({ width }: { width?: string }) => {
     <div className="relative">
       <input
         type="text"
+        id="term"
         defaultValue={searchTerm}
         placeholder="Search products..."
         onChange={(e) => {

@@ -1,6 +1,6 @@
 import { connectDB } from "@/libs/connectDB";
 import { User } from "@/models/userModel";
-import { IUserDB } from "@/types";
+import { IUserDB, TBaseUser } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 
 // Create a user
@@ -39,4 +39,10 @@ export const getAllFarmers = async () => {
   await connectDB();
   const farmers = await User.find({ role: "Farmer" }).lean();
   return transformMongoDoc(farmers);
+};
+
+// Get farmer by id
+export const getFarmerById = async (farmerId: string) => {
+  const farmer = await User.findById(farmerId).lean<TBaseUser>();
+  return transformMongoDoc(farmer);
 };

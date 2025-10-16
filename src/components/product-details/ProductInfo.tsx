@@ -181,7 +181,10 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
         href="/navigate-to-farmer-"
         className="block bg-primary-50 dark:bg-primary-900 rounded-xl p-4 group"
       >
-        <div className="flex items-center space-x-3">
+        <Link
+          href={`/products/?farmerId=${product.farmer.id}`}
+          className="flex items-center space-x-3"
+        >
           <Image
             src={product.farmer.image!}
             alt={product.farmer.firstName}
@@ -197,7 +200,7 @@ const ProductInfo = ({ product }: { product: IProductFrontend }) => {
               Farmer since {new Date(product.farmer.updatedAt!).getFullYear()}
             </p>
           </div>
-        </div>
+        </Link>
       </Link>
     </div>
   );

@@ -1,4 +1,6 @@
 import { IProductFrontend } from "@/types";
+import Link from "next/link";
+import { FaArrowRight } from "react-icons/fa";
 import ProductCardWrapper from "../common/ProductCardWrapper";
 
 const FeaturedProducts = ({ products }: { products: IProductFrontend[] }) => (
@@ -13,12 +15,12 @@ const FeaturedProducts = ({ products }: { products: IProductFrontend[] }) => (
             Fresh picks from our local farmers
           </p>
         </div>
-        <a
-          href="products.html"
-          className="text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700 dark:hover:text-primary-300"
+        <Link
+          href="/products"
+          className="text-primary-600 dark:text-primary-400 font-medium hover:text-primary-700 dark:hover:text-primary-300 flex gap-1 items-center"
         >
-          View All <i className="fas fa-arrow-right ml-1"></i>
-        </a>
+          View All <FaArrowRight />
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

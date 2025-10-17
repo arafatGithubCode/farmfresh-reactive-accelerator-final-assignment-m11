@@ -118,10 +118,7 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
                       order.customer.lastName ?? ""
                     }`}</p>
                     {showCustomer && (
-                      <Popup
-                        hasUserInfo={true}
-                        onClose={() => setShowCustomer(false)}
-                      >
+                      <Popup size="big" onClose={() => setShowCustomer(false)}>
                         <UserInfo user={order.customer} />
                       </Popup>
                     )}
@@ -181,10 +178,7 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
                         By {product?.farmer?.farmName}&apos;s Farm
                       </p>
                       {showFarmer && (
-                        <Popup
-                          hasUserInfo={true}
-                          onClose={() => setShowFarmer(false)}
-                        >
+                        <Popup size="big" onClose={() => setShowFarmer(false)}>
                           <UserInfo user={item.product.farmer} />
                         </Popup>
                       )}

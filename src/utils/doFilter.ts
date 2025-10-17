@@ -27,6 +27,8 @@ export const doFilter = (searchParams: {
     filter.isActive = true;
   } else if (status === "inactive") {
     filter.isActive = false;
+  } else if (status === "out_of_stock") {
+    filter.stock = 0;
   } else {
     filter.isActive = true;
   }

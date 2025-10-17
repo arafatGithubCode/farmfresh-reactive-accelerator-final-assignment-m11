@@ -123,10 +123,7 @@ const ReviewItem = ({ review }: { review: IReviewFronted }) => {
                 `${review.customer.firstName} ${review.customer.lastName}`}
             </h4>
             {showCustomerInfo && (
-              <Popup
-                hasUserInfo={true}
-                onClose={() => setShowCustomerInfo(false)}
-              >
+              <Popup size="big" onClose={() => setShowCustomerInfo(false)}>
                 <UserInfo user={review.customer} />
               </Popup>
             )}

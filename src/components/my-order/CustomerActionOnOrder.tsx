@@ -6,9 +6,11 @@ import { FaRedo, FaStar } from "react-icons/fa";
 import DownloadReceipt from "../common/DownloadReceipt";
 import WriteReview from "../common/WriteReview";
 import Popup from "../ui/Popup";
+import Reorder from "./Reorder";
 
 const CustomerActionOnOrder = ({ order }: { order: IOrderFronted }) => {
   const [showReviewPopup, setShowReviewPopup] = useState<boolean>(false);
+  const [showReorderPopup, setShowReorderPopup] = useState<boolean>(false);
 
   const newReview: IReview = {
     customerId: order?.customer?.id,
@@ -25,11 +27,21 @@ const CustomerActionOnOrder = ({ order }: { order: IOrderFronted }) => {
           <DownloadReceipt order={order} />
           <button
             type="button"
+            onClick={() => setShowReorderPopup(true)}
             className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg font-medium transition"
           >
             <FaRedo className="mr-2" />
             Reorder
           </button>
+          {showReorderPopup && (
+            <Popup
+              onClose={() => setShowReorderPopup(false)}
+              size="big"
+              isReorder={true}
+            >
+              <Reorder order={order} />
+            </Popup>
+          )}
         </Fragment>
       )}
 

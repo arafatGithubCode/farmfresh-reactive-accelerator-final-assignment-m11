@@ -7,13 +7,15 @@ import { IoClose } from "react-icons/io5";
 const Popup = ({
   children,
   onClose,
-  hasUserInfo = false,
+  size = "small",
+  isReorder = false,
 }: {
   children: ReactNode;
   onClose: () => void;
-  hasUserInfo?: boolean;
+  size?: "small" | "big";
+  isReorder?: boolean;
 }) => {
-  const width = hasUserInfo ? "w-full max-w-3xl" : "w-full max-w-md";
+  const width = size === "big" ? "w-full max-w-3xl" : "w-full max-w-md";
 
   return ReactDOM.createPortal(
     <div
@@ -22,7 +24,9 @@ const Popup = ({
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`${width} bg-white dark:bg-gray-800 rounded-lg p-4 shadow-xl animate-zoom-in relative`}
+        className={`${width} bg-white dark:bg-gray-800 rounded-lg py-4 ${
+          isReorder ? "px-0" : "px-4"
+        } shadow-xl animate-zoom-in relative`}
       >
         {children}
         <IoClose

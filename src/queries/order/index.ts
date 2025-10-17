@@ -1,7 +1,7 @@
 import { connectDB } from "@/libs/connectDB";
 import { Order } from "@/models/orderModel";
 import { Product } from "@/models/productModel";
-import { IOrderFronted } from "@/types";
+import { IOrderFronted, TOrderStatus } from "@/types";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import mongoose from "mongoose";
 
@@ -25,12 +25,19 @@ export const getOrderById = async (orderId: string) => {
 };
 
 // Get orders by customer id
-export const getOrdersByCustomerId = async (customerId: string) => {
+export const getOrdersByCustomerId = async (
+  customerId: string,
+  orderStatus?: TOrderStatus
+) => {
   await connectDB();
 
-  const orders = await Order.find({
-    customer: customerId,
-  })
+  const filter: Record<string, string> = { customer: customerId };
+
+  if (orderStatus) {
+    filter.status = orderStatus;
+  }
+
+  const orders = await Order.find(filter)
     .populate("customer")
     .populate({
       path: "items.product",
@@ -46,7 +53,10 @@ export const getOrdersByCustomerId = async (customerId: string) => {
 };
 
 // Get orders by farmer id
-export const getOrdersByFarmerId = async (farmerId: string) => {
+export const getOrdersByFarmerId = async (
+  farmerId: string,
+  orderStatus?: TOrderStatus
+) => {
   await connectDB();
 
   // Get all products of this farmer
@@ -55,8 +65,15 @@ export const getOrdersByFarmerId = async (farmerId: string) => {
 
   if (productIds.length === 0) return null;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const filter: any = { "items.product": { $in: productIds } };
+
+  if (orderStatus) {
+    filter.status = orderStatus;
+  }
+
   // Get only the orders that include those orders
-  const orders = await Order.find({ "items.product": { $in: productIds } })
+  const orders = await Order.find(filter)
     .populate("customer")
     .populate({
       path: "items.product",

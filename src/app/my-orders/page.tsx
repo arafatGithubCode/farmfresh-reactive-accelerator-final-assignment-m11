@@ -1,9 +1,14 @@
+import FilterOrder from "@/components/my-order/FilterOrder";
 import OrderItem from "@/components/my-order/OrderItem";
 import { getOrdersByCustomerId, getOrdersByFarmerId } from "@/queries/order";
-import { IOrderFronted } from "@/types";
+import { IOrderFronted, TOrderStatus } from "@/types";
 import { getUserSession } from "@/utils/getUserSession";
 
-const MyOrdersPage = async () => {
+const MyOrdersPage = async ({
+  searchParams: { orderStatus },
+}: {
+  searchParams: { orderStatus: TOrderStatus };
+}) => {
   const user = await getUserSession();
   const role = user?.role;
 
@@ -17,9 +22,9 @@ const MyOrdersPage = async () => {
 
   const orders =
     role === "Customer"
-      ? await getOrdersByCustomerId(user.id!)
+      ? await getOrdersByCustomerId(user.id!, orderStatus)
       : role === "Farmer"
-      ? await getOrdersByFarmerId(user.id!)
+      ? await getOrdersByFarmerId(user.id!, orderStatus)
       : [];
 
   return (
@@ -34,17 +39,7 @@ const MyOrdersPage = async () => {
             Track and manage your orders
           </p>
         </div>
-
-        {/* Filter (optional future use) */}
-        <div className="mt-4 sm:mt-0">
-          <select className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-            <option>All Orders</option>
-            <option>Pending</option>
-            <option>Confirmed</option>
-            <option>Delivered</option>
-            <option>Cancelled</option>
-          </select>
-        </div>
+        <FilterOrder />
       </div>
 
       {/* Orders List */}

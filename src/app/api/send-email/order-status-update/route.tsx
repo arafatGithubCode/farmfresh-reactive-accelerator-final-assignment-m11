@@ -21,12 +21,16 @@ export const POST = async (req: NextRequest) => {
 
     const subject = `Order #${id} - ${statusMessages[status]}`;
     const html = `
+    <div style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+        <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
       <p>Hi ${fullName},</p>
       <p>${statusMessages[status]}</p>
       <p><strong>Order ID:</strong> #${id}</p>
       <p><strong>Current Status:</strong> ${status}</p>
       <p>Thank you for choosing <strong>FarmFresh</strong>!<br/>
       Stay tuned for more updates.</p>
+      </div>
+      </div>
     `;
 
     const text = `

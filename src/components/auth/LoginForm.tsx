@@ -142,7 +142,7 @@ const LoginForm = () => {
             </label>
           </div>
           <a
-            href="forgot-password.html"
+            href="/forgot-password"
             className="text-sm text-primary-600 hover:text-primary-500"
           >
             Forgot password?

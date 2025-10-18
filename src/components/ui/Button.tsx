@@ -8,7 +8,7 @@ type ButtonVariant = "primary" | "danger" | "warning" | "outline";
 
 type ButtonProps = {
   label: string;
-  loading: boolean;
+  loading?: boolean;
   hasSpinner?: boolean;
   loadingText?: string;
   variant?: ButtonVariant;

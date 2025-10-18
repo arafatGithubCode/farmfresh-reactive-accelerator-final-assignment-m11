@@ -2,15 +2,22 @@
 
 import { signIn, signOut } from "@/auth";
 import { connectDB } from "@/libs/connectDB";
+import { Reset } from "@/models/resetPasswordModel";
 import { User } from "@/models/userModel";
 import { createUser } from "@/queries/user";
 import { uploadImage } from "@/services/UploadImag";
-import { IUserDB, IUserRegistrationForm } from "@/types";
+import {
+  IResetForm,
+  IResetPassword,
+  IUserDB,
+  IUserRegistrationForm,
+} from "@/types";
 import { catchErr } from "@/utils/catchErr";
 import { getUserSession } from "@/utils/getUserSession";
 import { transformMongoDoc } from "@/utils/transformMongoDoc";
 import { validateChangePassword } from "@/validations/validateChangePassword";
 import { validateRegistrationForm } from "@/validations/validateRegistrationForm";
+import { validateResetForm } from "@/validations/validateResetForm";
 import bcrypt from "bcryptjs";
 import { getUserByEmail } from "./../../queries/user/index";
 
@@ -251,6 +258,113 @@ export const doChangePassword = async (
       { email: existingUser.email },
       { password: hashedPassword }
     );
+
+    return { success: true, message: "Password updated successfully." };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, message: errMsg.error };
+  }
+};
+
+// Perform reset password
+export const doResetPassword = async (formData: FormData) => {
+  try {
+    const email = formData.get("email");
+    const isExist = await getUserByEmail(email as string);
+
+    if (!isExist) {
+      throw new Error("This email does not exist.");
+    }
+
+    const userName =
+      isExist.name ?? isExist.firstName + " " + isExist?.lastName;
+
+    const res = await fetch(
+      `${process.env.BASE_URL}/api/send-email/send-reset-password`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, userName }),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to send reset key link.");
+    }
+
+    const data = await res.json();
+
+    return { success: true, message: data.message, email };
+  } catch (error) {
+    const errMsg = catchErr(error);
+    return { success: false, message: errMsg.error };
+  }
+};
+
+// Perform verify reset key
+export const doVerifyResetKey = async (
+  formData: FormData
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const formValues: IResetForm = {
+      email: formData.get("email") as string,
+      resetKey: formData.get("resetKey") as string,
+      newPassword: formData.get("newPassword") as string,
+      confirmPassword: formData.get("confirmPassword") as string,
+    };
+
+    // run validation
+    const validationErrors = validateResetForm(formValues);
+
+    if (
+      validationErrors &&
+      Object.values(validationErrors).some((field) => field)
+    ) {
+      throw new Error(Object.values(validationErrors)[0]!); // return first err
+    }
+
+    const isExist = await Reset.findOne({
+      email: formValues.email,
+    }).lean<IResetPassword>();
+
+    if (!isExist) {
+      throw new Error("This reset key does not exist.");
+    }
+
+    const user = await getUserByEmail(formValues.email);
+    if (!user) {
+      throw new Error("This user does not exist.");
+    }
+    const userName = user.name ?? user.firstName + " " + user?.lastName;
+
+    // verify reset key
+    if (isExist.resetKey !== formValues.resetKey) {
+      throw new Error("This reset key does not match.");
+    }
+
+    // hash password
+    const hashPassword = await bcrypt.hash(formValues.confirmPassword, 10);
+
+    // update the password
+    await User.findOneAndUpdate(
+      { email: formValues.email },
+      { password: hashPassword },
+      { new: true }
+    );
+
+    // delete this reset key
+    await Reset.findByIdAndDelete(isExist._id);
+
+    // send success mail
+    await fetch(`${process.env.BASE_URL}/api/send-email/send-reset-success`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: formValues.email, userName }),
+    });
 
     return { success: true, message: "Password updated successfully." };
   } catch (error) {

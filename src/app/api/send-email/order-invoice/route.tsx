@@ -14,14 +14,22 @@ export const POST = async (req: NextRequest) => {
     const pdfBuffer = await renderToBuffer(<InvoicePDF order={order} />);
     const uint8Array = new Uint8Array(pdfBuffer);
 
+    const userName =
+      order.customer.name ??
+      `${order.customer.firstName} ${order.customer.lastName}`;
+
     const subject = `Your order #${order.id} receipt.`;
     const html = `
-      <p>Hi ${order.customer.firstName} ${order.customer.lastName},</p>
+    <div style="font-family: Arial, sans-serif; background-color: #f8f9fa; padding: 20px;">
+        <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+      <p>Hi ${userName},</p>
       <p>Thanks for your order. Your receipt is attached as a PDF.</p>
       <p>Order ID: <strong>#${order.id}</strong></p>
       <p>Best regards,<br/>FarmFresh</p>
+      </div>
+      </div>
     `;
-    const text = `Hi ${order.customer.firstName} ${order.customer.lastName},
+    const text = `Hi ${userName},
 
 Thanks for your order. Your receipt is attached as a PDF.
 

@@ -78,6 +78,7 @@ export interface IUserRegistrationForm
     | "image"
     | "updatedAt"
     | "id"
+    | "name"
   > {
   avatar: File | null;
   confirmPassword: string;
@@ -358,3 +359,17 @@ export interface IOrderFronted {
   updatedAt?: Date | string;
 }
 // Fronted Order Type End
+
+//  reset password
+export interface IResetPassword {
+  _id?: string | mongoose.Types.ObjectId;
+  email: string;
+  resetKey: string;
+}
+
+export interface IResetForm {
+  email: string;
+  resetKey: string;
+  newPassword: string;
+  confirmPassword: string;
+}

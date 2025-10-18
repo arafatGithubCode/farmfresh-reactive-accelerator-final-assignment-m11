@@ -9,6 +9,7 @@ export const getReviewsByProductId = async (productId: string) => {
 
   const reviews = await Review.find({ product: productId })
     .populate("customer")
+    .limit(5)
     .lean<IReviewFronted[]>();
 
   return transformMongoDoc(reviews);
@@ -24,7 +25,9 @@ export const getSingleReviewByProductIdAndCustomerId = async (
   const review = await Review.findOne({
     customer: customerId,
     product: productId,
-  }).lean<IReviewFronted>();
+  })
+    .populate("customer")
+    .lean<IReviewFronted>();
 
   return transformMongoDoc(review);
 };

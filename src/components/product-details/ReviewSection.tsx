@@ -2,7 +2,7 @@
 
 import { IReview, IReviewFronted } from "@/types";
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaRegStar, FaStar, FaStarHalfAlt } from "react-icons/fa";
 import ReviewItem from "../common/ReviewItem";
 import WriteReview from "../common/WriteReview";
@@ -10,17 +10,23 @@ import Popup from "../ui/Popup";
 
 const ReviewSection = ({
   reviews,
+  loggedInUserReview,
   productId,
 }: {
   reviews: IReviewFronted[];
+  loggedInUserReview: IReviewFronted;
   productId: string;
 }) => {
   const [showWriteReview, setShowWriteReview] = useState<boolean>(false);
+  const [showMore, setShowMore] = useState<number>(0);
 
   const session = useSession();
   const userId = session?.data?.user?.id;
 
-  const totalReviews = reviews.length;
+  let totalReviews = reviews.length;
+  if (loggedInUserReview) {
+    totalReviews += 1;
+  }
 
   const totalAverageRating =
     reviews.reduce((acc, cur) => acc + cur.rating, 0) / totalReviews;
@@ -42,13 +48,11 @@ const ReviewSection = ({
     return totalReviews === 0 ? 0 : Math.round((count / totalReviews) * 100);
   };
 
-  const loggedInUserReviews = reviews.filter(
-    (review) => review.customer.id === userId
-  );
-
   const otherReviews = reviews.filter(
     (review) => review.product === productId && review.customer.id !== userId
   );
+
+  const reviewsToShow = otherReviews.slice(0, showMore + 3);
 
   const addNewReview: IReview = {
     customerId: userId!,
@@ -56,6 +60,12 @@ const ReviewSection = ({
     comment: "",
     rating: 0,
   };
+
+  useEffect(() => {
+    if (loggedInUserReview) {
+      setShowMore(1);
+    }
+  }, [loggedInUserReview]);
 
   return (
     <div className="mt-16">
@@ -98,8 +108,8 @@ const ReviewSection = ({
                   ))}
                 </div>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Based on {reviews.length} review
-                  {reviews.length > 1 ? "s" : ""}
+                  Based on {totalReviews} review
+                  {totalReviews > 1 ? "s" : ""}
                 </p>
               </div>
             </div>
@@ -130,19 +140,23 @@ const ReviewSection = ({
 
       {/* <!-- Individual Reviews --> */}
       <div className="space-y-6">
-        {loggedInUserReviews.map((review) => (
-          <ReviewItem key={review.id} review={review} />
-        ))}
-        {otherReviews.map((review) => (
+        {loggedInUserReview && <ReviewItem review={loggedInUserReview} />}
+
+        {reviewsToShow.map((review) => (
           <ReviewItem key={review.id} review={review} />
         ))}
       </div>
 
-      <div className="text-center mt-8">
-        <button className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition">
-          Load More Reviews
-        </button>
-      </div>
+      {otherReviews.length > reviewsToShow.length && (
+        <div className="text-center mt-8">
+          <button
+            onClick={() => setShowMore((prev) => prev + 5)}
+            className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-900 dark:text-white px-6 py-3 rounded-lg font-medium transition"
+          >
+            Load More Reviews
+          </button>
+        </div>
+      )}
     </div>
   );
 };

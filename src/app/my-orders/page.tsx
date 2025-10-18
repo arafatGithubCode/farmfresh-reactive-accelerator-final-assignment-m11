@@ -36,7 +36,7 @@ const MyOrdersPage = async ({
             My Orders
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mt-2">
-            Track and manage your orders
+            Track and manage your orders ({orders?.length})
           </p>
         </div>
         <FilterOrder />

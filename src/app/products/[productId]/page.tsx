@@ -5,27 +5,38 @@ import ReviewSection from "@/components/product-details/ReviewSection";
 import BreadCrumb from "@/components/ui/BreadCrumb";
 import { showToast } from "@/providers/ToastProvider";
 import { getProduct } from "@/queries/product";
-import { getReviewsByProductId } from "@/queries/review";
+import {
+  getReviewsByProductId,
+  getSingleReviewByProductIdAndCustomerId,
+} from "@/queries/review";
+import { getUserSession } from "@/utils/getUserSession";
 import { redirect } from "next/navigation";
 
 const ProductDetailsPage = async ({
-  params,
+  params: { productId },
 }: {
   params: { productId: string };
 }) => {
-  if (!params.productId) {
+  const user = await getUserSession();
+  const customerId = user?.id;
+
+  if (!productId) {
     showToast("This product does not exist.", "WARNING");
     redirect("/products");
   }
 
-  const product = await getProduct(params.productId);
+  const product = await getProduct(productId);
 
   if (!product) {
     showToast("This product does not exist.", "WARNING");
     redirect("/products");
   }
 
-  const reviews = await getReviewsByProductId(params.productId);
+  const reviews = await getReviewsByProductId(productId);
+  const loggedInUserReview = await getSingleReviewByProductIdAndCustomerId(
+    customerId!,
+    productId
+  );
 
   return (
     <>
@@ -39,12 +50,17 @@ const ProductDetailsPage = async ({
           description={product.description}
           farmer={product.farmer}
           reviews={product.reviews}
-          productId={params.productId}
+          loggedInUserReview={loggedInUserReview!}
+          productId={productId}
         />
         {reviews && reviews.length === 0 ? (
           <p>No reviews added yet.</p>
         ) : (
-          <ReviewSection reviews={reviews} productId={params.productId} />
+          <ReviewSection
+            reviews={reviews}
+            productId={productId}
+            loggedInUserReview={loggedInUserReview!}
+          />
         )}
       </div>
     </>

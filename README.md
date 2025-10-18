@@ -1,87 +1,130 @@
-# The Final Assignment of Reactive Accelerator (react/next.js) Course (rnext-batch-3)
+# FarmFresh – Final Assignment of Reactive Accelerator (React/Next.js) Course (rnext-batch-3)
 
-## এসাইনমেন্টে আপনাকে যা যা করতে হবেঃ
+## Introduction
 
-✅ ইউজার Authentication Implement করতে হবে । এক্ষেত্রে Access Token এবং Refresh Token যথাযথ ভাবে কাজ করতে পারতে হবে ।
+**FarmFresh** is a web platform that connects farmers directly to customers, allowing them to sell their fresh farm products without any middlemen. It ensures transparency, fairness, and freshness for both farmers and consumers.
 
-✅ আমাদের দেয়া login.html এবং register.html টেমপ্লেট ব্যবহার করে ইউজার কে লগইন এবং রেজিস্ট্রেশন করাতে হবে ।
+## UI/UX
 
-✅ লগইন এবং রেজিস্ট্রেশন এর ক্ষেত্রে "Continue with Google" অর্থাৎ সোশাল লগিন ব্যবহার করে যেন ইউজার তাদের একাউন্টে লগইন এবং রেজিস্টার করতে হবে ।
+The design of FarmFresh focuses on a farming-themed aesthetic combined with an e-commerce experience.
 
-✅ লগইন এবং রেজিস্ট্রেশনের ক্ষেত্রে Parallel Routing এবং Intercepting Routing ইমপ্লিমেন্ট করতে হবে, যেন নেভিগেশন করে লগইন বা রেজিস্ট্রেশন এ ক্লিক করলে মোডাল ওপেন হয় আর পেজ রিলোড করলে সেটি যেন একটি আলাদা পেজ আকারে দেখা যায় ।
+- The interface uses soothing green tones to reflect the freshness of agriculture.
+- Both light and dark themes are included for accessibility.
+- Every UI element clearly communicates its purpose, ensuring a smooth and intuitive user journey.
+- Each process in the app is well-connected for a seamless experience.
 
-- ইউজার চাইলে forget-password.html ব্যবহার করে তার Password Reset করতে পারবে । Password Reset এর ক্ষেত্রে ইউজারের ইমেইল এ মেইল পাঠাতে হবে ।
+## Features
 
-- হোম পেজ অর্থাৎ index.html পেজের ক্ষেত্রে -
+### Authentication
 
-  - সার্চ Implement করতে হবে । যেন ইউজার যদি কোনো কী-ওয়ার্ড লিখে, ক্যাটেগরি সিলেক্ট করে সার্চ করে তাহলে প্রোডাক্ট এর সার্চ রেজাল্ট products.html অনুরূপ পেজে নিয়ে গিয়ে দেখাতে হবে ।
+- Complete authentication flow with **Email** and **Google** credentials.
+  - Login and Register using Email/Password or Google.
+  - Password reset system with email confirmation.
+  - Middleware-protected routes.
+  - Refresh and Access Token setup for secure sessions.
 
-  - সার্চ রেজাল্ট পেজ অর্থাৎ products.html এ একটা ইউজার এক্সপেরিয়ান্স রিলেটেড সমস্যা আছে । ইউজার কোন কী-ওয়ার্ড লিখে সার্চ করেছে এবং ইউজার যদি অন্য কোনো কী-ওয়ার্ড লিখে সার্চ করতে চায়, সেই অপশন বর্তমানে নেই । আপনাকে সার্চ রেজাল্ট পেজের এই ইউজার এক্সপেরিয়ান্স রিলেটেড সমস্যার সমাধান করতে হবে ।
+### Farmer Features
 
-  - Hero Section এর নিচে রয়েছে Shop by Category Section, সেখানে কোনো Category-তে ক্লিক করলে products.html পেজে নিয়ে যাবে এবং products.html পেজের বাম পাশের Filter অপশন এ ইউজারের সিলেক্ট করা Category By default সিলেক্ট করা থাকবে । এবং সেই Category অনুযায়ী প্রোডাক্ট দেখাতে হবে ।
+- **Product Management**
+  - Add products with title, description, images, discount, price, and more.
+  - Update, edit, or delete existing products.
+  - Activate/deactivate listed products easily.
+  - Advanced filters and pagination for quick navigation.
+- **Order Management**
+  - View and track all product orders from the “My Orders” page.
+  - Update order status (Placed → Confirmed → Shipped → Delivered).
+  - Smart filters for quick order search.
+- **Profile Management**
+  - Edit profile details, including role and personal info.
 
-  - Featured Products Section-এ সেই সকল প্রোডাক্ট গুলো নিয়ে এসে দেখাতে হবে, যেগুলো প্রোডাক্ট এর Purchase সব থেকে বেশি । Initial অবস্থায় যদি কোনো কোনো Purchase না হয়ে থাকে তাহলে Created At তারিখের ভিত্তিতে সর্বোচ্চ ৮ টি প্রোডাক্ট নিয়ে এসে দেখাতে হবে । এই সেকশন থেকে ইউজার যাইলে যেকোনো প্রোডাক্ট "Add to Cart" করতে পারবে, Favourite Toggle করতে পারবে এবং Product Title এ ক্লিক করে সেই প্রোডাক্ট এর ডিটেইলস ও দেখতে পারবে । প্রোডাক্ট এর ডিটেইলস এ ক্লিক করলে details.html পেজের অনুরূপ পেজে নিয়ে গিয়ে অথবা Parallel Routing এবং Intercepting Routing ইমপ্লিমেন্ট করে প্রোডাক্ট এর ডিটেইলস ও দেখতে হবে ।
+### Customer Features
 
-  - Featured Products Section-এ View All লিঙ্ক রয়েছে । সেখানে ক্লিক করলে সব গুলো প্রোডাক্ট দেখাতে হবে ।
+- **Cart Management**
+  - Add, increment, decrement, and delete products from the cart.
+  - Smart cart page to manage products and navigate to checkout.
+  - Simulated payment process for order placement.
+  - Orders can be canceled before farmer confirmation; canceled orders can be replaced.
+  - Downloadable order receipt as a professional PDF including farmer and order details.
 
-- প্রোডাক্ট ডিটেইলস পেজ অর্থাৎ details.html পেজের ক্ষেত্রে -
+### Filtering and Searching
 
-  - প্রোডাক্ট ডিটেইলস পেজ এ প্রোডাক্ট এর গ্যালারি, ক্যাটাগরি ও প্রোডাক্ট ফিচারস (ex. Organic, Fresh) , প্রোডাক্ট নাম, ফার্মারের নাম, মোট রেটিং সংখ্যা এবং এভারেজ রেটিং, বিবরণ, Quantity ইত্যাদি তথ্য দেখাতে হবে অনুরূপ আমাদের দেয়া details.html টেম্পলেট এর মত ।
+- Case-insensitive search for products by title and description.
+- Filter products by price, category, features, and location.
+- Sort products for better browsing experience.
 
-  - ইউজার Add to Cart Toggle করতে পারবে, Add to Favourite করতে পারবে এবং Buy Now তে ক্লিক করলে সরাসরি paymentProcess.html এ নিয়ে যাবে ।
+### Review System
 
-  - আপনাদের সকল প্রডাক্ট এর Stock Manage করতে হবে ।
+- Customers can review a product only once.
+- Reviews are allowed only after the product is successfully delivered.
 
-  - নিচের সেকশন এ Description, Reviews & Farmar Info ইত্যাদি ট্যাবভিউ তে দেখাতে হবে ।
+### Email Configuration
 
-  - রিভিউ সেকশন এ সেই প্রোডাক্ট এর রিভিউ গুলো নিয়ে এসে দেখাতে হবে । ইউজার যদি প্রোডাক্টটি Purchase করে থাকে, তাহলে ইউজার Write a Review বাটন বাটন দেখতে পারবে । এবং একজন ইউজার শুধু মাত্র একটি রিভিউই দিতে পারবে ।
+- Order confirmation emails.
+- Order status update notifications.
+- Password reset key emails.
 
-  - রিভিউ সেকশন এ অনেক গুলো রিভিউ এর মধ্যে লগইন করা ইউজার এর রিভিউ প্রথমে দেখাবে এবং লগিন করা ইউজার তার রিভিউ Edit এবং Delete করতে পারবে ।
+### UI Navigation
 
-  - Load More Reviews বাটনে ক্লিক করলে ৫টা করে রিভিউ নিয়ে এসে আগের রিভিউ লিস্ট এ যোগ করে দিবে ।
+The **Navbar** is common across all pages but adapts based on user login status.
 
-  - Related Products সেকশন এ রিলেটেড প্রোডাক্ট গুলো নিয়ে এসে দেখাতে হবে ।
+- **If not logged in:** Show **Login** and **Signup** buttons.
+- **If logged in as a Farmer:** Show menu items: `Home`, `Add Product`, `Manage Products`, `About`, `Logout`.
+- **If logged in as a Customer:** Show menu items: `Home`, `Products`, `Farmers`, `My Orders`, `About`, `Logout`.
 
-- Payment Process পেজে -
+**Page Access and Functionality:**
 
-  - ইউজারের সিলেক্ট করা প্রোডাক্ট এবং কার্ট এ থাকা প্রোডাক্ট গুলো লিস্ট করে থাকবে, ইউজারের Delivery Address, Subtotal, Delivery Fee, Service Fee সহ Total Amount দেখাবে । আমাদের Fake Payment Simulate করার জন্যে ডান পাশের Payment Information এ ইউজার ইনফরমেশন প্রোভাইড করে পেমেন্ট করতে পারবে ।
+- Only farmer-type users can access the **Add Product** page to create new products.
+- Farmers can manage their products using the **Manage Products** page — edit, publish/unpublish, delete, search, or filter items.
+- All users (including guests) can view registered farmers on the **Farmers** page.
+- The **Cart** menu redirects users to the Cart Page (which must be designed following the app’s theme and design system).
+- A **Favorite Products** page should allow users to favorite/unfavorite products, purchase, or add them to the cart.
+- Proper handling of states such as **Loading**, **Error**, and **Not Found** is implemented.
+- **SEO-Friendly Pages:**  
+  The Home and Product Details pages include meta title, description, and image for social sharing (e.g., Facebook).  
+  Product details dynamically generate SEO metadata based on the product link.
+- A smooth **Breadcrumb Navigation** is implemented throughout the app.
 
-  - Payment সাবমিট করলে ইউজার কে "success.html" পেজ দেখাতে হবে । সেখানে Oder Details, Payment Summery দেখাতে হবে ।
+## Tech Stack
 
-  - সফল বুকিংয়ের পরে ইউজারকে ইমেইলে PDF ইনভয়েস পাঠাতে হবে ।
+- **Next.js 14 (with TypeScript):** Framework for building server-side rendered React applications.
+- **Yarn:** Dependency manager for fast and reliable installations.
+- **File-based Routing (Pages & API):** Automatic route generation for pages and API endpoints.
+- **Server Actions:** Simplifies server-side data mutation.
+- **React Icons:** Ready-to-use icons as React components.
+- **React Toastify:** Provides toast notifications for user feedback.
+- **Nodemailer (SMTP):** Handles email sending securely.
+- **ESLint:** Ensures consistent code quality and formatting.
+- **React PDF:** Generates PDF documents from React components.
+- **Next Themes:** Enables dark and light theme toggling.
+- **Next Auth:** Provides authentication using email, credentials, or Google.
+- **bcryptjs:** Secure password hashing library.
+- **Cloudinary:** Cloud-based image storage and optimization.
 
-  - Edit Order Details ব্যাটনে ক্লিক করলে মোডাল ওপেন হবে এবং কারেন্ট অর্ডার এর তথ্য যেমন প্রোডাক্ট এর পরিমাণ বা ডেলিভারি এড্রেস পরিবর্তন করা যাবে । এর জন্যে কোনো UI দেয়া হয় নি । আপনাদের নিজেদের করতে হবে ।
+## How to Clone and Run the Project
 
-- "success.html" পেজ এ -
+Follow these steps to get started:
 
-  - PDF আকারে Invoice Download করার ফিচার এড করতে হবে । Invoice এ কোম্পানির তথ্য, অর্ডারের তথ্য, গ্রাহকের তথ্য, Oder Details সহ প্রয়োজনীয় সকল তথ্য থাকবে PDF Invoice এ ।
+```bash
+# 1. Copy one of the following repository URLs:
 
-  - "View All Orders" বাটনে ক্লিক করলে, লগইন করা ইউজারের সকল অর্ডার গুলো দেখা যাবে । সকল অর্ডার গুলো দেখানোর জন্যে "bookings.html" এ টেম্পলেট দেয়া হয়েছে ।
+# HTTPS
+https://github.com/arafatGithubCode/farmfresh-reactive-accelerator-final-assignment-m11.git
 
-- ইউজারের বুকিং হিস্টরি দেখাতে "bookings.html" এর টেম্পলেট ব্যবহার করতে হবে । সেখানে -
+# SSH
+git@github.com:arafatGithubCode/farmfresh-reactive-accelerator-final-assignment-m11.git
 
-  - ইউজারের পূর্বের এবং বর্তমান সকল অর্ডার গুলো দেখা যাবে ।
 
-  - ইউজারের অর্ডার Invoice Download করা যাবে ।
+# 2. Clone the repository
+git clone <your-selected-url>
 
-  - অর্ডারের প্রোডাক্ট এ Review দেয়া যাবে ।
+# 3. Navigate to the project directory
+cd farmfresh-reactive-accelerator-final-assignment-m11
 
-  - অর্ডার ক্যান্সেল করা যাবে ।
+# 4. Install dependencies
+yarn
 
-  - লগইন ইউজার যদি "ফার্মার" হয় তবে এই পেজ এ তার সকল পণ্যের অর্ডার হওয়া তালিকা দেখবে এবং সে অর্ডার হওয়া পণ্যের অবস্থা পরিবর্তন করতে পারবে। পণ্যের অবস্থা: Pending, Confirmed, Shipped, Delivered, Cancled । অপর দিকে, লগইন ইউজার যদি "User" হয়, তাহলে সে তার Order Status দেখতে পারবে, সেই সাথে Download, Review, Reorder ফিচার ও ব্যবহার করতে পারবে ।
+# 5. Start the development server
+yarn run dev
+```
 
-  - Reorder এর ক্ষেত্রে ইউজারের জার্নি কেমন হবে, সেটা আপনি বিবেচনা করবেন ।
-
-✅ Navbar সকল পেজের জন্যে কমন । তবে ইউজার লগইন এর উপর ভিত্তি করে মেনু ভিন্ন হতে হবে । ইউজার যদি লগইন না করে, তবে Login & Signup বাটন দেখাতে হবে । যদি লগইন করা থাকে তাহলে ইউজারের ইউজারের ছবি ও নাম দেখাতে হবে । সেই সাথে লগইন করা ব্যাক্তি যদি ফার্মার হয় তবে এই মেনু গুলো দেখাতে হবে - "Home", "Add Product", "Manage Products", "About", "Logout" । আর লগইন করা ব্যাক্তি যদি নর্মাল ইউজার হয় তবে - "Home", "Products", "Farmers" "My Orders", "About", "Logout" দেখাতে হবে ।
-
-- Add Product পেজে শুধুমাত্র একজন ফার্মার টাইপের ইউজার যেতে পারবে । এই পেজের জন্যে create.html টেম্পলেট ব্যবহার করতে হবে । এই পেজের প্রয়োজনীয় তথ্য দিয়ে সাবমিট করলে নতুন প্রোডাক্ট তৈরি হবে ।
-
-- একজন ফার্মার তার তৈরি করা প্রোডাক্ট গুলো ম্যানেজ করতে manageList.html এর টেম্পলেট ব্যবহার করবে । সেখানে সে তার তৈরি করা প্রোডাক্ট Edit, Publish/unpublish, Delete, Search, filter করতে পারবে । সেই সাথে Add new Product বাটন থেকে পুনরায় Add করার পেজে যেতে পারবে ।
-
-- যেকোনো ইউজার (Anonymous/Farmar/User) Farmers পেজে গেলে Registered Farmar দের তথ্য দেখতে পারবে ।
-
-- Navbar থেকে Cart Menu তে ক্লিক করলে Cart Page এ নিয়ে যেতে হবে । কিন্তু আমরা আপনাকে Cart পেজ তৈরি করে দেই নি । আপনাকে পুরো এপ্লিকেশন এর Theme এবং Design System অনুযায়ী একটি Cart Page তৈরি করে নিতে হবে । অনুরূপ ভাবে Favourite পেজ ও আপনাকে বানাতে হবে । এবং মেনু এড করতে হবে, যেন ইউজার বা ফার্মার Favourite Products পেজে যেতে পারে এবং সেখান থেকে Favourite Toggle, Purchase, Cart Add করতে পারে ।
-
-- আপনাকে বিভিন্ন স্টেট যেমন - Loading, Error, Not found ইত্যাদি এবং ফর্ম ভ্যালিডেশন সঠিক ভাবে ম্যানেজ করতে হবে ।
-
-- হোম পেজ এবং প্রোডাক্ট ডিটেইলস পেজ SEO friendly হতে হবে । অর্থাৎ এই দুটি পেজে সঠিক ইনফরমেশন দিয়ে Meta title, description, image দেখাতে হবে । বিশেষ করে Product Details পেজে যেন প্রোডাক্ট এর লিংক এর উপর ভিত্তি করে Meta title, description, image Generate হয় । এবং সোশাল মিডিয়া যেমনঃ ফেসবুকে শেয়ার করলে যেন এই ইনফরমেশন গুলো দেখা যায় ।
+© 2025 Arafat Hossain – All Rights Reserved.

@@ -12,6 +12,37 @@ import {
 import { getUserSession } from "@/utils/getUserSession";
 import { redirect } from "next/navigation";
 
+export const metadata = {
+  title: "Local Farmer Booking - Fresh Produce Direct from Farmers",
+  description:
+    "**FarmFresh** is a web platform that connects farmers directly to customers, allowing them to sell their fresh farm products without any middlemen. It ensures transparency, fairness, and freshness for both farmers and consumers.",
+  openGraph: {
+    images: [
+      {
+        url: `${process.env.BASE_URL}/api/og`,
+        width: 1200,
+        height: 600,
+      },
+    ],
+  },
+};
+
+export async function generateMetadata({
+  params: { productId },
+}: {
+  params: { productId: string };
+}) {
+  const productInfo = await getProduct(productId);
+
+  return {
+    title: `Farmfresh - ${productInfo?.name}`,
+    description: productInfo?.description,
+    openGraph: {
+      images: [productInfo?.imagesUrl[0].url],
+    },
+  };
+}
+
 const ProductDetailsPage = async ({
   params: { productId },
 }: {

@@ -268,6 +268,7 @@ export const doChangePassword = async (
 
 // Perform reset password
 export const doResetPassword = async (formData: FormData) => {
+  await connectDB();
   try {
     const email = formData.get("email");
     const isExist = await getUserByEmail(email as string);
@@ -307,6 +308,7 @@ export const doResetPassword = async (formData: FormData) => {
 export const doVerifyResetKey = async (
   formData: FormData
 ): Promise<{ success: boolean; message: string }> => {
+  await connectDB();
   try {
     const formValues: IResetForm = {
       email: formData.get("email") as string,

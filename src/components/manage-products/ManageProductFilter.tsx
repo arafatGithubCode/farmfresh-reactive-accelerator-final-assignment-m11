@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import SearchByTerm from "../products/filter/SearchByTerm";
 
 const ManageProductFilter = () => {
@@ -24,7 +24,9 @@ const ManageProductFilter = () => {
     setQuery((prev) => ({ ...prev, [name]: value }));
   };
 
-  const params = new URLSearchParams(searchParams.toString());
+  const params = useMemo(() => {
+    return new URLSearchParams(searchParams.toString());
+  }, [searchParams]);
 
   const handleApplyFilter = () => {
     if (query.category) {
@@ -62,7 +64,7 @@ const ManageProductFilter = () => {
     }
 
     router.replace(`${pathname}?${params.toString()}`);
-  }, [pathname, query.category, query.status]);
+  }, [pathname, query.category, query.status, params, router]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">

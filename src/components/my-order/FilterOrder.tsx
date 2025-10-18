@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 
 const FilterOrder = () => {
   const [query, setQuery] = useState<string>("");
@@ -10,7 +10,9 @@ const FilterOrder = () => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const params = new URLSearchParams(searchParams.toString());
+  const params = useMemo(() => {
+    return new URLSearchParams(searchParams.toString());
+  }, [searchParams]);
 
   useEffect(() => {
     const orderStatus = params.get("orderStatus");
@@ -18,7 +20,7 @@ const FilterOrder = () => {
       params.set("orderStatus", "orderStatus");
     }
     router.replace(`${pathname}?${params.toString()}`);
-  }, []);
+  }, [params, pathname, router]);
 
   useEffect(() => {
     if (query) {
@@ -28,7 +30,7 @@ const FilterOrder = () => {
     }
 
     router.replace(`${pathname}?${params.toString()}`);
-  }, [query, pathname]);
+  }, [query, pathname, params, router]);
 
   return (
     <div className="mt-4 sm:mt-0">

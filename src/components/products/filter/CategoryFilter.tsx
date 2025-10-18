@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 
 const CategoryFilter = () => {
   const [query, setQuery] = useState<string[]>([]);
@@ -21,7 +21,9 @@ const CategoryFilter = () => {
     }
   };
 
-  const params = new URLSearchParams(searchParams.toString());
+  const params = useMemo(() => {
+    return new URLSearchParams(searchParams.toString());
+  }, [searchParams]);
 
   useEffect(() => {
     const category = params.get("category");
@@ -31,7 +33,7 @@ const CategoryFilter = () => {
       const decodedCategoryInQuery = decodedCategory.split("|");
       setQuery(decodedCategoryInQuery);
     }
-  }, []);
+  }, [params]);
 
   useEffect(() => {
     if (query.length > 0) {
@@ -41,7 +43,7 @@ const CategoryFilter = () => {
     }
 
     router.replace(`${pathname}?${params.toString()}`);
-  }, [pathname, query]);
+  }, [pathname, query, params, router]);
   return (
     <div className="mb-6">
       <h4 className="font-medium text-gray-900 dark:text-white mb-3">

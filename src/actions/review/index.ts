@@ -71,6 +71,7 @@ export const doCreateReview = async (
 export const doUpdateReview = async (
   reviewData: IReview
 ): Promise<{ success: boolean; message: string }> => {
+  await connectDB();
   try {
     const { id, comment, rating } = reviewData;
 
@@ -138,6 +139,7 @@ export const doLike = async (
 export const doDeleteReviewById = async (
   reviewId: string
 ): Promise<{ success: boolean; message: string }> => {
+  await connectDB();
   try {
     await Review.findByIdAndDelete(reviewId);
     return { success: true, message: "This review deleted successfully." };

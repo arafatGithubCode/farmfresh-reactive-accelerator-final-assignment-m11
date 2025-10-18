@@ -2,7 +2,7 @@
 
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
 const SearchByTerm = ({ width }: { width?: string }) => {
@@ -12,9 +12,11 @@ const SearchByTerm = ({ width }: { width?: string }) => {
   const pathname = usePathname();
   const router = useRouter();
 
-  const doDebounceSearch = useDebounce((term: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const params = useMemo(() => {
+    return new URLSearchParams(searchParams.toString());
+  }, [searchParams]);
 
+  const doDebounceSearch = useDebounce((term: string) => {
     if (term) {
       params.set("term", term);
     } else {
@@ -34,11 +36,11 @@ const SearchByTerm = ({ width }: { width?: string }) => {
   };
 
   useEffect(() => {
-    const term = searchParams.get("term");
+    const term = params.get("term");
     if (term) {
       setSearchTerm(term);
     }
-  }, []);
+  }, [params]);
 
   return (
     <div className="relative">

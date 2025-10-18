@@ -4,7 +4,7 @@ import FarmersPageHeader from "@/components/farmers/FarmersPageHeader";
 import FarmersStats from "@/components/farmers/FarmersStats";
 import { getAllFarmers } from "@/queries/user";
 
-const FarmersPage = async () => {
+const FarmersPage = async ({}) => {
   const farmers = await getAllFarmers();
   return (
     <>

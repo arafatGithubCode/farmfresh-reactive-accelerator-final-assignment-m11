@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 
 const OrganicFilter = () => {
   const [query, setQuery] = useState(false);
@@ -10,14 +10,16 @@ const OrganicFilter = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const params = new URLSearchParams(searchParams.toString());
+  const params = useMemo(() => {
+    return new URLSearchParams(searchParams.toString());
+  }, [searchParams]);
 
   useEffect(() => {
-    const organic = searchParams.get("organic");
+    const organic = params.get("organic");
     if (organic) {
       params.set("organic", organic);
     }
-  }, []);
+  }, [params]);
 
   useEffect(() => {
     if (query) {
@@ -27,7 +29,7 @@ const OrganicFilter = () => {
     }
 
     router.replace(`${pathname}?${params.toString()}`);
-  }, [query]);
+  }, [query, params, pathname, router]);
 
   return (
     <div className="mb-6">

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 
 const priceRanges = [
   { label: "Under ৳60", min: 0, max: 60 },
@@ -26,7 +26,9 @@ const PriceFilter = () => {
     }
   };
 
-  const params = new URLSearchParams(searchParams.toString());
+  const params = useMemo(() => {
+    return new URLSearchParams(searchParams.toString());
+  }, [searchParams]);
 
   useEffect(() => {
     const priceRange = params.get("priceRange");
@@ -34,7 +36,7 @@ const PriceFilter = () => {
       const decodedPriceRange = decodeURI(priceRange);
       setQuery(decodedPriceRange);
     }
-  }, []);
+  }, [params]);
 
   useEffect(() => {
     if (query) {
@@ -44,7 +46,7 @@ const PriceFilter = () => {
     }
 
     router.replace(`${pathname}?${params.toString()}`);
-  }, [query]);
+  }, [query, params, pathname, router]);
 
   return (
     <div className="mb-6">

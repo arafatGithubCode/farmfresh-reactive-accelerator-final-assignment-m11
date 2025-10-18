@@ -1,6 +1,7 @@
 import { getProductsByFarmerId } from "@/queries/product";
 import { IUserDB } from "@/types";
 import Image from "next/image";
+import Link from "next/link";
 import { FaMapMarkedAlt } from "react-icons/fa";
 import { FaCertificate, FaPhone, FaStar } from "react-icons/fa6";
 import Tags from "../ui/Tags";
@@ -20,7 +21,7 @@ const FarmerCard = async ({
     farmSizeUnit,
     id,
   } = farmer;
-  const products = await getProductsByFarmerId(id);
+  const { products } = await getProductsByFarmerId({}, id);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
@@ -72,12 +73,18 @@ const FarmerCard = async ({
           )}
         </div>
         <div className="flex space-x-3">
-          <button className="flex-1 bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium transition">
+          <Link
+            href={`/products?farmerId=${farmer.id}`}
+            className="flex-1 block bg-primary-600 hover:bg-primary-700 text-white py-2 rounded-lg font-medium text-center transition"
+          >
             View Products
-          </button>
-          <button className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+          </Link>
+          <Link
+            href="tel:01825639874"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition"
+          >
             <FaPhone />
-          </button>
+          </Link>
         </div>
       </div>
     </div>

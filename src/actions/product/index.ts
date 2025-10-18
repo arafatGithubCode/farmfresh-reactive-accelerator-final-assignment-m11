@@ -497,9 +497,9 @@ export const doUpdateOrderStatus = async (
     // customer actions
     if (role === "Customer") {
       if (currentStatus === "PLACED") {
-        newStatus = "CANCELED";
+        newStatus = "CANCELLED";
         successMessage = "Your order has been canceled successfully.";
-      } else if (currentStatus === "CANCELED") {
+      } else if (currentStatus === "CANCELLED") {
         newStatus = "PLACED";
         successMessage = "Your order has been placed again successfully.";
       }
@@ -511,7 +511,7 @@ export const doUpdateOrderStatus = async (
         PLACED: "CONFIRMED",
         CONFIRMED: "SHIPPED",
         SHIPPED: "DELIVERED",
-        CANCELED: "CANCELED",
+        CANCELLED: "CANCELLED",
         DELIVERED: "DELIVERED",
       };
 

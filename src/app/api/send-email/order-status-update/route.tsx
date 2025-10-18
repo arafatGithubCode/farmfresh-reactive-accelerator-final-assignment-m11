@@ -16,7 +16,7 @@ export const POST = async (req: NextRequest) => {
       CONFIRMED: "Your order has been confirmed by the farmer.",
       SHIPPED: "Your order is on the way!",
       DELIVERED: "Your order has been delivered successfully.",
-      CANCELED: "Your order has been canceled.",
+      CANCELLED: "Your order has been canceled.",
     };
 
     const subject = `Order #${id} - ${statusMessages[status]}`;

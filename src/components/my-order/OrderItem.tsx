@@ -42,13 +42,13 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
   const orderIdColor =
     order.status === "DELIVERED"
       ? "text-primary-500"
-      : order.status === "CANCELED"
+      : order.status === "CANCELLED"
       ? "text-red-500"
       : "text-yellow-500";
 
   // ===== Update Status Buttons =====
   const renderUpdateButtons = () => {
-    if (role !== "Farmer" && ["PLACED", "CANCELED"].includes(order.status)) {
+    if (role !== "Farmer" && ["PLACED", "CANCELLED"].includes(order.status)) {
       return (
         <UpdateOrderStatus
           orderId={order.id}
@@ -58,7 +58,7 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
       );
     }
 
-    if (role === "Farmer" && order.status !== "CANCELED") {
+    if (role === "Farmer" && order.status !== "CANCELLED") {
       return (
         <UpdateOrderStatus
           orderId={order.id}
@@ -68,7 +68,7 @@ const OrderItem = ({ order, role }: OrderItemProps) => {
       );
     }
 
-    if (role === "Farmer" && order.status === "CANCELED") {
+    if (role === "Farmer" && order.status === "CANCELLED") {
       return (
         <p className="text-sm text-red-500 mt-2">
           This order was canceled by{" "}

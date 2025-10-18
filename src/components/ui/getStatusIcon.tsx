@@ -5,7 +5,7 @@ export const getStatusIcon = (status: TOrderStatus) => {
   switch (status) {
     case "DELIVERED":
       return <FaCheckCircle className="mr-1" />;
-    case "CANCELED":
+    case "CANCELLED":
       return <FaSadTear className="mr-1" />;
     default:
       return <FaRegClock className="mr-1" />;

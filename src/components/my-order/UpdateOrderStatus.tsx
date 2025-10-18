@@ -67,7 +67,7 @@ const UpdateOrderStatus = ({
     }
 
     // Customer: Re-place canceled order
-    if (role === "Customer" && currentStatus === "CANCELED") {
+    if (role === "Customer" && currentStatus === "CANCELLED") {
       return (
         <Button
           type="button"
@@ -84,7 +84,7 @@ const UpdateOrderStatus = ({
     // Farmer: Forward status (PLACED → CONFIRMED → SHIPPED → DELIVERED)
     if (
       role === "Farmer" &&
-      !["DELIVERED", "CANCELED"].includes(currentStatus)
+      !["DELIVERED", "CANCELLED"].includes(currentStatus)
     ) {
       const nextLabel = getForwardOrderStatus(currentStatus);
       return (
@@ -108,7 +108,7 @@ const UpdateOrderStatus = ({
     <div
       onSubmit={handleSubmit}
       className={`${
-        currentStatus === "CANCELED" && role === "Customer"
+        currentStatus === "CANCELLED" && role === "Customer"
           ? ""
           : "border-t border-gray-200 dark:border-gray-600"
       } pt-4 flex flex-wrap gap-3`}

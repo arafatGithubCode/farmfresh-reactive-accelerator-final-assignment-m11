@@ -325,7 +325,7 @@ export type TOrderStatus =
   | "CONFIRMED"
   | "SHIPPED"
   | "DELIVERED"
-  | "CANCELED";
+  | "CANCELLED";
 export interface IOrder {
   customer: string | TBaseUser;
   farmer: string | TBaseUser;

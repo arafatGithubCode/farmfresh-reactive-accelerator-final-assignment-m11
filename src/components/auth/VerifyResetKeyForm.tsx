@@ -37,7 +37,7 @@ const VerifyResetKeyForm = ({}) => {
     initialValues,
     validate: validateResetForm,
     onSubmit: async (values) => {
-      setLoading(false);
+      setLoading(true);
       try {
         const formData = new FormData();
 

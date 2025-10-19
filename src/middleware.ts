@@ -1,10 +1,10 @@
-import NextAuth, { type NextAuthConfig } from "next-auth";
+import NextAuth from "next-auth";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { authConfig } from "./auth.config";
 import { LOGIN, PUBLIC_ROUTE, ROOT } from "./libs/route";
 
-const { auth } = NextAuth(authConfig as NextAuthConfig);
+const { auth } = NextAuth(authConfig);
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -32,4 +32,5 @@ export function middleware(req: NextRequest) {
 
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/"],
+  runtime: "nodejs",
 };

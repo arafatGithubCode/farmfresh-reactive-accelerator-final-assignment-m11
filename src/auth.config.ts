@@ -1,6 +1,12 @@
-export const authConfig = {
+import type { NextAuthConfig } from "next-auth";
+
+export const authConfig: NextAuthConfig = {
+  providers: [],
+  pages: {
+    signIn: "/auth/signin",
+  },
   session: {
     strategy: "jwt",
   },
-  providers: [],
+  secret: process.env.NEXTAUTH_SECRET,
 };

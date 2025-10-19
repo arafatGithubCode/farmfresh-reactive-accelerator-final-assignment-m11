@@ -458,7 +458,7 @@ export const doPayment = async (
 
     const order = await getOrderById(created._id.toString());
 
-    await fetch(`http://localhost:3000/api/send-email/order-invoice`, {
+    await fetch(`${process.env.BASE_URL}/api/send-email/order-invoice`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
